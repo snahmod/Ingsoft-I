@@ -3,7 +3,7 @@ from piso import Piso
 import sys
 
 def main():
-	robot = Robot(Piso(sys.argv[1], sys.argv[2]))
+	robot = Robot(Piso(int(sys.argv[1]), int(sys.argv[2])))
 	robot.excavar()
 
   

@@ -1,9 +1,9 @@
 class Brazo:
 
 	def girar(self, sentido, velocidadEnRPM, duracionEnMinutos):
-		self._sentido = sentido
-		self._velocidadEnRPM = velocidadEnRPM
-		self._duracionEnMinutos = duracionEnMinutos
+		self.__sentido = sentido
+		self.__velocidadEnRPM = velocidadEnRPM
+		self.__duracionEnMinutos = duracionEnMinutos
 		print("Se giro el brazo")
 
 	def accionar(self):
