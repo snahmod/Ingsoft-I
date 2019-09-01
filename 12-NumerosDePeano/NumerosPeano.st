@@ -19,11 +19,27 @@ I class
 + unNumero
 	^unNumero next! !
 
-!I class methodsFor: 'as yet unclassified' stamp: 'aa 8/26/2019 20:53:47'!
-/ unNumero
-	unNumero = I ifFalse: [self error]! !
+!I class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:08:32'!
+- unNumero
+	self error: self descripcionDeErrorDeNumerosNegativosNoSoportados! !
 
-!I class methodsFor: 'as yet unclassified' stamp: 'aa 8/27/2019 18:11:52'!
+!I class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:07:48'!
+/ unNumero
+	unNumero = I ifFalse: [self error: self descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor]! !
+
+!I class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:26:29'!
+< unNumero
+	^ (self == unNumero) not! !
+
+!I class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:07:01'!
+descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
+	^'No se puede dividir por un número mayor'! !
+
+!I class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:06:05'!
+descripcionDeErrorDeNumerosNegativosNoSoportados
+	^'Números negativos no soportados'! !
+
+!I class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:58:45'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
@@ -33,6 +49,10 @@ initializeCollaboratorsFromFile
 next
 	next := II.
 	^next! !
+
+!I class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:08:53'!
+previous
+	self error: self descripcionDeErrorDeNumerosNegativosNoSoportados! !
 
 
 !classDefinition: #II category: #NumerosPeano!
@@ -56,18 +76,30 @@ II class
 + unNumero
 	^self previous + unNumero next! !
 
-!II class methodsFor: 'as yet unclassified' stamp: 'aa 8/27/2019 17:54:45'!
+!II class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:17:13'!
 - unNumero
-	^self previous - ([unNumero previous]
-						on: MessageNotUnderstood
-						do: [^self previous])! !
+	^self previous - ([unNumero previous] on: Error do: [^self previous])! !
 
-!II class methodsFor: 'as yet unclassified' stamp: 'aa 8/27/2019 18:05:04'!
+!II class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:47:54'!
 / unNumero
 	self == unNumero ifTrue: [^I].
+	self < unNumero ifTrue: [self error: self descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor].
 	^self - unNumero / unNumero + I! !
 
-!II class methodsFor: 'as yet unclassified' stamp: 'aa 8/27/2019 18:11:52'!
+!II class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:38:49'!
+< unNumero
+	(I < unNumero) ifTrue: [^self previous < unNumero previous].
+	^false! !
+
+!II class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:20:48'!
+descripcionDeErrorDeNoSePuedeDividirPorUnNumeroMayor
+	^'No se puede dividir por un número mayor'! !
+
+!II class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:21:05'!
+descripcionDeErrorDeNumerosNegativosNoSoportados
+	^'Números negativos no soportados'! !
+
+!II class methodsFor: 'as yet unclassified' stamp: 'aa 9/1/2019 15:58:45'!
 initializeCollaboratorsFromFile
 	"Auto generated method for loading purposes - Do not modify it"
 
