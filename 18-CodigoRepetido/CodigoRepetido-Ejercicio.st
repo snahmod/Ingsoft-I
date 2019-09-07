@@ -21,6 +21,35 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
+!CustomerBookTest methodsFor: 'testBehaviours' stamp: 'aa 9/6/2019 18:02:12'!
+createCustomerBookWithCustomer: aCustomerName
+
+	| customerBook |
+	
+	customerBook := CustomerBook new.
+	customerBook addCustomerNamed: aCustomerName.
+	^customerBook ! !
+
+!CustomerBookTest methodsFor: 'testBehaviours' stamp: 'aa 9/7/2019 15:08:15'!
+verifyCustomerBook: customerBook hasNumberOfActiveCustomers: numberOfActiveCustomers andSuspendedCustomers: numberOfSuspendedCustomers
+
+	self assert: numberOfActiveCustomers equals: customerBook numberOfActiveCustomers.
+	self assert: numberOfSuspendedCustomers equals: customerBook numberOfSuspendedCustomers.
+	self assert: (numberOfActiveCustomers  + numberOfSuspendedCustomers) equals: customerBook numberOfCustomers.! !
+
+!CustomerBookTest methodsFor: 'testBehaviours' stamp: 'aa 9/6/2019 18:03:07'!
+verifyThatClosureDoesNotChangeCustomerBook: closure andRaises: errorType
+	
+	| customerBook johnLennon |
+
+	johnLennon := 'John Lennon'.
+	customerBook := self createCustomerBookWithCustomer: johnLennon .
+		
+	self should: [closure value: customerBook value: johnLennon ] raise: errorType.
+	self assert: customerBook numberOfCustomers = 1.
+	self assert: (customerBook includesCustomerNamed: johnLennon)	! !
+
+
 !CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/2/2019 19:33:33'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
@@ -32,14 +61,13 @@ test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/2/2019 19:41:35'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/6/2019 18:03:47'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
 	| customerBook paulMcCartney |
-	
-	customerBook := CustomerBook new.
+
 	paulMcCartney := 'Paul McCartney'.
-	customerBook addCustomerNamed: paulMcCartney.
+	customerBook  := self createCustomerBookWithCustomer: paulMcCartney .
 	
 	self assert: (Time millisecondsToRun: [customerBook removeCustomerNamed: paulMcCartney.]) * millisecond < (100 * millisecond)
 	
@@ -55,86 +83,62 @@ test03CanNotAddACustomerWithEmptyName
 	self should: [customerBook addCustomerNamed: ''] raise: Error description: CustomerBook customerCanNotBeEmptyErrorMessage.
 	self assert: customerBook isEmpty! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/2/2019 20:44:59'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/7/2019 15:11:37'!
 test04CanNotRemoveAnInvalidCustomer
 	
-	| customerBook johnLennon |
-			
-	customerBook := CustomerBook new.
-	johnLennon := 'John Lennon'.
-	customerBook addCustomerNamed: johnLennon.
-		
-	self should: [customerBook removeCustomerNamed: 'Paul McCartney'] raise: NotFound.
-	self assert: customerBook numberOfCustomers = 1.
-	self assert: (customerBook includesCustomerNamed: johnLennon)! !
+	self verifyThatClosureDoesNotChangeCustomerBook: [:customerBook :customerName |
+		customerBook removeCustomerNamed: 'NOT_A_CUSTOMER'
+	] andRaises: NotFound! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 4/3/2019 10:50:25'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/7/2019 15:08:54'!
 test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney|
 	
-	customerBook := CustomerBook new.
 	paulMcCartney := 'Paul McCartney'.
+	customerBook  := self createCustomerBookWithCustomer: paulMcCartney .
 	
-	customerBook addCustomerNamed: paulMcCartney.
 	customerBook suspendCustomerNamed: paulMcCartney.
 	
-	self assert: 0 equals: customerBook numberOfActiveCustomers.
-	self assert: 1 equals: customerBook numberOfSuspendedCustomers.
-	self assert: 1 equals: customerBook numberOfCustomers.
+	self verifyCustomerBook: customerBook hasNumberOfActiveCustomers: 0 andSuspendedCustomers: 1.
 	self assert: (customerBook includesCustomerNamed: paulMcCartney).
 	
 
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'NR 4/3/2019 10:50:28'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/7/2019 15:09:30'!
 test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 
 	| customerBook paulMcCartney|
 	
-	customerBook := CustomerBook new.
 	paulMcCartney := 'Paul McCartney'.
+	customerBook  := self createCustomerBookWithCustomer: paulMcCartney .
 	
-	customerBook addCustomerNamed: paulMcCartney.
 	customerBook suspendCustomerNamed: paulMcCartney.
 	customerBook removeCustomerNamed: paulMcCartney.
 	
-	self assert: 0 equals: customerBook numberOfActiveCustomers.
-	self assert: 0 equals: customerBook numberOfSuspendedCustomers.
-	self assert: 0 equals: customerBook numberOfCustomers.
+	self verifyCustomerBook: customerBook hasNumberOfActiveCustomers: 0 andSuspendedCustomers: 0.
 	self deny: (customerBook includesCustomerNamed: paulMcCartney).
 
 
 	
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/2/2019 20:53:11'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/6/2019 17:58:08'!
 test07CanNotSuspendAnInvalidCustomer
 	
-	| customerBook johnLennon |
-			
-	customerBook := CustomerBook new.
-	johnLennon := 'John Lennon'.
-	customerBook addCustomerNamed: johnLennon.
-	
-	self should: [customerBook suspendCustomerNamed: 'Paul McCartney'] raise: CantSuspend.
-	self assert: customerBook numberOfCustomers = 1.
-	self assert: (customerBook includesCustomerNamed: johnLennon)
+	self verifyThatClosureDoesNotChangeCustomerBook: [:customerBook :customerName |
+		customerBook suspendCustomerNamed: 'NOT_A_CUSTOMER'
+	] andRaises: CantSuspend
 ! !
 
-!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/2/2019 21:02:03'!
+!CustomerBookTest methodsFor: 'testing' stamp: 'aa 9/6/2019 17:57:54'!
 test08CanNotSuspendAnAlreadySuspendedCustomer
-	
-	| customerBook johnLennon |
-			
-	customerBook := CustomerBook new.
-	johnLennon := 'John Lennon'.
-	customerBook addCustomerNamed: johnLennon.
-		
-	self should: [2 timesRepeat: [customerBook suspendCustomerNamed: johnLennon]] raise: CantSuspend.
-	self assert: customerBook numberOfCustomers = 1.
-	self assert: (customerBook includesCustomerNamed: johnLennon)! !
+
+	self verifyThatClosureDoesNotChangeCustomerBook: [ :customerBook :customerName |
+		2 timesRepeat: [customerBook suspendCustomerNamed: customerName]
+	] andRaises: CantSuspend ! !
 
 
 !classDefinition: #CustomerBook category: #'CodigoRepetido-Ejercicio'!
