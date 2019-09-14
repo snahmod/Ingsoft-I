@@ -450,16 +450,13 @@ divideAnEntero: anEntero
 	
 	^Fraccion with: anEntero over: self! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HAW 9/24/2018 08:47:50'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'aa 9/14/2019 20:19:54'!
 fibonacci
 
 	| one two |
 	
-	one := Entero with: 1.
-	two := Entero with: 2.
-	
-	self isNegative ifTrue: [self error: Entero negativeFibonacciErrorDescription ].	
-	(self isZero or: [self isOne]) ifTrue: [^one].
+	one := Uno initalize.
+	two := Positivo with: 2.
 	
 	^ (self - one) fibonacci + (self - two) fibonacci
 		! !
@@ -528,20 +525,20 @@ printOn: aStream
 	aStream print: value ! !
 
 
-!Entero methodsFor: 'testing' stamp: 'NR 9/23/2018 22:17:55'!
+!Entero methodsFor: 'testing' stamp: 'aa 9/14/2019 17:49:17'!
 isNegative
 	
-	^value < 0! !
+	^self subclassResponsibility! !
 
-!Entero methodsFor: 'testing' stamp: 'HernanWilkinson 5/7/2016 20:14'!
+!Entero methodsFor: 'testing' stamp: 'aa 9/14/2019 17:49:59'!
 isOne
 	
-	^value = 1! !
+	^self subclassResponsibility ! !
 
-!Entero methodsFor: 'testing' stamp: 'HernanWilkinson 5/7/2016 20:12'!
+!Entero methodsFor: 'testing' stamp: 'aa 9/14/2019 17:50:09'!
 isZero
 	
-	^value = 0! !
+	^self subclassResponsibility ! !
 
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
@@ -554,13 +551,207 @@ Entero class
 negativeFibonacciErrorDescription
 	^ ' Fibonacci no está definido aquí para Enteros Negativos'! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'HernanWilkinson 5/7/2016 22:53'!
+!Entero class methodsFor: 'instance creation' stamp: 'aa 9/14/2019 18:58:43'!
 with: aValue 
 	
+	|cero uno|
+	
+	cero := Cero initalize.
+	uno := Uno initalize .
+
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
 	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
 	
-	^self new initalizeWith: aValue! !
+	aValue = cero integerValue ifTrue: [^cero ].
+	aValue = uno integerValue ifTrue: [^uno ].
+	aValue  < (cero integerValue) ifTrue: [^Negativo new initalizeWith: aValue ].
+	^Positivo new initalizeWith: aValue.! !
+
+
+!classDefinition: #Cero category: #'Numero-Exercise'!
+Entero subclass: #Cero
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Cero methodsFor: 'testing' stamp: 'aa 9/14/2019 18:22:57'!
+isNegative
+
+	^false! !
+
+!Cero methodsFor: 'testing' stamp: 'aa 9/14/2019 18:23:05'!
+isOne
+
+	^false! !
+
+!Cero methodsFor: 'testing' stamp: 'aa 9/14/2019 19:01:01'!
+isZero
+
+	^true! !
+
+
+!Cero methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:15:28'!
+divide: aDividend
+
+	^Fraccion with: aDividend overCero: self! !
+
+!Cero methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:15:37'!
+dividedByNegativo: aDivisor
+
+	^Fraccion withCero: self overNegativo: aDivisor ! !
+
+!Cero methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:15:43'!
+dividedByPositivo: aDivisor
+
+	^Fraccion withCero: self overPositivo: aDivisor ! !
+
+
+!Cero methodsFor: 'arithmetic operations' stamp: 'aa 9/14/2019 20:20:36'!
+fibonacci
+
+	^Uno initalize ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Cero class' category: #'Numero-Exercise'!
+Cero class
+	instanceVariableNames: ''!
+
+!Cero class methodsFor: 'instance creation' stamp: 'aa 9/14/2019 18:27:16'!
+initalize
+
+	^self new initalizeWith: 0 ! !
+
+
+!classDefinition: #Negativo category: #'Numero-Exercise'!
+Entero subclass: #Negativo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Negativo methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:15:49'!
+divide: aDividend
+
+	^Fraccion with: aDividend overNegativo: self.! !
+
+!Negativo methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:15:53'!
+dividedByNegativo: aDivisor
+
+	^Fraccion withNegativo: self overNegativo: aDivisor ! !
+
+!Negativo methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:15:58'!
+dividedByPositivo: aDivisor
+
+	^Fraccion withNegativo: self overPositivo: aDivisor ! !
+
+
+!Negativo methodsFor: 'testing' stamp: 'aa 9/14/2019 17:51:59'!
+isNegative
+
+	^true! !
+
+!Negativo methodsFor: 'testing' stamp: 'aa 9/14/2019 17:52:22'!
+isOne
+
+	^false! !
+
+!Negativo methodsFor: 'testing' stamp: 'aa 9/14/2019 17:51:51'!
+isZero
+
+	^false! !
+
+
+!Negativo methodsFor: 'arithmetic operations' stamp: 'aa 9/14/2019 20:18:57'!
+fibonacci
+
+	self error: Entero negativeFibonacciErrorDescription! !
+
+
+!classDefinition: #Positivo category: #'Numero-Exercise'!
+Entero subclass: #Positivo
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Positivo methodsFor: 'testing' stamp: 'aa 9/14/2019 17:53:27'!
+isNegative
+
+	^false! !
+
+!Positivo methodsFor: 'testing' stamp: 'aa 9/14/2019 17:54:36'!
+isOne
+
+	^false! !
+
+!Positivo methodsFor: 'testing' stamp: 'aa 9/14/2019 17:54:46'!
+isZero
+
+	^false! !
+
+
+!Positivo methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:16:05'!
+divide: aDividend
+
+	^Fraccion with: aDividend overPositivo: self.! !
+
+!Positivo methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:16:09'!
+dividedByNegativo: aDivisor
+
+	^Fraccion withPositivo: self overNegativo: aDivisor ! !
+
+!Positivo methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:16:14'!
+dividedByPositivo: aDivisor
+
+	^Fraccion withPositivo: self overPositivo: aDivisor ! !
+
+
+!classDefinition: #Uno category: #'Numero-Exercise'!
+Positivo subclass: #Uno
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Numero-Exercise'!
+
+!Uno methodsFor: 'testing' stamp: 'aa 9/14/2019 17:55:17'!
+isOne
+
+	^true! !
+
+
+!Uno methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:16:19'!
+divide: aDividend
+
+	^Fraccion with: aDividend overUno: self.! !
+
+!Uno methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:16:24'!
+dividedByNegativo: aDivisor
+
+	^Fraccion withUno: self overNegativo: aDivisor ! !
+
+!Uno methodsFor: 'initialization' stamp: 'aa 9/14/2019 20:16:29'!
+dividedByPositivo: aDivisor
+
+	^Fraccion withUno: self overPositivo: aDivisor ! !
+
+
+!Uno methodsFor: 'arithmetic operations' stamp: 'aa 9/14/2019 20:19:22'!
+fibonacci
+
+	^self! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Uno class' category: #'Numero-Exercise'!
+Uno class
+	instanceVariableNames: ''!
+
+!Uno class methodsFor: 'instance creation' stamp: 'aa 9/14/2019 18:28:31'!
+initalize
+
+	^self new initalizeWith: 1! !
 
 
 !classDefinition: #Fraccion category: #'Numero-Exercise'!
@@ -709,21 +900,87 @@ printOn: aStream
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'NR 9/23/2018 23:45:19'!
-with: aDividend over: aDivisor
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 20:07:37'!
+reduceWith: aDividend over: aDivisor
 
-	| greatestCommonDivisor numerator denominator |
-	
-	aDivisor isZero ifTrue: [ self error: self canNotDivideByZeroErrorDescription ].
-	aDividend isZero ifTrue: [ ^aDividend ].
-	
-	aDivisor isNegative ifTrue:[ ^aDividend negated / aDivisor negated].
+	|greatestCommonDivisor numerator denominator|
 	
 	greatestCommonDivisor := aDividend greatestCommonDivisorWith: aDivisor. 
 	numerator := aDividend // greatestCommonDivisor.
 	denominator := aDivisor // greatestCommonDivisor.
 	
 	denominator isOne ifTrue: [ ^numerator ].
+	
+	^self new initializeWith: numerator over: denominator! !
 
-	^self new initializeWith: numerator over: denominator
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 19:16:34'!
+with: aDividend over: aDivisor
+	
+	^aDivisor divide: aDividend
 	! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 19:14:02'!
+with: aDividend overCero: aDivisor
+	
+	^self error: self canNotDivideByZeroErrorDescription
+	! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 20:01:28'!
+with: aDividend overNegativo: aDivisor
+	
+	^aDividend dividedByNegativo: aDivisor 
+	! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 20:01:20'!
+with: aDividend overPositivo: aDivisor
+	
+	^aDividend dividedByPositivo: aDivisor 
+	! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 20:09:41'!
+with: aDividend overUno: aDivisor
+	
+	^aDividend
+	! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 19:58:41'!
+withCero: aDividend overNegativo: aDivisor
+	
+	^aDividend 
+	! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 19:44:59'!
+withCero: aDividend overPositivo: aDivisor
+	
+	^aDividend 
+	! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 19:47:29'!
+withNegativo: aDividend overNegativo: aDivisor
+	
+	^aDividend negated / aDivisor negated! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 20:12:00'!
+withNegativo: aDividend overPositivo: aDivisor
+	
+	^self reduceWith: aDividend over: aDivisor ! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 19:47:16'!
+withPositivo: aDividend overNegativo: aDivisor
+	
+	^aDividend negated / aDivisor negated! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 20:06:40'!
+withPositivo: aDividend overPositivo: aDivisor
+	
+	^self reduceWith: aDividend over: aDivisor ! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 19:47:02'!
+withUno: aDividend overNegativo: aDivisor
+	
+	^aDividend negated / aDivisor negated! !
+
+!Fraccion class methodsFor: 'intance creation' stamp: 'aa 9/14/2019 19:56:02'!
+withUno: aDividend overPositivo: aDivisor
+	
+	^self new initializeWith: aDividend over: aDivisor! !
