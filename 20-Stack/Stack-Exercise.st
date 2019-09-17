@@ -266,7 +266,64 @@ with: aValue
 
 !classDefinition: #SentenceFinderByPrefix category: #'Stack-Exercise'!
 Object subclass: #SentenceFinderByPrefix
-	instanceVariableNames: ''
+	instanceVariableNames: 'stack'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Stack-Exercise'!
+
+!SentenceFinderByPrefix methodsFor: 'testing' stamp: 'Eden 9/17/2019 20:56:24'!
+find: aPrefix
+
+	|elements elementsWithPrefix|.
+	
+	elements := self getOrderCollectionFromStack. 
+	elementsWithPrefix := elements select: [:element |  aPrefix, '*' match: element ].
+	self recoverStackFromOrderCollection: elements.
+
+	^elementsWithPrefix
+	
+	! !
+
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'Eden 9/17/2019 20:52:11'!
+getOrderCollectionFromStack
+	
+	|elements|
+	
+	elements := OrderedCollection new.
+
+	(stack size) timesRepeat: [
+		elements addFirst: stack top.
+		stack pop
+	].
+	
+	^elements
+	
+
+	
+! !
+
+!SentenceFinderByPrefix methodsFor: 'private' stamp: 'Eden 9/17/2019 20:54:54'!
+recoverStackFromOrderCollection: anOrderCollection
+
+	(anOrderCollection size) timesRepeat: [
+		stack push: anOrderCollection last.
+		anOrderCollection removeLast.
+	].
+! !
+
+
+!SentenceFinderByPrefix methodsFor: 'initialization' stamp: 'Eden 9/17/2019 20:11:57'!
+initializeWithStack: aStack
+	stack := aStack! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SentenceFinderByPrefix class' category: #'Stack-Exercise'!
+SentenceFinderByPrefix class
+	instanceVariableNames: 'stack'!
+
+!SentenceFinderByPrefix class methodsFor: 'instance creation' stamp: 'Eden 9/17/2019 20:10:02'!
+with: aStack
+	
+ 	^SentenceFinderByPrefix new initializeWithStack: aStack! !
