@@ -26,18 +26,38 @@ test02MarsRoverRecievesEmptyInstructionsAndDoesNothing
 	self assert: originPosition equals: rover position.
 	self assert: originDirection equals: rover direction.! !
 
-!MarsRoverTest methodsFor: 'tests' stamp: 'aa 10/3/2019 21:45:14'!
-test03MarsRoverRecievesInvalidInstructionsAndRaisesError
+!MarsRoverTest methodsFor: 'tests' stamp: 'aa 10/4/2019 17:24:25'!
+test03MarsRoverRecievesAnInvalidInstructionAndDoesNothing
 
 	| rover |
 	
 	rover := MarsRover withPosition: originPosition withDirection: #North.
+	rover doInstructions: 'x'.
 	
-	self should: [rover doInstructions: 'x'] raise: Error - MessageNotUnderstood
-		withExceptionDo: [ :error |
-			self assert: error messageText equals: MarsRover invalidInstructionsErrorDescription.
-			self assert: originPosition equals: rover position.
-			self assert: originDirection equals: rover direction.]! !
+	self assert: originPosition equals: rover position.
+	self assert: originDirection equals: rover direction.! !
+
+!MarsRoverTest methodsFor: 'tests' stamp: 'aa 10/4/2019 17:31:21'!
+test04MarsRoverRecievesFAndShouldMoveForward
+
+	| rover |
+	
+	rover := MarsRover withPosition: originPosition withDirection: #North.
+	rover doInstructions: 'f'.
+	
+	self assert: 0@1 equals: rover position.
+	self assert: originDirection equals: rover direction.! !
+
+!MarsRoverTest methodsFor: 'tests' stamp: 'aa 10/4/2019 17:36:25'!
+test05MarsRoverRecievesBAndShouldMoveBackwards
+
+	| rover |
+	
+	rover := MarsRover withPosition: originPosition withDirection: #North.
+	rover doInstructions: 'b'.
+	
+	self assert: 0@-1 equals: rover position.
+	self assert: originDirection equals: rover direction.! !
 
 
 !MarsRoverTest methodsFor: 'setup' stamp: 'aa 10/3/2019 21:24:57'!
@@ -72,16 +92,15 @@ position
 	^position ! !
 
 
-!MarsRover methodsFor: 'actions' stamp: 'aa 10/3/2019 21:38:14'!
+!MarsRover methodsFor: 'actions' stamp: 'aa 10/4/2019 17:38:27'!
 doInstructions: instructions 
 
-	(self areValidInstructions: instructions) ifFalse: [self error: self class invalidInstructionsErrorDescription ].! !
+	instructions isEmpty ifTrue: [^self].
+	(#($f $b $l $r) includes: instructions first) ifFalse: [^self].
+	
+	(instructions first = $f) ifTrue: [position := position + (0@1)].
+	(instructions first = $b) ifTrue: [position := position - (0@1)]! !
 
-
-!MarsRover methodsFor: 'private' stamp: 'aa 10/3/2019 21:40:44'!
-areValidInstructions: instructions
-
-	^instructions allSatisfy: [ :instruction | #($f $b $l $r) includes: instruction ]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
