@@ -567,25 +567,30 @@ moveFrom: fromPoint to: toPoint
 	(board at: toPoint ) fetchFrom: (board at: fromPoint ) .! !
 
 
-!TerniLapilliBoard methodsFor: 'testing' stamp: 'aa 10/14/2019 21:57:12'!
+!TerniLapilliBoard methodsFor: 'testing' stamp: 'aa 10/14/2019 22:35:37'!
 hasPlayerOWon
 
-	^(#(-1 0 1) anySatisfy: [ :column |
-		(board keys select: [:position | position x == column and: [(board at: position) isPlayerO]]) size == 3])
-	| (#(-1 0 1) anySatisfy: [ :row |
-		(board keys select: [:position | position y == row and: [(board at: position) isPlayerO]]) size == 3])
-	| ((board keys select: [:position | position y == position x and: [(board at: position) isPlayerO]]) size == 3)
-	| ((board keys select: [:position | position y == position x negated and: [(board at: position) isPlayerO]]) size == 3)! !
+	^self hasPlayerWon: #isPlayerO! !
 
-!TerniLapilliBoard methodsFor: 'testing' stamp: 'aa 10/14/2019 22:12:53'!
+!TerniLapilliBoard methodsFor: 'testing' stamp: 'aa 10/14/2019 22:34:58'!
+hasPlayerWon: playerMethod
+
+	^(self straightWin: [:column | [:position | position x == column and: [(board at: position) perform: playerMethod ]]])
+	| (self straightWin: [:row | [:position | position y == row and: [(board at: position) perform: playerMethod ]]])
+	| ((board keys select: [:position | position y == position x and: [(board at: position) perform: playerMethod ]]) size == 3)
+	| ((board keys select: [:position | position y == position x negated and: [(board at: position) perform: playerMethod ]]) size == 3)! !
+
+!TerniLapilliBoard methodsFor: 'testing' stamp: 'aa 10/14/2019 22:35:30'!
 hasPlayerXWon
 
-	^(#(-1 0 1) anySatisfy: [ :column |
-		(board keys select: [:position | position x == column and: [(board at: position) isPlayerX]]) size == 3])
-	| (#(-1 0 1) anySatisfy: [ :row |
-		(board keys select: [:position | position y == row and: [(board at: position) isPlayerX]]) size == 3])
-	| ((board keys select: [:position | position y == position x and: [(board at: position) isPlayerX]]) size == 3)
-	| ((board keys select: [:position | position y == position x negated and: [(board at: position) isPlayerX]]) size == 3)! !
+	^self hasPlayerWon: #isPlayerX! !
+
+!TerniLapilliBoard methodsFor: 'testing' stamp: 'aa 10/14/2019 22:28:30'!
+straightWin: aClosure
+
+	^(#(-1 0 1) anySatisfy: [ :line |
+		(board keys select: (aClosure value: line)) size == 3])
+	! !
 
 
 !TerniLapilliBoard methodsFor: 'validators' stamp: 'aa 10/14/2019 22:14:48'!
