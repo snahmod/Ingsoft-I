@@ -46,8 +46,8 @@ test03PortfolioRegistersTwoAccountsAndDepositIncreasesBalanceOnTransactionValue
 	self assert: 400 equals: portfolio balance .
 ! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'Eden 10/17/2019 19:21:06'!
-test04PortfolioRegistersTwoIdenticalAccountsAndBalanceDoesNotDuplicate
+!PortfolioTest methodsFor: 'tests' stamp: 'Eden 10/19/2019 16:16:33'!
+test04PortfolioRegistersTwoIdenticalAccountsShouldRaiseError
 
 	| portfolio account |
 	portfolio := Portfolio new.
@@ -55,9 +55,10 @@ test04PortfolioRegistersTwoIdenticalAccountsAndBalanceDoesNotDuplicate
 	
 	portfolio registerAccount: account.
 	Deposit register: 100 on: account.
-	portfolio registerAccount: account.
 	
-	self assert: 100 equals: portfolio balance.
+	self should: [portfolio registerAccount: account] raise: Error - MessageNotUnderstood
+		withMessageText: 'Ya existe la cuenta en el portfolio'.
+	self assert: (portfolio balance) equals: 100.
 	
 	
 ! !
@@ -251,6 +252,108 @@ test15PortfolioRegistersPorfolioWithAccountAndBalanceShouldBeAccounts
 	Deposit register: 100 on: account.
 		
 	self assert: 100 equals: portfolio balance .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'Eden 10/19/2019 16:01:41'!
+test16ShouldRaiseErrorWhenAddingAnAccountInsideAPortfolioInsideAPortfolioWithTheSameAccount
+
+	| portfolio account portfolio2 |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	
+	portfolio registerPortfolio: portfolio2 .
+	
+	account := ReceptiveAccount  new.
+	
+	portfolio registerAccount: account.
+	Deposit register: 100 on: account.
+	
+	self should: [portfolio2 registerAccount: account] raise: Error - MessageNotUnderstood
+		withMessageText: 'Ya existe la cuenta en el portfolio'.
+		
+	self assert: 100 equals: portfolio balance .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'Eden 10/19/2019 16:26:08'!
+test17ShouldRaiseErrorWhenAddingAnAccountInsideAPortfolioThatHasAPortfolioWithSameAccount
+
+	| portfolio account portfolio2 |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	
+	portfolio registerPortfolio: portfolio2 .
+	
+	account := ReceptiveAccount  new.
+	
+	portfolio2 registerAccount: account.
+	Deposit register: 100 on: account.
+	
+	self should: [portfolio registerAccount: account] raise: Error - MessageNotUnderstood
+		withMessageText: 'Ya existe la cuenta en el portfolio'.
+		
+	self assert: 100 equals: portfolio balance .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'Eden 10/19/2019 16:26:02'!
+test18ShouldRaiseErrorWhenAddingAPortfolioWithAnAccountToSamePortfolio
+
+	| portfolio account|
+	portfolio := Portfolio new.
+	account := ReceptiveAccount  new.
+	
+	portfolio registerAccount: account.
+	portfolio registerPortfolio: portfolio.
+
+	Deposit register: 100 on: account.
+	
+	self should: [portfolio registerPortfolio: portfolio.] raise: Error - MessageNotUnderstood
+		withMessageText: 'Ya existe la cuenta en el portfolio'.
+		
+	self assert: 100 equals: portfolio balance .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'Eden 10/19/2019 16:25:55'!
+test19ShouldRaiseErrorWhenAddingAnAccountToAPortfolioThatIsInTwoPortfoliosWithSameAccount
+
+	| portfolio portfolio2 portfolio3 account|
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+	account := ReceptiveAccount  new.
+	
+	portfolio registerAccount: account.
+	portfolio registerPortfolio: portfolio2.
+	
+	portfolio3 registerAccount: account.
+	portfolio3 registerPortfolio: portfolio2.
+
+	Deposit register: 100 on: account.
+	
+	self should: [portfolio2 registerAccount: account.] raise: Error - MessageNotUnderstood
+		withMessageText: 'Ya existe la cuenta en el portfolio'.
+		
+	self assert: 100 equals: portfolio balance .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'Eden 10/19/2019 16:25:49'!
+test20ShouldRaiseErrorWhenAddingAPortfolioWithAnAccountInAPortfolioWithSameAccount
+
+	| portfolio portfolio2 portfolio3 account|
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+	account := ReceptiveAccount  new.
+	
+	portfolio registerAccount: account.
+	portfolio2 registerAccount: account.
+	portfolio2 registerPortfolio: portfolio3.
+
+	Deposit register: 100 on: account.
+	
+	self should: [portfolio3 registerAccount: portfolio.] raise: Error - MessageNotUnderstood
+		withMessageText: 'Ya existe la cuenta en el portfolio'.
+		
+	self assert: 100 equals: portfolio2 balance .
 ! !
 
 
@@ -461,6 +564,11 @@ balance
 
 	^children sum: [ :child | child balance ] ifEmpty: [ 0 ]! !
 
+!Portfolio methodsFor: 'testing' stamp: 'Eden 10/19/2019 16:24:44'!
+hasAccount: account
+	
+	^ (children includes: account) | ((parents select: [:portfolioParent | portfolioParent hasAccount: account]) size > 0)! !
+
 !Portfolio methodsFor: 'testing' stamp: 'Eden 10/17/2019 20:45:45'!
 hasRegistered: aTransaction
 	^ self transactions includes: aTransaction.! !
@@ -472,16 +580,16 @@ registerPortfolio: aPortfolio
 	children add: aPortfolio .! !
 
 
-!Portfolio methodsFor: 'initialization' stamp: 'Eden 10/17/2019 21:41:49'!
+!Portfolio methodsFor: 'initialization' stamp: 'Eden 10/19/2019 16:16:12'!
 initialize
 
-	children := Set new.
+	children := OrderedCollection new.
 	parents := OrderedCollection new.! !
 
 
-!Portfolio methodsFor: 'registration' stamp: 'Eden 10/17/2019 21:41:49'!
+!Portfolio methodsFor: 'registration' stamp: 'Eden 10/19/2019 16:25:36'!
 registerAccount: aReceptiveAccount 
-
+	(self hasAccount: aReceptiveAccount)  ifTrue: [^ self error: 'Ya existe la cuenta en el portfolio'].
 	aReceptiveAccount registeredOn: self.
 	children add: aReceptiveAccount.! !
 

@@ -1,0 +1,6 @@
+*.DS_store
+informe/*.aux
+informe/*.out
+informe/*.log
+informe/*.synctex.gz
+informe/*.toc
