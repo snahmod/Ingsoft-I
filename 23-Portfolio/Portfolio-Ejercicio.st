@@ -294,7 +294,7 @@ test17ShouldRaiseErrorWhenAddingAnAccountInsideAPortfolioThatHasAPortfolioWithSa
 	self assert: 100 equals: portfolio balance .
 ! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'Eden 10/19/2019 16:26:02'!
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/21/2019 16:31:22'!
 test18ShouldRaiseErrorWhenAddingAPortfolioWithAnAccountToSamePortfolio
 
 	| portfolio account|
@@ -302,7 +302,6 @@ test18ShouldRaiseErrorWhenAddingAPortfolioWithAnAccountToSamePortfolio
 	account := ReceptiveAccount  new.
 	
 	portfolio registerAccount: account.
-	portfolio registerPortfolio: portfolio.
 
 	Deposit register: 100 on: account.
 	
@@ -335,7 +334,7 @@ test19ShouldRaiseErrorWhenAddingAnAccountToAPortfolioThatIsInTwoPortfoliosWithSa
 	self assert: 100 equals: portfolio balance .
 ! !
 
-!PortfolioTest methodsFor: 'tests' stamp: 'Eden 10/19/2019 16:25:49'!
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/21/2019 16:24:02'!
 test20ShouldRaiseErrorWhenAddingAPortfolioWithAnAccountInAPortfolioWithSameAccount
 
 	| portfolio portfolio2 portfolio3 account|
@@ -350,10 +349,87 @@ test20ShouldRaiseErrorWhenAddingAPortfolioWithAnAccountInAPortfolioWithSameAccou
 
 	Deposit register: 100 on: account.
 	
-	self should: [portfolio3 registerAccount: portfolio.] raise: Error - MessageNotUnderstood
+	self should: [portfolio3 registerPortfolio: portfolio.] raise: Error - MessageNotUnderstood
 		withMessageText: 'Ya existe la cuenta en el portfolio'.
 		
 	self assert: 100 equals: portfolio2 balance .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/21/2019 16:41:10'!
+test21WhenAddingAPortfolioWithAnAccountInAndAPortfolioWithAccountCorrectBalance
+
+	| portfolio portfolio2 portfolio3 account account2 account3 |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+	account := ReceptiveAccount  new.
+	account2  := ReceptiveAccount new.
+	account3  := ReceptiveAccount new.
+	
+	portfolio registerAccount: account.
+	portfolio2 registerAccount: account2.
+	portfolio3 registerAccount: account3.
+	portfolio2 registerPortfolio: portfolio3.
+	portfolio registerPortfolio: portfolio2 .
+
+	Deposit register: 100 on: account.
+	Deposit register: 200 on: account2.
+	Withdraw register: 100 on: account3.
+		
+	self assert: 200 equals: portfolio balance .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/21/2019 16:42:57'!
+test22WhenAddingAPortfolioWithAnAccountInAndAPortfolioWithAccountCorrectTransactions
+
+	| portfolio portfolio2 portfolio3 account account2 account3 deposit deposit2 withdraw |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+	account := ReceptiveAccount  new.
+	account2  := ReceptiveAccount new.
+	account3  := ReceptiveAccount new.
+	
+	portfolio registerAccount: account.
+	portfolio2 registerAccount: account2.
+	portfolio3 registerAccount: account3.
+	portfolio2 registerPortfolio: portfolio3.
+	portfolio registerPortfolio: portfolio2 .
+
+	deposit := Deposit register: 100 on: account.
+	deposit2 := Deposit register: 200 on: account2.
+	withdraw := Withdraw register: 100 on: account3.
+		
+	self assert: (portfolio transactions includes: deposit).
+	self assert: (portfolio transactions includes: deposit2).
+	self assert: (portfolio transactions includes: withdraw).
+	self assert: portfolio transactions size equals: 3.
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/21/2019 16:45:50'!
+test23WhenAddingAPortfolioWithAnAccountInAndAPortfolioWithAccountCorrectTransactionsRegistered
+
+	| portfolio portfolio2 portfolio3 account account2 account3 deposit deposit2 withdraw |
+	portfolio := Portfolio new.
+	portfolio2 := Portfolio new.
+	portfolio3 := Portfolio new.
+	account := ReceptiveAccount  new.
+	account2  := ReceptiveAccount new.
+	account3  := ReceptiveAccount new.
+	
+	portfolio registerAccount: account.
+	portfolio2 registerAccount: account2.
+	portfolio3 registerAccount: account3.
+	portfolio2 registerPortfolio: portfolio3.
+	portfolio registerPortfolio: portfolio2 .
+
+	deposit := Deposit register: 100 on: account.
+	deposit2 := Deposit register: 200 on: account2.
+	withdraw := Withdraw register: 100 on: account3.
+		
+	self assert: (portfolio hasRegistered: deposit).
+	self assert: (portfolio hasRegistered: deposit2).
+	self assert: (portfolio hasRegistered: withdraw).
 ! !
 
 
@@ -554,26 +630,30 @@ for: aValue
 
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
 Object subclass: #Portfolio
-	instanceVariableNames: 'parents children'
+	instanceVariableNames: 'parents portfolios accounts'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'testing' stamp: 'Eden 10/17/2019 21:45:05'!
+!Portfolio methodsFor: 'testing' stamp: 'aa 10/21/2019 16:33:01'!
 balance
 
-	^children sum: [ :child | child balance ] ifEmpty: [ 0 ]! !
+	^(portfolios sum: [ :portfolio | portfolio balance ] ifEmpty: [ 0 ]) + (accounts sum: [:account | account balance ] ifEmpty: [ 0 ]).! !
 
-!Portfolio methodsFor: 'testing' stamp: 'aa 10/20/2019 20:53:02'!
+!Portfolio methodsFor: 'testing' stamp: 'aa 10/21/2019 16:11:39'!
 canAddAccount: anAccount
 
-	self isRoot ifTrue: [^ (self hasAccount: anAccount) not ].
-	^ parents allSatisfy: [ :portfolioParent | portfolioParent canAddAccount: anAccount ]! !
+	^(self isRoot or: [(parents allSatisfy: [ :aParent | aParent canAddAccount: anAccount ])]) and: (self isRoot not or: [[(self hasAccount: anAccount) not]]).! !
 
-!Portfolio methodsFor: 'testing' stamp: 'aa 10/20/2019 20:38:25'!
-hasAccount: account
+!Portfolio methodsFor: 'testing' stamp: 'aa 10/21/2019 16:11:16'!
+hasAccount: anAccount
 	
-	^ children anySatisfy: [ :child | child hasAccount: account]! !
+	^ (accounts includes: anAccount) or: [portfolios anySatisfy: [ :portfolio | portfolio hasAccount: anAccount]]! !
+
+!Portfolio methodsFor: 'testing' stamp: 'aa 10/21/2019 16:27:16'!
+hasAccountInPortfolio: aPortfolio
+
+	^ (parents anySatisfy: [:aParent | aParent hasAccountInPortfolio: aPortfolio ]) or: [self anyAccountSatisfy: [:account | aPortfolio hasAccount: account ]]! !
 
 !Portfolio methodsFor: 'testing' stamp: 'Eden 10/17/2019 20:45:45'!
 hasRegistered: aTransaction
@@ -585,25 +665,27 @@ isRoot
 	^ parents isEmpty .! !
 
 
-!Portfolio methodsFor: 'initialization' stamp: 'Eden 10/19/2019 16:16:12'!
+!Portfolio methodsFor: 'initialization' stamp: 'aa 10/21/2019 16:10:08'!
 initialize
 
-	children := OrderedCollection new.
+	portfolios := OrderedCollection new.
+	accounts := OrderedCollection new.
 	parents := OrderedCollection new.! !
 
 
-!Portfolio methodsFor: 'registration' stamp: 'aa 10/20/2019 20:54:34'!
+!Portfolio methodsFor: 'registration' stamp: 'aa 10/21/2019 16:17:59'!
 registerAccount: aReceptiveAccount 
 
 	(self canAddAccount: aReceptiveAccount)  ifFalse: [^ self error: 'Ya existe la cuenta en el portfolio'].
 	aReceptiveAccount registeredOn: self.
-	children add: aReceptiveAccount.! !
+	accounts add: aReceptiveAccount.! !
 
-!Portfolio methodsFor: 'registration' stamp: 'Eden 10/17/2019 21:41:49'!
+!Portfolio methodsFor: 'registration' stamp: 'aa 10/21/2019 16:30:32'!
 registerPortfolio: aPortfolio 
 
+	(self hasAccountInPortfolio: aPortfolio )  ifTrue: [^ self error: 'Ya existe la cuenta en el portfolio'].
 	aPortfolio registeredOn: self.
-	children add: aPortfolio .! !
+	portfolios add: aPortfolio .! !
 
 !Portfolio methodsFor: 'registration' stamp: 'Eden 10/17/2019 21:42:39'!
 registeredOn: aPortfolio
@@ -611,9 +693,21 @@ registeredOn: aPortfolio
 	parents add: aPortfolio .! !
 
 
-!Portfolio methodsFor: 'accessing' stamp: 'Eden 10/17/2019 21:41:49'!
+!Portfolio methodsFor: 'accessing' stamp: 'aa 10/21/2019 16:50:15'!
 transactions
-	^ children inject: OrderedCollection new into: [:allTransactions :account |  allTransactions addAll: account transactions. allTransactions ]! !
+
+	| children |
+	
+	children := portfolios copy .
+	children addAll: accounts .
+	^children inject: OrderedCollection new into: [:allTransactions :account |  allTransactions addAll: account transactions. allTransactions ].
+	! !
+
+
+!Portfolio methodsFor: 'private accessing' stamp: 'aa 10/21/2019 16:13:47'!
+anyAccountSatisfy: aClosure
+
+	^ (accounts anySatisfy: aClosure ) or: [portfolios anySatisfy: [:portfolio | portfolio anyAccountSatisfy: aClosure ]].! !
 
 
 !classDefinition: #ReceptiveAccount category: #'Portfolio-Ejercicio'!
@@ -647,11 +741,6 @@ balance
 
 	^transactions sum: [ :aTransaction | aTransaction absoluteValue ] ifEmpty: [ 0 ]! !
 
-
-!ReceptiveAccount methodsFor: 'testing' stamp: 'aa 10/20/2019 20:40:50'!
-hasAccount: anAccount
-
-	^ self == anAccount! !
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
 hasRegistered: aTransaction
