@@ -564,20 +564,25 @@ balance
 
 	^children sum: [ :child | child balance ] ifEmpty: [ 0 ]! !
 
-!Portfolio methodsFor: 'testing' stamp: 'Eden 10/19/2019 16:24:44'!
+!Portfolio methodsFor: 'testing' stamp: 'aa 10/20/2019 20:53:02'!
+canAddAccount: anAccount
+
+	self isRoot ifTrue: [^ (self hasAccount: anAccount) not ].
+	^ parents allSatisfy: [ :portfolioParent | portfolioParent canAddAccount: anAccount ]! !
+
+!Portfolio methodsFor: 'testing' stamp: 'aa 10/20/2019 20:38:25'!
 hasAccount: account
 	
-	^ (children includes: account) | ((parents select: [:portfolioParent | portfolioParent hasAccount: account]) size > 0)! !
+	^ children anySatisfy: [ :child | child hasAccount: account]! !
 
 !Portfolio methodsFor: 'testing' stamp: 'Eden 10/17/2019 20:45:45'!
 hasRegistered: aTransaction
 	^ self transactions includes: aTransaction.! !
 
-!Portfolio methodsFor: 'testing' stamp: 'Eden 10/17/2019 21:41:49'!
-registerPortfolio: aPortfolio 
+!Portfolio methodsFor: 'testing' stamp: 'aa 10/20/2019 20:50:00'!
+isRoot
 
-	aPortfolio registeredOn: self.
-	children add: aPortfolio .! !
+	^ parents isEmpty .! !
 
 
 !Portfolio methodsFor: 'initialization' stamp: 'Eden 10/19/2019 16:16:12'!
@@ -587,11 +592,18 @@ initialize
 	parents := OrderedCollection new.! !
 
 
-!Portfolio methodsFor: 'registration' stamp: 'Eden 10/19/2019 16:25:36'!
+!Portfolio methodsFor: 'registration' stamp: 'aa 10/20/2019 20:54:34'!
 registerAccount: aReceptiveAccount 
-	(self hasAccount: aReceptiveAccount)  ifTrue: [^ self error: 'Ya existe la cuenta en el portfolio'].
+
+	(self canAddAccount: aReceptiveAccount)  ifFalse: [^ self error: 'Ya existe la cuenta en el portfolio'].
 	aReceptiveAccount registeredOn: self.
 	children add: aReceptiveAccount.! !
+
+!Portfolio methodsFor: 'registration' stamp: 'Eden 10/17/2019 21:41:49'!
+registerPortfolio: aPortfolio 
+
+	aPortfolio registeredOn: self.
+	children add: aPortfolio .! !
 
 !Portfolio methodsFor: 'registration' stamp: 'Eden 10/17/2019 21:42:39'!
 registeredOn: aPortfolio
@@ -635,6 +647,11 @@ balance
 
 	^transactions sum: [ :aTransaction | aTransaction absoluteValue ] ifEmpty: [ 0 ]! !
 
+
+!ReceptiveAccount methodsFor: 'testing' stamp: 'aa 10/20/2019 20:40:50'!
+hasAccount: anAccount
+
+	^ self == anAccount! !
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'NR 10/17/2019 03:28:43'!
 hasRegistered: aTransaction
