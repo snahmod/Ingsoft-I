@@ -213,6 +213,484 @@ test15PortfolioCanNotIncludeAnyOfTheComposedAccountOfPortfolioToAdd
 			self assert: Portfolio canNotAddAccountErrorMessage equals: anError messageText.
 			self assert: portfolioToModify accountsIsEmpty ]! !
 
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:28:28'!
+test16PortfolioHasZeroAsBalanceWhenReportedAccountSummary 
+
+	| account report expectedPrint |
+	
+	account := Portfolio new.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Balance = 0', String newLineString .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:31:59'!
+test17PortfolioWithEmptyAccountHasZeroAsBalanceWhenReportedAccountSummary 
+
+	| account report expectedPrint |
+	
+	account := Portfolio new.
+	account add: ReceptiveAccount new.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Balance = 0', String newLineString .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:42:44'!
+test18PortfolioWithAccountWithDepositWhenReportedAccountSummary 
+
+	| account report expectedPrint receptiveAccount |
+	
+	account := Portfolio new.
+	receptiveAccount := ReceptiveAccount new.
+	account add: receptiveAccount.
+	Deposit register: 100 on: receptiveAccount.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Depósito por 100', String newLineString, 'Balance = 100', String newLineString  .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:47:32'!
+test19PortfolioWithTwoAccountsWithTransactionsWhenReportedAccountSummary 
+
+	| account report expectedPrint receptiveAccount1 receptiveAccount2 |
+	
+	account := Portfolio new.
+	receptiveAccount1 := ReceptiveAccount new.
+	receptiveAccount2 := ReceptiveAccount new.
+
+	account add: receptiveAccount1.
+	account add: receptiveAccount2.
+	
+	WireTransfer register: 100 from: receptiveAccount1 to: receptiveAccount2.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Salida por transferencia de 100', String newLineString, 'Entrada por transferencia de 100', String newLineString, 'Balance = 0', String newLineString  .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:51:47'!
+test20PortfolioHasZeroAsBalanceWhenReportedTransferNet 
+
+	| account report |
+	
+	account := Portfolio new.
+	report := TransferNet for: account .
+
+	self assert: '0' equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:52:18'!
+test21PortfolioWithEmptyAccountHasZeroAsBalanceWhenReportedTransferNet
+
+	| account report |
+	
+	account := Portfolio new.
+	account add: ReceptiveAccount new.
+	report := TransferNet for: account .
+
+	self assert: '0' equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:53:20'!
+test22PortfolioWithAccountWithDepositWhenReportedTransferNet
+
+	| account report receptiveAccount |
+	
+	account := Portfolio new.
+	receptiveAccount := ReceptiveAccount new.
+	account add: receptiveAccount.
+	Deposit register: 100 on: receptiveAccount.
+	report := TransferNet for: account .
+
+	self assert: '0' equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:53:59'!
+test23PortfolioWithTwoAccountsWithTransactionsWhenReportedTransferNet
+
+	| account report receptiveAccount1 receptiveAccount2 |
+	
+	account := Portfolio new.
+	receptiveAccount1 := ReceptiveAccount new.
+	receptiveAccount2 := ReceptiveAccount new.
+
+	account add: receptiveAccount1.
+	account add: receptiveAccount2.
+	
+	WireTransfer register: 100 from: receptiveAccount1 to: receptiveAccount2.
+	report := TransferNet for: account .
+
+	self assert: '0' equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:54:38'!
+test24PortfolioWithAccountsWithTransfersWhenReportedTransferNet
+
+	| account report receptiveAccount1 receptiveAccount2 |
+	
+	account := Portfolio new.
+	receptiveAccount1 := ReceptiveAccount new.
+	receptiveAccount2 := ReceptiveAccount new.
+
+	account add: receptiveAccount1.
+	
+	WireTransfer register: 100 from: receptiveAccount1 to: receptiveAccount2.
+	report := TransferNet for: account .
+
+	self assert: '-100' equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 19:50:29'!
+test25EmptyPortfolioWhenReportedTreeSummary 
+
+	| account report expectedPrint |
+	
+	account := Portfolio named: 'Familia'.
+	report := TreeSummary  for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 19:52:51'!
+test26PortfolioWithAccountWhenReportedTreeSummary 
+
+	| account report expectedPrint |
+	
+	account := Portfolio named: 'Familia'.
+	account add: (ReceptiveAccount named: 'Forever Alone').
+	report := TreeSummary  for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Forever Alone', String newLineString .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 19:54:22'!
+test27PortfolioWithAccountAndEmptyPortfolioWhenReportedTreeSummary 
+
+	| account report expectedPrint |
+	
+	account := Portfolio named: 'Familia'.
+	account add: (ReceptiveAccount named: 'Forever Alone'); add: (Portfolio named: 'Amigues').
+	report := TreeSummary  for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Forever Alone', String newLineString,
+						'Portfolio de Amigues', String newLineString .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 19:57:04'!
+test28PortfolioWithAccountAndPortfolioWhenReportedTreeSummary 
+
+	| account report expectedPrint account2 |
+	
+	account := Portfolio named: 'Familia'.
+	account2 := Portfolio named: 'Amigues'.
+	account2 add: (ReceptiveAccount named: 'Not Forever Alone').
+	account add: (ReceptiveAccount named: 'Forever Alone'); add: account2.
+	report := TreeSummary  for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Forever Alone', String newLineString,
+						'Portfolio de Amigues', String newLineString,
+						'Cuenta de Not Forever Alone', String newLineString .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 19:58:38'!
+test29PortfolioWithAccountWithTransactionAndPortfolioWhenReportedTreeSummary 
+
+	| account report expectedPrint account2 receptiveAccount |
+	
+	account := Portfolio named: 'Familia'.
+	account2 := Portfolio named: 'Amigues'.
+	receptiveAccount := ReceptiveAccount named: 'Not Forever Alone'.
+	Deposit register: 100 on: receptiveAccount.
+	account2 add: receptiveAccount.
+	account add: (ReceptiveAccount named: 'Forever Alone'); add: account2.
+	report := TreeSummary  for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Forever Alone', String newLineString,
+						'Portfolio de Amigues', String newLineString,
+						'Cuenta de Not Forever Alone', String newLineString .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:03:23'!
+test30PortfolioHasZeroAsBalanceWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint |
+	
+	account := Portfolio named: 'Familia'.
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Balance = 0', String newLineString .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:08:51'!
+test31PortfolioWithEmptyAccountWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount |
+	
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	account := Portfolio named: 'Familia'.
+	account  add: receptiveAccount .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Balance = 0', String newLineString,
+						'Balance = 0', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:13:10'!
+test32PortfolioWithAccountWithDepositWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount |
+	
+	account := Portfolio named: 'Familia'.
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	account add: receptiveAccount .
+	Deposit register: 100 on: receptiveAccount .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Depósito por 100', String newLineString,
+						'Balance = 100', String newLineString,
+						'Balance = 100', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:14:14'!
+test33PortfolioWithAccountWithWithdrawWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount |
+	
+	account := Portfolio named: 'Familia'.
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	account add: receptiveAccount .
+	Withdraw register: 100 on: receptiveAccount .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Extracción por 100', String newLineString,
+						'Balance = -100', String newLineString,
+						'Balance = -100', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:16:38'!
+test34PortfolioWithAccountWithRecievedWireTransferWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount receptiveAccount2 |
+	
+	account := Portfolio named: 'Familia'.
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	receptiveAccount2 := ReceptiveAccount named: 'Patito'.
+	account add: receptiveAccount .
+
+	WireTransfer register: 100 from: receptiveAccount2 to: receptiveAccount .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Entrada por transferencia de 100', String newLineString,
+						'Balance = 100', String newLineString,
+						'Balance = 100', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:17:17'!
+test35PortfolioWithAccountWithSentWireTransferWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount receptiveAccount2 |
+	
+	account := Portfolio named: 'Familia'.
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	receptiveAccount2 := ReceptiveAccount named: 'Patito'.
+	account add: receptiveAccount .
+
+	WireTransfer register: 100 from: receptiveAccount to: receptiveAccount2 .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Salida por transferencia de 100', String newLineString,
+						'Balance = -100', String newLineString,
+						'Balance = -100', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:18:20'!
+test36PortfolioWithAccountWithDepositAndWithdrawWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount |
+	
+	account := Portfolio named: 'Familia'.
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	account add: receptiveAccount .
+	
+	Deposit register: 100 on: receptiveAccount .
+	Withdraw register: 50 on: receptiveAccount .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Depósito por 100', String newLineString,
+						'Extracción por 50', String newLineString,
+						'Balance = 50', String newLineString,
+						'Balance = 50', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:20:00'!
+test37PortfolioWithAccountWithRecievedAndSentSentWireTransferWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount receptiveAccount2 |
+	
+	account := Portfolio named: 'Familia'.
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	receptiveAccount2 := ReceptiveAccount named: 'Patito'.
+	account add: receptiveAccount .
+
+	WireTransfer register: 100 from: receptiveAccount to: receptiveAccount2 .
+	WireTransfer register: 50 from: receptiveAccount2 to: receptiveAccount .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Salida por transferencia de 100', String newLineString,
+						'Entrada por transferencia de 50', String newLineString,
+						'Balance = -50', String newLineString,
+						'Balance = -50', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:21:44'!
+test38PortfolioWithAccountWithTransactionsWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount receptiveAccount2 |
+	
+	account := Portfolio named: 'Familia'.
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	receptiveAccount2 := ReceptiveAccount named: 'Patito'.
+	account add: receptiveAccount .
+	
+	Deposit register: 101 on: receptiveAccount .
+	Withdraw register: 50 on: receptiveAccount .
+	WireTransfer register: 100 from: receptiveAccount to: receptiveAccount2 .
+	WireTransfer register: 50 from: receptiveAccount2 to: receptiveAccount .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Depósito por 101', String newLineString,
+						'Extracción por 50', String newLineString,
+						'Salida por transferencia de 100', String newLineString,
+						'Entrada por transferencia de 50', String newLineString,
+						'Balance = 1', String newLineString,
+						'Balance = 1', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:24:55'!
+test39PortfolioWithAccountsWithTransactionsWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount receptiveAccount2 |
+	
+	account := Portfolio named: 'Familia'.
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	receptiveAccount2 := ReceptiveAccount named: 'Patito'.
+	account add: receptiveAccount; add: receptiveAccount2 .
+	
+	Deposit register: 101 on: receptiveAccount .
+	Withdraw register: 50 on: receptiveAccount .
+	WireTransfer register: 100 from: receptiveAccount to: receptiveAccount2 .
+	WireTransfer register: 50 from: receptiveAccount2 to: receptiveAccount .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Depósito por 101', String newLineString,
+						'Extracción por 50', String newLineString,
+						'Salida por transferencia de 100', String newLineString,
+						'Entrada por transferencia de 50', String newLineString,
+						'Balance = 1', String newLineString,
+						'Cuenta de Patito', String newLineString,
+						'Entrada por transferencia de 100', String newLineString,
+						'Salida por transferencia de 50', String newLineString,
+						'Balance = 50', String newLineString,
+						'Balance = 51', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
+!PortfolioTest methodsFor: 'tests' stamp: 'aa 10/26/2019 20:27:22'!
+test40PortfolioWithAccountAndPortfolioWithTransactionsWhenReportedSpecializedTreeSummary
+
+	| account report expectedPrint receptiveAccount receptiveAccount2 account2 |
+	
+	account := Portfolio named: 'Familia'.
+	receptiveAccount := ReceptiveAccount named: 'Juanito'.
+	receptiveAccount2 := ReceptiveAccount named: 'Patito'.
+	account2 := Portfolio named: 'Amigues'.
+	account add: receptiveAccount; add: account2 .
+	account2 add: receptiveAccount2 .
+	
+	Deposit register: 101 on: receptiveAccount .
+	Withdraw register: 50 on: receptiveAccount .
+	WireTransfer register: 100 from: receptiveAccount to: receptiveAccount2 .
+	WireTransfer register: 50 from: receptiveAccount2 to: receptiveAccount .
+	report := SpecializedTreeSummary for: account .
+	
+	expectedPrint := 'Portfolio de Familia', String newLineString,
+						'Cuenta de Juanito', String newLineString,
+						'Depósito por 101', String newLineString,
+						'Extracción por 50', String newLineString,
+						'Salida por transferencia de 100', String newLineString,
+						'Entrada por transferencia de 50', String newLineString,
+						'Balance = 1', String newLineString,
+						'Portfolio de Amigues', String newLineString,
+						'Cuenta de Patito', String newLineString,
+						'Entrada por transferencia de 100', String newLineString,
+						'Salida por transferencia de 50', String newLineString,
+						'Balance = 50', String newLineString,
+						'Balance = 50', String newLineString,
+						'Balance = 51', String newLineString.
+						
+	self assert: expectedPrint equals: report print .
+! !
+
 
 !classDefinition: #ReceptiveAccountTest category: #'Portfolio-Solucion'!
 TestCase subclass: #ReceptiveAccountTest
@@ -318,7 +796,7 @@ test08WireTransferIncreasesBalanceOnOneAccountDecreasesOnOtherAccount
 	self assert: 100 equals: account2 balance .
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/21/2019 20:38:41'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 17:53:21'!
 test09AccountsHaveCorrectTransactionsAfterWireTransfer
 
 	| account1 account2 wireTransfer |
@@ -329,12 +807,12 @@ test09AccountsHaveCorrectTransactionsAfterWireTransfer
 	wireTransfer := WireTransfer register: 100 from: account1 to: account2 .
 		
 	self assert: 1 equals: account1 transactions size .
-	self assert: (account1 transactions includes: wireTransfer wireTransferFrom).
+	self assert: (account1 transactions includes: wireTransfer wireTransferOut).
 	self assert: 1 equals: account2 transactions size .
-	self assert: (account2 transactions includes: wireTransfer wireTransferTo).
+	self assert: (account2 transactions includes: wireTransfer wireTransferIn).
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/21/2019 21:01:09'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 17:53:21'!
 test10AccountsHaveSpecificRegistersAfterWireTransfer
 
 	| account1 account2 wireTransfer |
@@ -344,11 +822,11 @@ test10AccountsHaveSpecificRegistersAfterWireTransfer
 	
 	wireTransfer := WireTransfer register: 100 from: account1 to: account2 .
 	
-	self assert: (account1 hasRegistered: wireTransfer wireTransferFrom).
-	self assert: (account2 hasRegistered: wireTransfer wireTransferTo).
+	self assert: (account1 hasRegistered: wireTransfer wireTransferOut).
+	self assert: (account2 hasRegistered: wireTransfer wireTransferIn).
 ! !
 
-!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/21/2019 21:04:27'!
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 17:53:21'!
 test11AccountsDoesNotHaveUnknownWireTransferAfterWireTransfer
 
 	| account1 account2 wireTransfer account3 |
@@ -359,8 +837,8 @@ test11AccountsDoesNotHaveUnknownWireTransferAfterWireTransfer
 	
 	wireTransfer := WireTransfer register: 100 from: account3 to: account2 .
 	
-	self deny: (account1 hasRegistered: wireTransfer wireTransferTo ).
-	self deny: (account1 hasRegistered: wireTransfer wireTransferFrom ).
+	self deny: (account1 hasRegistered: wireTransfer wireTransferIn ).
+	self deny: (account1 hasRegistered: wireTransfer wireTransferOut ).
 ! !
 
 !ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/21/2019 21:15:54'!
@@ -394,10 +872,215 @@ test13ShouldRaiseErrorWhenWireTransferingFromSameAccount
 	self assert: account1 transactions isEmpty.
 ! !
 
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:06:54'!
+test14ReceptiveAccountHasZeroAsBalanceWhenReportedAccountSummary 
+
+	| account report expectedPrint |
+	
+	account := ReceptiveAccount new.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Balance = 0', String newLineString .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:10:53'!
+test15ReceptiveAccountWithDepositWhenReportedAccountSummary 
+
+	| account report expectedPrint |
+	
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Depósito por 100', String newLineString, 'Balance = 100', String newLineString  .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:11:29'!
+test16ReceptiveAccountWithWithdrawWhenReportedAccountSummary 
+
+	| account report expectedPrint |
+	
+	account := ReceptiveAccount new.
+	Withdraw register: 100 on: account.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Extracción por 100', String newLineString, 'Balance = -100', String newLineString  .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:13:03'!
+test17ReceptiveAccountWithRecievedWireTransferWhenReportedAccountSummary 
+
+	| account report expectedPrint account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	
+	WireTransfer register: 100 from: account2 to: account.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Entrada por transferencia de 100', String newLineString, 'Balance = 100', String newLineString  .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:13:28'!
+test18ReceptiveAccountWithSentWireTransferWhenReportedAccountSummary 
+
+	| account report expectedPrint account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	
+	WireTransfer register: 100 from: account to: account2.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Salida por transferencia de 100', String newLineString, 'Balance = -100', String newLineString  .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:14:58'!
+test19ReceptiveAccountWithDepositAndWithdrawWhenReportedAccountSummary 
+
+	| account report expectedPrint |
+	
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+	Withdraw register: 50 on: account.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Depósito por 100', String newLineString, 'Extracción por 50', String newLineString, 'Balance = 50', String newLineString  .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:17:47'!
+test20ReceptiveAccountWithRecievedAndSentWireTransferWhenReportedAccountSummary 
+
+	| account report expectedPrint account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	
+	WireTransfer register: 100 from: account to: account2.
+	WireTransfer register: 50 from: account2 to: account.
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Salida por transferencia de 100', String newLineString, 'Entrada por transferencia de 50', String newLineString, 'Balance = -50', String newLineString  .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:20:17'!
+test21ReceptiveAccountTransactionsWhenReportedAccountSummary 
+
+	| account report expectedPrint account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	
+	Deposit register: 101 on: account.
+	Withdraw register: 50 on: account.
+	WireTransfer register: 100 from: account to: account2.
+	WireTransfer register: 50 from: account2 to: account.
+	
+	report := AccountSummary for: account .
+	
+	expectedPrint := 'Depósito por 101', String newLineString, 'Extracción por 50', String newLineString,
+						'Salida por transferencia de 100', String newLineString, 'Entrada por transferencia de 50', String newLineString,
+						'Balance = 1', String newLineString  .
+
+	self assert: expectedPrint equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:22:08'!
+test22ReceptiveAccountHasZeroAsBalanceWhenReportedTransferNet 
+
+	| account report |
+	
+	account := ReceptiveAccount new.
+	report := TransferNet for: account .
+
+	self assert: '0' equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:23:05'!
+test23ReceptiveAccountWithDepositWhenReportedTransferNet
+
+	| account report |
+	
+	account := ReceptiveAccount new.
+	Deposit register: 100 on: account.
+	report := TransferNet for: account .
+
+	self assert: '0' equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:23:46'!
+test24ReceptiveAccountWithWithdrawWhenReportedTransferNet
+
+	| account report |
+	
+	account := ReceptiveAccount new.
+	Withdraw register: 100 on: account.
+	report := TransferNet for: account .
+
+	self assert: '0' equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:24:27'!
+test25ReceptiveAccountWithRecievedWireTransferWhenReportedTransferNet
+
+	| account report account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	
+	WireTransfer register: 100 from: account2 to: account.
+	report := TransferNet for: account .
+
+	self assert: '100' equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:25:08'!
+test26ReceptiveAccountWithSentWireTransferWhenReportedTransferNet
+
+	| account report account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	
+	WireTransfer register: 100 from: account to: account2.
+	report := TransferNet for: account .
+
+	self assert: '-100' equals: report print .
+! !
+
+!ReceptiveAccountTest methodsFor: 'tests' stamp: 'aa 10/26/2019 18:26:01'!
+test27ReceptiveAccountWithRecievedAndSentWireTransferWhenReportedTransferNet
+
+	| account report account2 |
+	
+	account := ReceptiveAccount new.
+	account2 := ReceptiveAccount new.
+	
+	WireTransfer register: 100 from: account to: account2.
+	WireTransfer register: 50 from: account2 to: account.
+	report := TransferNet for: account .
+	
+	self assert: '-50' equals: report print .
+! !
+
 
 !classDefinition: #Account category: #'Portfolio-Solucion'!
 Object subclass: #Account
-	instanceVariableNames: ''
+	instanceVariableNames: 'accountName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
@@ -434,6 +1117,29 @@ transactions
 addedTo: aPortfolio
 
 	self subclassResponsibility ! !
+
+
+!Account methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:59:59'!
+reportWith: aReport
+
+	^ self subclassResponsibility .! !
+
+
+!Account methodsFor: 'initialization' stamp: 'aa 10/26/2019 17:08:50'!
+initializeWithName: aName
+
+	accountName := aName.! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Account class' category: #'Portfolio-Solucion'!
+Account class
+	instanceVariableNames: ''!
+
+!Account class methodsFor: 'instance creation' stamp: 'aa 10/26/2019 19:09:39'!
+named: aName
+	
+	^ self new initializeWithName: aName ! !
 
 
 !classDefinition: #Portfolio category: #'Portfolio-Solucion'!
@@ -547,6 +1253,14 @@ signalCanNotAddAccount
 	
 	self error: self class canNotAddAccountErrorMessage! !
 
+
+!Portfolio methodsFor: 'reporting' stamp: 'aa 10/26/2019 18:35:46'!
+reportWith: aReport
+
+	aReport reportWithPortfolioName: accountName.
+	accounts do: [ :account | account reportWith: aReport ].
+	aReport reportWithBalance: self balance.! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Portfolio class' category: #'Portfolio-Solucion'!
@@ -630,6 +1344,14 @@ addedTo: aPortfolio
 	
 	! !
 
+
+!ReceptiveAccount methodsFor: 'reporting' stamp: 'aa 10/26/2019 18:35:55'!
+reportWith: aReport
+	
+	aReport reportWithReceptiveAccountName: accountName.
+	self transactions do: [ :transaction | transaction reportWith: aReport ].
+	aReport reportWithBalance: self balance.! !
+
 
 !classDefinition: #AccountTransaction category: #'Portfolio-Solucion'!
 Object subclass: #AccountTransaction
@@ -650,10 +1372,10 @@ affectBalance: aBalance
 	self subclassResponsibility ! !
 
 
-!AccountTransaction methodsFor: 'printing' stamp: 'aa 10/21/2019 21:42:44'!
-asString
+!AccountTransaction methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:11:06'!
+reportWith: aReport
 
-	^self subclassResponsibility .! !
+	^self subclassResponsibility ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -702,10 +1424,10 @@ affectBalance: aBalance
 	^aBalance + value ! !
 
 
-!Deposit methodsFor: 'printing' stamp: 'aa 10/21/2019 21:43:51'!
-asString
+!Deposit methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:23:31'!
+reportWith: aReport
 
-	^ 'Depósito por ', value , '.'! !
+	aReport reportDeposit: self value .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -719,54 +1441,64 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #WireTransferFrom category: #'Portfolio-Solucion'!
-AccountTransaction subclass: #WireTransferFrom
+!classDefinition: #WireTransferIn category: #'Portfolio-Solucion'!
+AccountTransaction subclass: #WireTransferIn
 	instanceVariableNames: 'wireTransfer'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!WireTransferFrom methodsFor: 'initialization' stamp: 'aa 10/21/2019 20:23:08'!
+!WireTransferIn methodsFor: 'initialization' stamp: 'aa 10/21/2019 20:23:08'!
 initializeFor: aWireTransfer
 
 	wireTransfer := aWireTransfer ! !
 
 
-!WireTransferFrom methodsFor: 'balance' stamp: 'aa 10/21/2019 20:58:08'!
-affectBalance: aBalance
+!WireTransferIn methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:24:27'!
+reportWith: aReport
 
-	^ aBalance - wireTransfer balance.! !
-
-
-!WireTransferFrom methodsFor: 'printing' stamp: 'aa 10/21/2019 21:44:46'!
-asString
-
-	^ 'Salida por transferencia de ', wireTransfer balance , '.'! !
-
-
-!classDefinition: #WireTransferTo category: #'Portfolio-Solucion'!
-AccountTransaction subclass: #WireTransferTo
-	instanceVariableNames: 'wireTransfer'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'Portfolio-Solucion'!
-
-!WireTransferTo methodsFor: 'initialization' stamp: 'aa 10/21/2019 20:23:23'!
-initializeFor: aWireTransfer
-
-	wireTransfer := aWireTransfer ! !
+	aReport reportWireTransferIn: self value .! !
 
 
-!WireTransferTo methodsFor: 'balance' stamp: 'aa 10/21/2019 20:58:19'!
+!WireTransferIn methodsFor: 'balance' stamp: 'aa 10/26/2019 17:42:05'!
 affectBalance: aBalance
 
 	^ aBalance + wireTransfer balance.! !
 
+!WireTransferIn methodsFor: 'balance' stamp: 'aa 10/26/2019 17:57:00'!
+value
 
-!WireTransferTo methodsFor: 'printing' stamp: 'aa 10/21/2019 21:45:29'!
-asString
+	^ wireTransfer balance ! !
 
-	^ 'Entrada por transferencia de ', wireTransfer balance , '.'! !
+
+!classDefinition: #WireTransferOut category: #'Portfolio-Solucion'!
+AccountTransaction subclass: #WireTransferOut
+	instanceVariableNames: 'wireTransfer'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!WireTransferOut methodsFor: 'initialization' stamp: 'aa 10/21/2019 20:23:23'!
+initializeFor: aWireTransfer
+
+	wireTransfer := aWireTransfer ! !
+
+
+!WireTransferOut methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:24:45'!
+reportWith: aReport
+
+	aReport reportWireTransferOut: self value .! !
+
+
+!WireTransferOut methodsFor: 'balance' stamp: 'aa 10/26/2019 17:53:58'!
+affectBalance: aBalance
+
+	^ aBalance - wireTransfer balance.! !
+
+!WireTransferOut methodsFor: 'balance' stamp: 'aa 10/26/2019 17:57:07'!
+value
+
+	^ wireTransfer balance ! !
 
 
 !classDefinition: #Withdraw category: #'Portfolio-Solucion'!
@@ -794,10 +1526,10 @@ affectBalance: aBalance
 	^aBalance - value! !
 
 
-!Withdraw methodsFor: 'printing' stamp: 'aa 10/21/2019 21:46:20'!
-asString
+!Withdraw methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:25:02'!
+reportWith: aReport
 
-	^ 'Extracción por ', value , '.'! !
+	aReport reportWithdraw: self value .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -811,43 +1543,208 @@ for: aValue
 	^ self new initializeFor: aValue ! !
 
 
-!classDefinition: #Reporter category: #'Portfolio-Solucion'!
-Object subclass: #Reporter
-	instanceVariableNames: 'account'
+!classDefinition: #Report category: #'Portfolio-Solucion'!
+Object subclass: #Report
+	instanceVariableNames: 'account reportString'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!Reporter methodsFor: 'initialization' stamp: 'aa 10/21/2019 21:50:10'!
+!Report methodsFor: 'initialization' stamp: 'aa 10/26/2019 16:41:37'!
+initialize
+
+	reportString := ''.! !
+
+!Report methodsFor: 'initialization' stamp: 'aa 10/21/2019 21:50:10'!
 initializeFor: anAccount
 
 	account := anAccount .! !
 
+
+!Report methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:31:36'!
+print
+
+	account reportWith: self.
+	^ reportString! !
+
+!Report methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:17:40'!
+reportDeposit: aValue! !
+
+!Report methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:19:46'!
+reportWireTransferIn: aValue! !
+
+!Report methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:19:58'!
+reportWireTransferOut: aValue! !
+
+!Report methodsFor: 'reporting' stamp: 'aa 10/26/2019 17:18:02'!
+reportWithBalance: aName! !
+
+!Report methodsFor: 'reporting' stamp: 'aa 10/26/2019 17:17:28'!
+reportWithPortfolioName: aName! !
+
+!Report methodsFor: 'reporting' stamp: 'aa 10/26/2019 17:17:19'!
+reportWithReceptiveAccountName: aName! !
+
+!Report methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:19:33'!
+reportWithdraw: aValue! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Reporter class' category: #'Portfolio-Solucion'!
-Reporter class
+!classDefinition: 'Report class' category: #'Portfolio-Solucion'!
+Report class
 	instanceVariableNames: ''!
 
-!Reporter class methodsFor: 'instance creation' stamp: 'aa 10/21/2019 21:49:42'!
+!Report class methodsFor: 'instance creation' stamp: 'aa 10/21/2019 21:49:42'!
 for: anAccount
 
 	^ self new initializeFor: anAccount .! !
 
 
-!classDefinition: #WireTransfer category: #'Portfolio-Solucion'!
-Object subclass: #WireTransfer
-	instanceVariableNames: 'value wireTransferFrom wireTransferTo'
+!classDefinition: #AccountSummary category: #'Portfolio-Solucion'!
+Report subclass: #AccountSummary
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!WireTransfer methodsFor: 'initialization' stamp: 'aa 10/21/2019 20:34:12'!
+!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 18:37:56'!
+print
+
+	super print.
+	self reportAccountBalance .
+	^ reportString .! !
+
+!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:51:21'!
+reportDeposit: aValue
+
+	reportString  := reportString, 'Depósito por ', aValue asString, String newLineString .! !
+
+!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:51:30'!
+reportWireTransferIn: aValue
+
+	reportString  := reportString, 'Entrada por transferencia de ', aValue asString, String newLineString .! !
+
+!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:51:42'!
+reportWireTransferOut: aValue
+
+	reportString  := reportString, 'Salida por transferencia de ', aValue asString, String newLineString .! !
+
+!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:51:54'!
+reportWithdraw: aValue
+
+	reportString  := reportString, 'Extracción por ', aValue asString, String newLineString .! !
+
+
+!AccountSummary methodsFor: 'private - reporting' stamp: 'aa 10/26/2019 18:37:36'!
+reportAccountBalance
+
+	reportString := reportString, 'Balance = ', account balance asString, String newLineString .! !
+
+
+!classDefinition: #SpecializedTreeSummary category: #'Portfolio-Solucion'!
+Report subclass: #SpecializedTreeSummary
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:17:47'!
+reportDeposit: aValue
+
+	reportString  := reportString, 'Depósito por ', aValue asString, String newLineString .! !
+
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:18:12'!
+reportWireTransferIn: aValue
+
+	reportString  := reportString, 'Entrada por transferencia de ', aValue asString, String newLineString .! !
+
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:18:27'!
+reportWireTransferOut: aValue
+
+	reportString  := reportString, 'Salida por transferencia de ', aValue asString, String newLineString .! !
+
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:20:08'!
+reportWithBalance: aValue
+
+	reportString := reportString, 'Balance = ', aValue asString , String newLineString .! !
+
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:19:17'!
+reportWithPortfolioName: aName
+
+	reportString := reportString, 'Portfolio de ', aName , String newLineString .! !
+
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:19:33'!
+reportWithReceptiveAccountName: aName
+
+	reportString := reportString, 'Cuenta de ', aName , String newLineString .! !
+
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:18:43'!
+reportWithdraw: aValue
+
+	reportString  := reportString, 'Extracción por ', aValue asString, String newLineString .! !
+
+
+!classDefinition: #TransferNet category: #'Portfolio-Solucion'!
+Report subclass: #TransferNet
+	instanceVariableNames: 'transferNet'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!TransferNet methodsFor: 'initialization' stamp: 'aa 10/26/2019 17:29:16'!
+initialize
+	
+	transferNet := 0.! !
+
+
+!TransferNet methodsFor: 'reporting' stamp: 'aa 10/26/2019 17:58:42'!
+print
+
+	super print.
+	^ transferNet asString.! !
+
+!TransferNet methodsFor: 'reporting' stamp: 'aa 10/26/2019 17:27:00'!
+reportWireTransferIn: aValue
+
+	transferNet := transferNet + aValue.! !
+
+!TransferNet methodsFor: 'reporting' stamp: 'aa 10/26/2019 17:27:32'!
+reportWireTransferOut: aValue
+
+	transferNet := transferNet - aValue.! !
+
+
+!classDefinition: #TreeSummary category: #'Portfolio-Solucion'!
+Report subclass: #TreeSummary
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!TreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:05:39'!
+reportWithPortfolioName: aName
+
+	reportString := reportString, 'Portfolio de ', aName , String newLineString .! !
+
+!TreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:05:23'!
+reportWithReceptiveAccountName: aName
+
+	reportString := reportString, 'Cuenta de ', aName , String newLineString .! !
+
+
+!classDefinition: #WireTransfer category: #'Portfolio-Solucion'!
+Object subclass: #WireTransfer
+	instanceVariableNames: 'value wireTransferOut wireTransferIn'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Portfolio-Solucion'!
+
+!WireTransfer methodsFor: 'initialization' stamp: 'aa 10/26/2019 17:51:52'!
 initializeFor: aValue from: anAccount to: anotherAccount
 
 	value := aValue .
-	wireTransferFrom := WireTransferFrom register: self on: anAccount .
-	wireTransferTo := WireTransferTo register: self on: anotherAccount .! !
+	wireTransferOut := WireTransferOut register: self on: anAccount .
+	wireTransferIn := WireTransferIn register: self on: anotherAccount .! !
 
 
 !WireTransfer methodsFor: 'balance' stamp: 'aa 10/21/2019 20:51:44'!
@@ -856,15 +1753,15 @@ balance
 	^value .! !
 
 
-!WireTransfer methodsFor: 'accessing' stamp: 'aa 10/21/2019 20:58:58'!
-wireTransferFrom
+!WireTransfer methodsFor: 'accessing' stamp: 'aa 10/26/2019 17:53:21'!
+wireTransferIn
 
-	^wireTransferFrom .! !
+	^wireTransferIn .! !
 
-!WireTransfer methodsFor: 'accessing' stamp: 'aa 10/21/2019 20:59:06'!
-wireTransferTo
+!WireTransfer methodsFor: 'accessing' stamp: 'aa 10/26/2019 17:52:42'!
+wireTransferOut
 
-	^wireTransferTo .! !
+	^wireTransferOut .! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
