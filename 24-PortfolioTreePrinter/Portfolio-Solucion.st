@@ -1588,6 +1588,12 @@ reportWithReceptiveAccountName: aName! !
 !Report methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:19:33'!
 reportWithdraw: aValue! !
 
+
+!Report methodsFor: 'private - reporting' stamp: 'aa 10/28/2019 16:06:04'!
+addReport: aString
+
+	reportString := reportString, aString, String newLineString .! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Report class' category: #'Portfolio-Solucion'!
@@ -1614,31 +1620,31 @@ print
 	self reportAccountBalance .
 	^ reportString .! !
 
-!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:51:21'!
+!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:07:18'!
 reportDeposit: aValue
 
-	reportString  := reportString, 'Depósito por ', aValue asString, String newLineString .! !
+	self addReport: ('Depósito por ', aValue asString)! !
 
-!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:51:30'!
+!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:07:33'!
 reportWireTransferIn: aValue
 
-	reportString  := reportString, 'Entrada por transferencia de ', aValue asString, String newLineString .! !
+	self addReport: ('Entrada por transferencia de ', aValue asString)! !
 
-!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:51:42'!
+!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:07:47'!
 reportWireTransferOut: aValue
 
-	reportString  := reportString, 'Salida por transferencia de ', aValue asString, String newLineString .! !
+	self addReport: ('Salida por transferencia de ', aValue asString)! !
 
-!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 16:51:54'!
+!AccountSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:08:03'!
 reportWithdraw: aValue
 
-	reportString  := reportString, 'Extracción por ', aValue asString, String newLineString .! !
+	self addReport: ('Extracción por ', aValue asString)! !
 
 
-!AccountSummary methodsFor: 'private - reporting' stamp: 'aa 10/26/2019 18:37:36'!
+!AccountSummary methodsFor: 'private - reporting' stamp: 'aa 10/28/2019 16:06:48'!
 reportAccountBalance
 
-	reportString := reportString, 'Balance = ', account balance asString, String newLineString .! !
+	self addReport: ('Balance = ', account balance asString)! !
 
 
 !classDefinition: #SpecializedTreeSummary category: #'Portfolio-Solucion'!
@@ -1648,40 +1654,40 @@ Report subclass: #SpecializedTreeSummary
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:17:47'!
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:08:23'!
 reportDeposit: aValue
 
-	reportString  := reportString, 'Depósito por ', aValue asString, String newLineString .! !
+	self addReport: ('Depósito por ', aValue asString)! !
 
-!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:18:12'!
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:08:37'!
 reportWireTransferIn: aValue
 
-	reportString  := reportString, 'Entrada por transferencia de ', aValue asString, String newLineString .! !
+	self addReport: ('Entrada por transferencia de ', aValue asString)! !
 
-!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:18:27'!
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:08:54'!
 reportWireTransferOut: aValue
 
-	reportString  := reportString, 'Salida por transferencia de ', aValue asString, String newLineString .! !
+	self addReport: ('Salida por transferencia de ', aValue asString)! !
 
-!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:20:08'!
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:09:05'!
 reportWithBalance: aValue
 
-	reportString := reportString, 'Balance = ', aValue asString , String newLineString .! !
+	self addReport: ('Balance = ', aValue asString)! !
 
-!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:19:17'!
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:09:30'!
 reportWithPortfolioName: aName
 
-	reportString := reportString, 'Portfolio de ', aName , String newLineString .! !
+	self addReport: ('Portfolio de ', aName)! !
 
-!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:19:33'!
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:09:41'!
 reportWithReceptiveAccountName: aName
 
-	reportString := reportString, 'Cuenta de ', aName , String newLineString .! !
+	self addReport: ('Cuenta de ', aName)! !
 
-!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:18:43'!
+!SpecializedTreeSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:09:54'!
 reportWithdraw: aValue
 
-	reportString  := reportString, 'Extracción por ', aValue asString, String newLineString .! !
+	self addReport: ('Extracción por ', aValue asString)! !
 
 
 !classDefinition: #TransferNet category: #'Portfolio-Solucion'!
@@ -1721,15 +1727,15 @@ Report subclass: #TreeSummary
 	poolDictionaries: ''
 	category: 'Portfolio-Solucion'!
 
-!TreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:05:39'!
+!TreeSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:10:22'!
 reportWithPortfolioName: aName
 
-	reportString := reportString, 'Portfolio de ', aName , String newLineString .! !
+	self addReport: ('Portfolio de ', aName)! !
 
-!TreeSummary methodsFor: 'reporting' stamp: 'aa 10/26/2019 19:05:23'!
+!TreeSummary methodsFor: 'reporting' stamp: 'aa 10/28/2019 16:10:33'!
 reportWithReceptiveAccountName: aName
 
-	reportString := reportString, 'Cuenta de ', aName , String newLineString .! !
+	self addReport: ('Cuenta de ', aName)! !
 
 
 !classDefinition: #WireTransfer category: #'Portfolio-Solucion'!
