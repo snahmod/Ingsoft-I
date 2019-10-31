@@ -1,0 +1,493 @@
+
+
+----STARTUP---- (31 October 2019 15:42:34) as /home/snahmod/Documentos/UBA/2019/Segundo Cuatrimestre/Ingsoft I/cuis-nuevo/CuisUniversity-3938.image!
+
+
+Object subclass: #NameOfSubclass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TDDGuruFirstBootstrappin'!
+
+!classDefinition: #NameOfSubclass category: #TDDGuruFirstBootstrappin stamp: 'SN 10/31/2019 15:47:10'!
+Object subclass: #NameOfSubclass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TDDGuruFirstBootstrappin'!
+
+!classRemoval: #NameOfSubclass stamp: 'SN 10/31/2019 15:47:28'!
+Object subclass: #NameOfSubclass
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TDDGuruFirstBootstrappin'!
+
+Object subclass: #Cart
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Exercise'!
+
+!classDefinition: #Cart category: #'TusLibros-Exercise' stamp: 'SN 10/31/2019 15:49:10'!
+Object subclass: #Cart
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Exercise'!
+
+----SNAPSHOT----(31 October 2019 15:51:46) CuisUniversity-3938.image priorSource: 14319118!
+
+Object subclass: #CartTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Exercise'!
+
+!classDefinition: #CartTest category: #'TusLibros-Exercise' stamp: 'SN 10/31/2019 15:53:04'!
+Object subclass: #CartTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Exercise'!
+
+TestCase subclass: #CartTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Exercise'!
+
+!classDefinition: #CartTest category: #'TusLibros-Exercise' stamp: 'SN 10/31/2019 15:53:20'!
+TestCase subclass: #CartTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Exercise'!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 15:55:36'!
+test01NewCartShouldBeEmpty
+
+	| cart |
+	cart := Cart new.
+	
+	self assert: cart isEmpty.! !
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 15:55:52' prior: 50777416!
+test01NewCartShouldBeEmpty
+
+	| cart |
+
+	cart := Cart new.
+	
+	self assert: cart isEmpty.! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 15:55:54'!
+ERROR!
+!Cart methodsFor: 'testing' stamp: 'SN 10/31/2019 15:56:30'!
+isEmpty
+
+	^ true! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 15:56:31'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 15:58:36' prior: 50777422!
+test01NewCartShouldBeEmpty
+
+	| cart |
+
+	cart := Cart new.
+	
+	self assert: cart isEmpty.
+	self assert: 0 equals: cart count.! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 15:58:37'!
+ERROR!
+!Cart methodsFor: 'testing' stamp: 'SN 10/31/2019 15:58:52'!
+count
+
+	^ 0! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 15:58:54'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 15:59:39'!
+test02CartWithOneBookShouldNotBeEmpty
+
+	| cart |
+
+	cart := Cart new.
+	
+	self assert: cart isEmpty.
+	self assert: 0 equals: cart count.! !
+
+!classDefinition: #CartTest category: #'TusLibros-Exercise' stamp: 'SN 10/31/2019 16:01:10'!
+TestCase subclass: #CartTest
+	instanceVariableNames: 'book'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Exercise'!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:01:09' prior: 50777451!
+test02CartWithOneBookShouldNotBeEmpty
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	
+	self assert: cart isEmpty.
+	self assert: 0 equals: cart count.! !
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:01:26' prior: 50777466!
+test02CartWithOneBookShouldNotBeEmpty
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	
+	self deny: cart isEmpty.
+	self assert: 1 equals: cart count.! !
+!CartTest methodsFor: 'set up' stamp: 'SN 10/31/2019 16:02:05'!
+setUp
+
+	book := #aBook! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:02:08'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:02:08'!
+ERROR!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:02:08'!
+ERROR!
+
+!classDefinition: #Cart category: #'TusLibros-Exercise' stamp: 'SN 10/31/2019 16:03:07'!
+Object subclass: #Cart
+	instanceVariableNames: 'books'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Exercise'!
+!Cart methodsFor: 'book adding' stamp: 'SN 10/31/2019 16:03:05'!
+add: aBook
+	
+	books add: aBook .! !
+!Cart methodsFor: 'initialization' stamp: 'SN 10/31/2019 16:03:37'!
+initialize
+
+	books := OrderedCollection new.! !
+!Cart methodsFor: 'testing' stamp: 'SN 10/31/2019 16:03:54' prior: 50777445!
+count
+
+	^ books count .! !
+!Cart methodsFor: 'testing' stamp: 'SN 10/31/2019 16:04:02' prior: 50777430!
+isEmpty
+
+	^ books isEmpty .! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:04:03'!
+ERROR!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:04:03'!
+ERROR!
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:04:12'!
+ERROR!
+!Cart methodsFor: 'testing' stamp: 'SN 10/31/2019 16:04:26' prior: 50777508!
+count
+
+	^ books size .! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:04:27'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:04:27'!
+PASSED!
+
+!classDefinition: #CartTest category: #'TusLibros-Exercise' stamp: 'SN 10/31/2019 16:06:00'!
+TestCase subclass: #CartTest
+	instanceVariableNames: 'book otherBook'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros-Exercise'!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:05:58'!
+test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	cart add: otherBook.
+	
+	self deny: cart isEmpty.
+	self assert: 2 equals: cart count.! !
+
+!testRun: #CartTest #test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo stamp: 'SN 10/31/2019 16:06:11'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:06:11'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:06:11'!
+PASSED!
+
+!testRun: #CartTest #test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo stamp: 'SN 10/31/2019 16:06:11'!
+PASSED!
+!CartTest methodsFor: 'set up' stamp: 'SN 10/31/2019 16:06:51' prior: 50777481!
+setUp
+
+	book := #aBook.
+	otherBook := #otherBook.! !
+!CartTest methodsFor: 'set up' stamp: 'SN 10/31/2019 16:07:11' prior: 50777564!
+setUp
+
+	book := #aBook.
+	otherBook := #otherBook.
+	self deny: true.! !
+!CartTest methodsFor: 'set up' stamp: 'SN 10/31/2019 16:07:18' prior: 50777569!
+setUp
+
+	book := #aBook.
+	otherBook := #otherBook.! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:07:18'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:07:18'!
+PASSED!
+
+!testRun: #CartTest #test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo stamp: 'SN 10/31/2019 16:07:18'!
+PASSED!
+
+----SNAPSHOT----(31 October 2019 16:07:27) CuisUniversity-3938.image priorSource: 14263693!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:09:34'!
+test04CartWithBookShouldHaveTheBook
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	
+	self assert: (cart has: book).! !
+
+!testRun: #CartTest #test04CartWithBookShouldHaveTheBook stamp: 'SN 10/31/2019 16:09:39'!
+ERROR!
+
+!testRun: #CartTest #test04CartWithBookShouldHaveTheBook stamp: 'SN 10/31/2019 16:10:29'!
+ERROR!
+!Cart methodsFor: 'testing' stamp: 'SN 10/31/2019 16:10:55'!
+has: aSymbol 
+	self shouldBeImplemented.! !
+!Cart methodsFor: 'testing' stamp: 'SN 10/31/2019 16:11:35' prior: 50777603!
+has: aBook 
+	
+	^ books includes: aBook .! !
+
+!testRun: #CartTest #test04CartWithBookShouldHaveTheBook stamp: 'SN 10/31/2019 16:11:43'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:11:43'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:11:43'!
+PASSED!
+
+!testRun: #CartTest #test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo stamp: 'SN 10/31/2019 16:11:43'!
+PASSED!
+
+!testRun: #CartTest #test04CartWithBookShouldHaveTheBook stamp: 'SN 10/31/2019 16:11:43'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:12:20'!
+test04CartWithBookShouldNotHaveOtherBook
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	
+	self deny: (cart has: otherBook).! !
+
+!testRun: #CartTest #test04CartWithBookShouldNotHaveOtherBook stamp: 'SN 10/31/2019 16:12:21'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:12:21'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:12:21'!
+PASSED!
+
+!testRun: #CartTest #test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo stamp: 'SN 10/31/2019 16:12:21'!
+PASSED!
+
+!testRun: #CartTest #test04CartWithBookShouldHaveTheBook stamp: 'SN 10/31/2019 16:12:21'!
+PASSED!
+
+!testRun: #CartTest #test04CartWithBookShouldNotHaveOtherBook stamp: 'SN 10/31/2019 16:12:21'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:12:32'!
+test05CartWithBookShouldNotHaveOtherBook
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	
+	self deny: (cart has: otherBook).! !
+
+!methodRemoval: CartTest #test04CartWithBookShouldNotHaveOtherBook stamp: 'SN 10/31/2019 16:12:32'!
+test04CartWithBookShouldNotHaveOtherBook
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	
+	self deny: (cart has: otherBook).!
+
+----End fileIn of /home/snahmod/Documentos/UBA/2019/Segundo Cuatrimestre/Ingsoft I/cuis-nuevo/Packages/TerseGuide.pck.st----!
+!Cart methodsFor: 'initialization' stamp: 'SN 10/31/2019 16:22:01' prior: 50777504!
+initialize
+
+	books := Dictionary new.! !
+!Cart methodsFor: 'initialization' stamp: 'SN 10/31/2019 16:23:31' prior: 50780679!
+initialize
+
+	books := Bag new.! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:23:32'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:23:32'!
+PASSED!
+
+!testRun: #CartTest #test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo stamp: 'SN 10/31/2019 16:23:32'!
+PASSED!
+
+!testRun: #CartTest #test04CartWithBookShouldHaveTheBook stamp: 'SN 10/31/2019 16:23:32'!
+PASSED!
+
+!testRun: #CartTest #test05CartWithBookShouldNotHaveOtherBook stamp: 'SN 10/31/2019 16:23:32'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:24:49'!
+test06CartWithBookShouldHaveBookOnce
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	
+	self deny: (cart has: otherBook).! !
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:25:44' prior: 50780702!
+test06CartWithBookShouldHaveBookOnce
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	
+	self assert: 1 equals: (cart quantityOf: book).! !
+
+!testRun: #CartTest #test06CartWithBookShouldHaveBookOnce stamp: 'SN 10/31/2019 16:25:48'!
+ERROR!
+!Cart methodsFor: 'testing' stamp: 'SN 10/31/2019 16:26:19'!
+quanitityOf: aBook
+
+	^ books occurrencesOf: aBook .! !
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:26:20'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:26:20'!
+PASSED!
+
+!testRun: #CartTest #test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo stamp: 'SN 10/31/2019 16:26:20'!
+PASSED!
+
+!testRun: #CartTest #test04CartWithBookShouldHaveTheBook stamp: 'SN 10/31/2019 16:26:20'!
+PASSED!
+
+!testRun: #CartTest #test05CartWithBookShouldNotHaveOtherBook stamp: 'SN 10/31/2019 16:26:20'!
+PASSED!
+
+!testRun: #CartTest #test06CartWithBookShouldHaveBookOnce stamp: 'SN 10/31/2019 16:26:20'!
+ERROR!
+
+!testRun: #CartTest #test06CartWithBookShouldHaveBookOnce stamp: 'SN 10/31/2019 16:26:20'!
+ERROR!
+!Cart methodsFor: 'testing' stamp: 'SN 10/31/2019 16:26:34'!
+quantityOf: aBook
+
+	^ books occurrencesOf: aBook .! !
+
+!methodRemoval: Cart #quanitityOf: stamp: 'SN 10/31/2019 16:26:34'!
+quanitityOf: aBook
+
+	^ books occurrencesOf: aBook .!
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:26:35'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:26:35'!
+PASSED!
+
+!testRun: #CartTest #test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo stamp: 'SN 10/31/2019 16:26:35'!
+PASSED!
+
+!testRun: #CartTest #test04CartWithBookShouldHaveTheBook stamp: 'SN 10/31/2019 16:26:35'!
+PASSED!
+
+!testRun: #CartTest #test05CartWithBookShouldNotHaveOtherBook stamp: 'SN 10/31/2019 16:26:35'!
+PASSED!
+
+!testRun: #CartTest #test06CartWithBookShouldHaveBookOnce stamp: 'SN 10/31/2019 16:26:35'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:26:53'!
+test07CartWithRepeatedBookShouldHaveBookTwice
+
+	| cart |
+
+	cart := Cart new.
+	
+	cart add: book.
+	
+	self assert: 1 equals: (cart quantityOf: book).! !
+!CartTest methodsFor: 'tests' stamp: 'SN 10/31/2019 16:27:19' prior: 50780772!
+test07CartWithRepeatedBookShouldHaveBookTwice
+
+	| cart |
+
+	cart := Cart new.
+	
+	2 timesRepeat: [cart add: book].
+	
+	self assert: 2 equals: (cart quantityOf: book).! !
+
+!testRun: #CartTest #test07CartWithRepeatedBookShouldHaveBookTwice stamp: 'SN 10/31/2019 16:27:21'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartShouldBeEmpty stamp: 'SN 10/31/2019 16:27:21'!
+PASSED!
+
+!testRun: #CartTest #test02CartWithOneBookShouldNotBeEmpty stamp: 'SN 10/31/2019 16:27:21'!
+PASSED!
+
+!testRun: #CartTest #test03CartWithTwoBooksShouldNotBeEmptyAndHaveCountTwo stamp: 'SN 10/31/2019 16:27:21'!
+PASSED!
+
+!testRun: #CartTest #test04CartWithBookShouldHaveTheBook stamp: 'SN 10/31/2019 16:27:21'!
+PASSED!
+
+!testRun: #CartTest #test05CartWithBookShouldNotHaveOtherBook stamp: 'SN 10/31/2019 16:27:21'!
+PASSED!
+
+!testRun: #CartTest #test06CartWithBookShouldHaveBookOnce stamp: 'SN 10/31/2019 16:27:21'!
+PASSED!
+
+!testRun: #CartTest #test07CartWithRepeatedBookShouldHaveBookTwice stamp: 'SN 10/31/2019 16:27:21'!
+PASSED!
+
+----SNAPSHOT----(31 October 2019 16:27:32) CuisUniversity-3938.image priorSource: 14269992!
