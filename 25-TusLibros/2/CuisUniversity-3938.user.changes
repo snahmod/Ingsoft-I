@@ -2553,3 +2553,335 @@ PASSED!
 PASSED!
 
 ----QUIT----(4 November 2019 21:47:38) CuisUniversity-3938.image priorSource: 14450954!
+
+----STARTUP---- (7 November 2019 15:55:01) as /home/snahmod/Documentos/UBA/2019/Segundo Cuatrimestre/Ingsoft I/cuis-nuevo/CuisUniversity-3938.image!
+
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:16:20' prior: 50783292!
+test04CashierWithoneItemCartAndValidCreditRegitersSellAtCheckout
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate.
+	cashier checkout.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .! !
+
+[ 'hola' ] simulateValueWithArguments: #(#lelo) caller: thisContext .!
+
+([ 'hola' ] simulateValueWithArguments: #(#lelo) caller: thisContext) lelo.!
+
+([ 'hola' ] simulateValueWithArguments: #(#lelo) caller: thisContext) first.!
+
+([ 'hola' ] simulateValueWithArguments: #(#lelo) caller: thisContext) first lelo!
+
+([ ^'hola' ] simulateValueWithArguments: #(#lelo) caller: thisContext) !
+
+([ :a | ^a ] simulateValueWithArguments: #('olo') caller: thisContext) !
+
+([ :a | a ] simulateValueWithArguments: #('olo') caller: thisContext) !
+
+([ :a | a ] simulateValueWithArguments: #("olo") caller: thisContext) !
+
+([ :a | a ] simulateValueWithArguments: #("olo") caller: thisContext) first!
+
+([ :a | a ] simulateValueWithArguments: #("olo") caller: thisContext) first!
+
+[ 'oaao' ] value!
+
+[ 'oaao' ] lelo!
+
+[ 'oaao' ] argumentCount !
+
+[ 'oaao' ] home !
+
+[ 'oaao' ] capturedValues !
+
+[ 'oaao' ] receiver !
+
+[ 'oaao' ] at: 0!
+
+[ 'oaao' ] addInstanceVarNamed: 'lala' withValue: 0!
+
+!classDefinition: #CashierTest category: #TusLibros stamp: 'SN 11/7/2019 16:51:34'!
+TestCase subclass: #CashierTest
+	instanceVariableNames: 'emptyCart aCard emptySalesBook catalog oneItemCart someOldDate someDate someFarDate mockedDebitFrom'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!CashierTest methodsFor: 'mocking' stamp: 'SN 11/7/2019 16:51:32'!
+debitFrom: aCreditCard
+
+	^ mockedDebitFrom value.! !
+!CashierTest methodsFor: 'setUp/tearDown' stamp: 'SN 11/7/2019 16:51:51' prior: 50783395!
+setUp
+
+	emptySalesBook := OrderedCollection new.
+	catalog := Dictionary new add: 'validBook'->0; yourself.
+	emptyCart := Cart acceptingItemsOf: catalog.
+	oneItemCart := (Cart acceptingItemsOf: catalog) add: 'validBook'; yourself.
+	someOldDate := GregorianMonthOfYear yearNumber: 1962 month: November.
+	someDate := FixedGregorianDate yearNumber: 2020 month: March dayNumber: 20.
+	someFarDate := FixedGregorianDate yearNumber: 2050 month: May dayNumber: 3.
+	mockedDebitFrom := [].! !
+
+!classDefinition: #Cashier category: #TusLibros stamp: 'SN 11/7/2019 16:54:26'!
+Object subclass: #Cashier
+	instanceVariableNames: 'cart creditCard salesBook date amountToCharge paymentProcesor'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!Cashier methodsFor: 'initialization' stamp: 'SN 11/7/2019 16:54:24'!
+initializeFor: aCart withCreditCard: aCreditCard withSalesBook: aSalesBook withDate: aDate withPaymentProcesor: aPaymentProcesor
+	
+	cart := aCart.
+	creditCard := aCreditCard.
+	salesBook := aSalesBook .
+	date := aDate .
+	paymentProcesor := aPaymentProcesor .! !
+
+!methodRemoval: Cashier #initializeFor:withCreditCard:withSalesBook:withDate: stamp: 'SN 11/7/2019 16:54:30'!
+initializeFor: aCart withCreditCard: aCreditCard withSalesBook: aSalesBook withDate: aDate
+	
+	cart := aCart.
+	creditCard := aCreditCard.
+	salesBook := aSalesBook .
+	date := aDate .!
+!Cashier class methodsFor: 'instance creation' stamp: 'SN 11/7/2019 16:54:56'!
+for: aCart withCreditCard: aCreditCard withSalesBook: aSalesBook withDate: aDate withPaymentProcesor: aPaymentProcesor
+
+	aCart isEmpty ifTrue: [self error: 'No se puede hacer checkout de un carrito vacio'].
+	
+	(aCreditCard expiredAfter: aDate) ifTrue: [self error: 'Tarjeta expirada'].
+
+	^self new initializeFor: aCart withCreditCard: aCreditCard withSalesBook: aSalesBook withDate: aDate withPaymentProcesor: aPaymentProcesor.! !
+
+!methodRemoval: Cashier class #for:withCreditCard:withSalesBook:withDate: stamp: 'SN 11/7/2019 16:54:59'!
+for: aCart withCreditCard: aCreditCard withSalesBook: aSalesBook withDate: aDate
+
+	aCart isEmpty ifTrue: [self error: 'No se puede hacer checkout de un carrito vacio'].
+	
+	(aCreditCard expiredAfter: aDate) ifTrue: [self error: 'Tarjeta expirada'].
+
+	^self new initializeFor: aCart withCreditCard: aCreditCard withSalesBook: aSalesBook withDate: aDate .!
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:55:25' prior: 50782844!
+test01CashierWithEmptyCartRaisesError
+
+	|cashier_build|
+	
+	cashier_build := [Cashier for: emptyCart withCreditCard: aCard withSalesBook: emptySalesBook withDate: someDate withPaymentProcesor: self].
+	
+	self should: cashier_build 
+		raise: Error - MessageNotUnderstood
+		withMessageText: 'No se puede hacer checkout de un carrito vacio'.
+	
+	self assert: emptySalesBook isEmpty.! !
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:55:31' prior: 50782826!
+test02CashierWithoneItemCartAndExpiredCartRaisesError
+
+	| expiredCard cashier_build |
+	
+	expiredCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someOldDate.
+	
+	cashier_build := [Cashier for: oneItemCart withCreditCard: expiredCard withSalesBook: emptySalesBook withDate: someDate withPaymentProcesor: self].
+	
+	
+	self should: cashier_build 
+		raise: Error - MessageNotUnderstood
+		withMessageText: 'Tarjeta expirada'.
+	
+	self assert: emptySalesBook isEmpty.! !
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:55:36' prior: 50783215!
+test03CashierWithoneItemCartAndValidCreditCardRaisesNoError
+
+	| validCard |
+	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	Cashier for: oneItemCart withCreditCard: validCard withSalesBook: emptySalesBook withDate: someDate withPaymentProcesor: self.
+	
+	self assert: emptySalesBook isEmpty.! !
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:56:06'!
+test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate.
+	cashier checkout.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .! !
+
+!methodRemoval: CashierTest #test04CashierWithoneItemCartAndValidCreditRegitersSellAtCheckout stamp: 'SN 11/7/2019 16:56:06'!
+test04CashierWithoneItemCartAndValidCreditRegitersSellAtCheckout
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate.
+	cashier checkout.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .!
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:56:12' prior: 50783621!
+test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate withPaymentProcesor: self.
+	cashier checkout.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .! !
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:56:36' prior: 50783655!
+test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	mockedDebitFrom := [self error: 'SOME ERROR'].
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate withPaymentProcesor: self.
+	cashier checkout.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .! !
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:57:22' prior: 50783673!
+test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	mockedDebitFrom := [self error: 'SOME ERROR'].
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate withPaymentProcesor: self.
+	self should: [cashier checkout]
+		raise: Error - MessageNotUnderstood 
+		des.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .! !
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:57:42' prior: 50783692!
+test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	mockedDebitFrom := [self error: 'SOME ERROR'].
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate withPaymentProcesor: self.
+	self should: [cashier checkout]
+		raise: Error - MessageNotUnderstood 
+		withMessageText: 'SOME ERROR'.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .! !
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:57:45' prior: 50783713!
+test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	mockedDebitFrom := [self error: 'SOME ERROR'].
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate withPaymentProcesor: self.
+
+	self should: [cashier checkout]
+		raise: Error - MessageNotUnderstood 
+		withMessageText: 'SOME ERROR'.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .! !
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:57:54' prior: 50783735!
+test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	mockedDebitFrom := [self error: 'SOME ERROR'].
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate withPaymentProcesor: self.
+
+	self should: [cashier checkout]
+		raise: Error - MessageNotUnderstood 
+		withMessageText: 'SOME ERROR'.
+	
+	self assert: salesBook isEmpty .! !
+
+!testRun: #CashierTest #test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout stamp: 'SN 11/7/2019 16:57:57'!
+FAILURE!
+!Cashier methodsFor: 'private cobranding' stamp: 'SN 11/7/2019 16:58:32' prior: 50783335!
+debit
+	
+	paymentProcesor debitFrom: creditCard .! !
+
+!testRun: #CashierTest #test01CashierWithEmptyCartRaisesError stamp: 'SN 11/7/2019 16:58:36'!
+PASSED!
+
+!testRun: #CashierTest #test02CashierWithoneItemCartAndExpiredCartRaisesError stamp: 'SN 11/7/2019 16:58:36'!
+PASSED!
+
+!testRun: #CashierTest #test03CashierWithoneItemCartAndValidCreditCardRaisesNoError stamp: 'SN 11/7/2019 16:58:36'!
+PASSED!
+
+!testRun: #CashierTest #test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout stamp: 'SN 11/7/2019 16:58:36'!
+PASSED!
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:59:03'!
+test05CashierWithOneItemCartAndValidCreditRegistersSell
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	mockedDebitFrom := [self error: 'SOME ERROR'].
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate withPaymentProcesor: self.
+	cashier checkout.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .! !
+!CashierTest methodsFor: 'tests' stamp: 'SN 11/7/2019 16:59:20' prior: 50783801!
+test05CashierWithOneItemCartAndValidCreditRegistersSell
+
+	| validCard cashier salesBook |
+	
+	salesBook := emptySalesBook .	
+	validCard := CreditCard withNumber: '0000000000000000' withOwnerName: 'Eden Torres' withExpiration: someFarDate.
+	
+	mockedDebitFrom := ['OK'].
+	
+	cashier := Cashier for: oneItemCart withCreditCard: validCard withSalesBook: salesBook withDate: someDate withPaymentProcesor: self.
+	cashier checkout.
+	
+	self assert: salesBook includes: oneItemCart totalPrice .! !
+
+!testRun: #CashierTest #test05CashierWithOneItemCartAndValidCreditRegistersSell stamp: 'SN 11/7/2019 16:59:21'!
+PASSED!
+
+!testRun: #CashierTest #test01CashierWithEmptyCartRaisesError stamp: 'SN 11/7/2019 16:59:21'!
+PASSED!
+
+!testRun: #CashierTest #test02CashierWithoneItemCartAndExpiredCartRaisesError stamp: 'SN 11/7/2019 16:59:21'!
+PASSED!
+
+!testRun: #CashierTest #test03CashierWithoneItemCartAndValidCreditCardRaisesNoError stamp: 'SN 11/7/2019 16:59:21'!
+PASSED!
+
+!testRun: #CashierTest #test04CashierWithOneItemCartAndValidCreditRaisesErrorAtCheckout stamp: 'SN 11/7/2019 16:59:21'!
+PASSED!
+
+!testRun: #CashierTest #test05CashierWithOneItemCartAndValidCreditRegistersSell stamp: 'SN 11/7/2019 16:59:21'!
+PASSED!
