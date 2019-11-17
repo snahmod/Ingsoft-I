@@ -6772,3 +6772,452 @@ PASSED!
 PASSED!
 
 ----QUIT----(15 November 2019 09:44:07) CuisUniversity-3938.image priorSource: 14546625!
+
+----STARTUP---- (17 November 2019 18:13:26) as /home/snahmod/Documentos/UBA/2019/Segundo Cuatrimestre/Ingsoft I/cuis-nuevo/CuisUniversity-3938.image!
+
+
+!classRemoval: #TusLibrosInternalInterface stamp: 'SN 11/17/2019 18:14:09'!
+Object subclass: #TusLibrosInternalInterface
+	instanceVariableNames: 'userRegistry carts catalog lastCartID'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classRemoval: #StoreTestObjectsFactory stamp: 'SN 11/17/2019 18:14:09'!
+Object subclass: #StoreTestObjectsFactory
+	instanceVariableNames: 'today'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classRemoval: #Sale stamp: 'SN 11/17/2019 18:14:10'!
+Object subclass: #Sale
+	instanceVariableNames: 'total'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classRemoval: #CreditCard stamp: 'SN 11/17/2019 18:14:10'!
+Object subclass: #CreditCard
+	instanceVariableNames: 'expiration'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classRemoval: #Cashier stamp: 'SN 11/17/2019 18:14:10'!
+Object subclass: #Cashier
+	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classRemoval: #Cart stamp: 'SN 11/17/2019 18:14:11'!
+Object subclass: #Cart
+	instanceVariableNames: 'catalog items'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classRemoval: #TusLibrosInternalInterfaceTest stamp: 'SN 11/17/2019 18:14:11'!
+TestCase subclass: #TusLibrosInternalInterfaceTest
+	instanceVariableNames: 'edenUser edenPassword userRegistry factory'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classRemoval: #CashierTest stamp: 'SN 11/17/2019 18:14:11'!
+TestCase subclass: #CashierTest
+	instanceVariableNames: 'testObjectsFactory debitBehavior'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+!classRemoval: #CartTest stamp: 'SN 11/17/2019 18:14:12'!
+TestCase subclass: #CartTest
+	instanceVariableNames: 'testObjectsFactory'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+
+----End fileIn of /home/snahmod/Documentos/UBA/2019/Segundo Cuatrimestre/Ingsoft I/cuis-nuevo/TusLibros.st----!
+
+!testRun: #TusLibrosInternalInterfaceTest #test01CreateCartRaisesErrorWhenNonExistentUser stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test02CreateCartRaisesErrorWhenPasswordDoesNotMatch stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test03CreateCartCreatesACartWithValidUser stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test04CreateCartTwiceCreatesTwoCartsWithDifferentIDs stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test05ListCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test06ListCartListsNothingWhenCartIsJustCreated stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test07AddToCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test08AddToCartRaisesErrorWhenItemIsNotSoldByTheStore stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test09AddToCartRaisesErrorWhenQuantityIsZero stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test10AddToCartListsOneItem stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test11AddABookTwiceToCartListsTwoItem stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test12AddTwoDifferentBookToCartListsTwoDifferentItems stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test13ListCartDoesNotListItemNotIncludedInCart stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test14ShouldRaiseErrorWhenAddingAnItemToAnExpiredCart stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test15ShouldRaiseErrorWhenListingAnExpiredCart stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test16ShouldNotRaiseErrorWhenAddingAnItemTo30minOldCart stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test17ShouldNotRaiseErrorWhenAddingBooksToCartWithLagOf30minutes stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test18CheckoutCartShouldRaiseErrorWithInvalidCartId stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test19CheckoutCartShouldRaiseErrorWithEmptyCardName stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test20CheckoutCartShouldRaiseErrorWithTooLongCardName stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test21CheckoutCartShouldRaiseErrorWithExpiredCard stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test22CheckoutCartShouldRaiseErrorWithEmptyCart stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test23CheckoutCartWithOneElementListsOnePurchase stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test24CheckoutCartWithTwoElementListsTwoPurchase stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test25CheckoutCartWithTwoEqualElementsListsTwoPurchase stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test26CheckoutCartWithOneElementListsOnlySameUserPurchases stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test27ListPurchasesRaisesErrorWhenTheUserDoesNotExist stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test28ListPurchasesRaisesErrorWhenTheUserAndPasswordDontMatch stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test29ListPurchasesIsEmptyWhenTheUserDoesntCheckout stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test30CheckoutCartShouldRaiseErrorWithExpiredCart stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test31CheckoutCartShouldRaiseErrorWithMerchantProcessorError stamp: 'SN 11/17/2019 18:15:07'!
+PASSED!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/17/2019 18:28:36'!
+test32CheckoutCartWithOneElementHasOneItemInTicket
+
+	| interface cartID ticket |
+
+	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+	
+	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
+		
+	ticket := interface checkoutCart: cartID withCreditCardNumber: factory notExpiredCreditCard number
+			    		 withCreditCardName: factory notExpiredCreditCard name withExpritationDate: factory notExpiredCreditCard
+			    		 expirationDate on: factory today.
+
+
+	self assert: interface carts isEmpty.
+	self assert: ticket first includes: factory itemSellByTheStore .
+	self assert: ticket second equals: factory itemSellByTheStorePrice .  ! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test32CheckoutCartWithOneElementHasOneItemInTicket stamp: 'SN 11/17/2019 18:28:42'!
+ERROR!
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/17/2019 18:29:08' prior: 50787760!
+checkoutCart: aCartID withCreditCardNumber: aNumber withCreditCardName: aName withExpritationDate: anExpirationDate on: aDate
+	
+	| creditCard cart cashier |
+	
+	self validateCartWith: aCartID.
+	cart := carts at: aCartID.
+	
+	creditCard := CreditCard expiringOn: anExpirationDate  withName: aName  withNumber: aNumber.
+	cashier := Cashier toCheckout: cart charging: creditCard  throught: merchantProcessor
+						 on: aDate registeringOn: (salesBooks at: cart userID ).
+	cashier checkOut.
+	carts removeKey: aCartID.! !
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/17/2019 18:30:22' prior: 50788060!
+checkoutCart: aCartID withCreditCardNumber: aNumber withCreditCardName: aName withExpritationDate: anExpirationDate on: aDate
+	
+	| creditCard cart cashier items total |
+	
+	self validateCartWith: aCartID.
+	cart := carts at: aCartID.
+	
+	creditCard := CreditCard expiringOn: anExpirationDate  withName: aName  withNumber: aNumber.
+	cashier := Cashier toCheckout: cart charging: creditCard  throught: merchantProcessor
+						 on: aDate registeringOn: (salesBooks at: cart userID ).
+	total := cashier checkOut.
+	items := cart list .
+	carts removeKey: aCartID.
+	^ OrderedCollection with: items with: total.! !
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/17/2019 18:30:35' prior: 50788080!
+checkoutCart: aCartID withCreditCardNumber: aNumber withCreditCardName: aName withExpritationDate: anExpirationDate on: aDate
+	
+	| creditCard cart cashier items total |
+	
+	self validateCartWith: aCartID.
+	cart := carts at: aCartID.
+	
+	creditCard := CreditCard expiringOn: anExpirationDate  withName: aName  withNumber: aNumber.
+	cashier := Cashier toCheckout: cart charging: creditCard  throught: merchantProcessor
+						 on: aDate registeringOn: (salesBooks at: cart userID ).
+	total := cashier checkOut.
+	items := cart list .
+	
+	carts removeKey: aCartID.
+	
+	^ OrderedCollection with: items with: total.! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test01CreateCartRaisesErrorWhenNonExistentUser stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test02CreateCartRaisesErrorWhenPasswordDoesNotMatch stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test03CreateCartCreatesACartWithValidUser stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test04CreateCartTwiceCreatesTwoCartsWithDifferentIDs stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test05ListCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test06ListCartListsNothingWhenCartIsJustCreated stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test07AddToCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test08AddToCartRaisesErrorWhenItemIsNotSoldByTheStore stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test09AddToCartRaisesErrorWhenQuantityIsZero stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test10AddToCartListsOneItem stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test11AddABookTwiceToCartListsTwoItem stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test12AddTwoDifferentBookToCartListsTwoDifferentItems stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test13ListCartDoesNotListItemNotIncludedInCart stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test14ShouldRaiseErrorWhenAddingAnItemToAnExpiredCart stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test15ShouldRaiseErrorWhenListingAnExpiredCart stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test16ShouldNotRaiseErrorWhenAddingAnItemTo30minOldCart stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test17ShouldNotRaiseErrorWhenAddingBooksToCartWithLagOf30minutes stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test18CheckoutCartShouldRaiseErrorWithInvalidCartId stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test19CheckoutCartShouldRaiseErrorWithEmptyCardName stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test20CheckoutCartShouldRaiseErrorWithTooLongCardName stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test21CheckoutCartShouldRaiseErrorWithExpiredCard stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test22CheckoutCartShouldRaiseErrorWithEmptyCart stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test23CheckoutCartWithOneElementListsOnePurchase stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test24CheckoutCartWithTwoElementListsTwoPurchase stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test25CheckoutCartWithTwoEqualElementsListsTwoPurchase stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test26CheckoutCartWithOneElementListsOnlySameUserPurchases stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test27ListPurchasesRaisesErrorWhenTheUserDoesNotExist stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test28ListPurchasesRaisesErrorWhenTheUserAndPasswordDontMatch stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test29ListPurchasesIsEmptyWhenTheUserDoesntCheckout stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test30CheckoutCartShouldRaiseErrorWithExpiredCart stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test31CheckoutCartShouldRaiseErrorWithMerchantProcessorError stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test32CheckoutCartWithOneElementHasOneItemInTicket stamp: 'SN 11/17/2019 18:30:36'!
+PASSED!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/17/2019 18:35:05'!
+test33CheckoutCartWithManyElementHasItemsInTicket
+
+	| interface cartID ticket totalPurchaseAmount |
+
+	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+	
+	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 3.
+	interface addToCart: cartID item: factory anotherItemSellByTheStore withQuantity: 2.
+		
+	ticket := interface checkoutCart: cartID withCreditCardNumber: factory notExpiredCreditCard number
+			    		 withCreditCardName: factory notExpiredCreditCard name withExpritationDate: factory notExpiredCreditCard
+			    		 expirationDate on: factory today.
+
+	totalPurchaseAmount := (factory itemSellByTheStorePrice * 3) + (factory anotherItemSellByTheStorePrice * 2).
+
+	self assert: interface carts isEmpty.
+	self assert: ticket first size equals: 5.
+	self assert: (ticket first occurrencesOf: factory itemSellByTheStore) equals: 3 .
+	self assert: (ticket first occurrencesOf: factory anotherItemSellByTheStore ) equals: 2 .
+	self assert: ticket second equals: totalPurchaseAmount.	! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test33CheckoutCartWithManyElementHasItemsInTicket stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test01CreateCartRaisesErrorWhenNonExistentUser stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test02CreateCartRaisesErrorWhenPasswordDoesNotMatch stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test03CreateCartCreatesACartWithValidUser stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test04CreateCartTwiceCreatesTwoCartsWithDifferentIDs stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test05ListCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test06ListCartListsNothingWhenCartIsJustCreated stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test07AddToCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test08AddToCartRaisesErrorWhenItemIsNotSoldByTheStore stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test09AddToCartRaisesErrorWhenQuantityIsZero stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test10AddToCartListsOneItem stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test11AddABookTwiceToCartListsTwoItem stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test12AddTwoDifferentBookToCartListsTwoDifferentItems stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test13ListCartDoesNotListItemNotIncludedInCart stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test14ShouldRaiseErrorWhenAddingAnItemToAnExpiredCart stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test15ShouldRaiseErrorWhenListingAnExpiredCart stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test16ShouldNotRaiseErrorWhenAddingAnItemTo30minOldCart stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test17ShouldNotRaiseErrorWhenAddingBooksToCartWithLagOf30minutes stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test18CheckoutCartShouldRaiseErrorWithInvalidCartId stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test19CheckoutCartShouldRaiseErrorWithEmptyCardName stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test20CheckoutCartShouldRaiseErrorWithTooLongCardName stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test21CheckoutCartShouldRaiseErrorWithExpiredCard stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test22CheckoutCartShouldRaiseErrorWithEmptyCart stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test23CheckoutCartWithOneElementListsOnePurchase stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test24CheckoutCartWithTwoElementListsTwoPurchase stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test25CheckoutCartWithTwoEqualElementsListsTwoPurchase stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test26CheckoutCartWithOneElementListsOnlySameUserPurchases stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test27ListPurchasesRaisesErrorWhenTheUserDoesNotExist stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test28ListPurchasesRaisesErrorWhenTheUserAndPasswordDontMatch stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test29ListPurchasesIsEmptyWhenTheUserDoesntCheckout stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test30CheckoutCartShouldRaiseErrorWithExpiredCart stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test31CheckoutCartShouldRaiseErrorWithMerchantProcessorError stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test32CheckoutCartWithOneElementHasOneItemInTicket stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test33CheckoutCartWithManyElementHasItemsInTicket stamp: 'SN 11/17/2019 18:35:08'!
+PASSED!
+
+----SNAPSHOT----(17 November 2019 18:36:25) CuisUniversity-3938.image priorSource: 14543504!
