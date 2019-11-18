@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #CartTest category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 TestCase subclass: #CartTest
 	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
@@ -98,7 +98,7 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!classDefinition: #CashierTest category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #CashierTest category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'testObjectsFactory debitBehavior'
 	classVariableNames: ''
@@ -246,7 +246,7 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
 
-!classDefinition: #TusLibrosInternalInterfaceTest category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #TusLibrosInternalInterfaceTest category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 TestCase subclass: #TusLibrosInternalInterfaceTest
 	instanceVariableNames: 'edenUser edenPassword userRegistry factory stubbedTime debitBehavior santiUser santiPassword emptyUserRegistry'
 	classVariableNames: ''
@@ -259,12 +259,12 @@ localMillisecondClock
 	^stubbedTime.! !
 
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 21:22:08'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:40:15'!
 test01CreateCartRaisesErrorWhenNonExistentUser
 
 	| interface |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: emptyUserRegistry. 
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: emptyUserRegistry. 
 	
 	self should: [interface createCartFor: edenUser withPassword: edenPassword]
 		 raise: Error - MessageNotUnderstood
@@ -273,12 +273,12 @@ test01CreateCartRaisesErrorWhenNonExistentUser
 	self assert: interface carts isEmpty.
 		 ! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:16:27'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:40:19'!
 test02CreateCartRaisesErrorWhenPasswordDoesNotMatch
 
 	| interface |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	
 	self should: [interface createCartFor: edenUser withPassword: 'wrong password']
 		 raise: Error - MessageNotUnderstood
@@ -287,24 +287,24 @@ test02CreateCartRaisesErrorWhenPasswordDoesNotMatch
 	self assert: interface carts isEmpty.
 		 ! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:16:56'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:40:23'!
 test03CreateCartCreatesACartWithValidUser
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry .
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry .
 	
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 		
 	self assert: interface carts size equals: 1.
 	self assert: (interface includesCartID: cartID).! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:17:02'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:40:29'!
 test04CreateCartTwiceCreatesTwoCartsWithDifferentIDs
 
 	| interface cartID1 cartID2 |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry .
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry .
 	
 	cartID1 := interface createCartFor: edenUser withPassword: edenPassword.
 	cartID2 := interface createCartFor: edenUser withPassword: edenPassword.
@@ -314,127 +314,131 @@ test04CreateCartTwiceCreatesTwoCartsWithDifferentIDs
 	self assert: (interface includesCartID: cartID2).
 	self deny: cartID1 = cartID2 .! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:17:15'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:16:53'!
 test05ListCartRaisesErrorWhenCartIDDoesNotExist
 
 	| interface |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 		
 	self should: [interface listCart: 'INVALID CART ID']
 		 raise: Error - MessageNotUnderstood 
-		 withMessageText: 'CartID inválido'.! !
+		 withMessageText: 'CartID inválido'.
+		
+	self assert: interface carts isEmpty.
+! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:17:20'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:15:50'!
 test06ListCartListsNothingWhenCartIsJustCreated
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 		
-	self assert: (interface listCart: cartID ) isEmpty .! !
+	self assertThatListCartIsEmtyIn: interface ofCartID: cartID.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:17:28'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:17:03'!
 test07AddToCartRaisesErrorWhenCartIDDoesNotExist
 
 	| interface |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 		
 	self should: [interface addToCart: 'INVALID CART ID' item: factory itemSellByTheStore withQuantity: 1]
 		 raise: Error - MessageNotUnderstood 
-		 withMessageText: 'CartID inválido'.! !
+		 withMessageText: 'CartID inválido'.
+		
+	self assert: interface carts isEmpty.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:17:34'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:16:10'!
 test08AddToCartRaisesErrorWhenItemIsNotSoldByTheStore
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 		
 	self should: [interface addToCart: cartID item: factory itemNotSellByTheStore withQuantity: 1]
 		 raise: Error - MessageNotUnderstood 
-		 withMessageText: 'Item is not in catalog'.! !
+		 withMessageText: 'Item is not in catalog'.
+		
+	self assertThatListCartIsEmtyIn: interface ofCartID: cartID.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:17:46'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:16:23'!
 test09AddToCartRaisesErrorWhenQuantityIsZero
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 		
 	self should: [interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 0]
 		 raise: Error - MessageNotUnderstood 
-		 withMessageText: 'Invalid number of items'.! !
+		 withMessageText: 'Invalid number of items'.
+		
+	self assertThatListCartIsEmtyIn: interface ofCartID: cartID.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:17:54'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:13:06'!
 test10AddToCartListsOneItem
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 		
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 	
-	self assert: ((interface listCart: cartID ) includes: factory itemSellByTheStore ).
-	self assert: ((interface listCart: cartID ) occurrencesOf: factory itemSellByTheStore ) equals: 1.! !
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory itemSellByTheStore aNumberOfTimes: 1.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:18:02'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:13:13'!
 test11AddABookTwiceToCartListsTwoItem
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 		
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 2.
 	
-	self assert: ((interface listCart: cartID ) includes: factory itemSellByTheStore ).
-	self assert: ((interface listCart: cartID ) occurrencesOf: factory itemSellByTheStore ) equals: 2.! !
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory itemSellByTheStore aNumberOfTimes: 2.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:18:08'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:17:23'!
 test12AddTwoDifferentBookToCartListsTwoDifferentItems
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 		
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 	interface addToCart: cartID item: factory anotherItemSellByTheStore withQuantity: 1.
 	
-	self assert: ((interface listCart: cartID ) includes: factory itemSellByTheStore ).
-	self assert: ((interface listCart: cartID ) occurrencesOf: factory itemSellByTheStore ) equals: 1.
-	
-	self assert: ((interface listCart: cartID ) includes: factory anotherItemSellByTheStore ).
-	self assert: ((interface listCart: cartID ) occurrencesOf: factory anotherItemSellByTheStore ) equals: 1.! !
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory itemSellByTheStore aNumberOfTimes: 1.
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory anotherItemSellByTheStore aNumberOfTimes: 1.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:18:14'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:41:08'!
 test13ListCartDoesNotListItemNotIncludedInCart
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 		
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 	
 	self deny: ((interface listCart: cartID ) includes: factory anotherItemSellByTheStore).! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:18:20'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:49:55'!
 test14ShouldRaiseErrorWhenAddingAnItemToAnExpiredCart
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	
-	stubbedTime := stubbedTime + 31 minutes totalMilliseconds.
+	self addExpiredTime.
 	
 	self should: [interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.]
 		raise: Error - MessageNotUnderstood
@@ -442,15 +446,15 @@ test14ShouldRaiseErrorWhenAddingAnItemToAnExpiredCart
 	
 	self assert: interface carts isEmpty.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:18:27'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:50:10'!
 test15ShouldRaiseErrorWhenListingAnExpiredCart
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	
-	stubbedTime := stubbedTime + 31 minutes totalMilliseconds.
+	self addExpiredTime.
 	
 	self should: [interface listCart: cartID.]
 		raise: Error - MessageNotUnderstood
@@ -458,44 +462,44 @@ test15ShouldRaiseErrorWhenListingAnExpiredCart
 	
 	self assert: interface carts isEmpty.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:18:33'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:50:25'!
 test16ShouldNotRaiseErrorWhenAddingAnItemTo30minOldCart
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	
-	stubbedTime := stubbedTime + 30 minutes totalMilliseconds.
+	self addUnexpiredTime .
 	
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 	
 	self assert: interface carts size equals: 1.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/11/2019 21:18:40'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:51:19'!
 test17ShouldNotRaiseErrorWhenAddingBooksToCartWithLagOf30minutes
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	
-	stubbedTime := stubbedTime + 30 minutes totalMilliseconds.
+	self addUnexpiredTime .
 	
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 	
-	stubbedTime := stubbedTime + 30 minutes totalMilliseconds.
+	self addUnexpiredTime .
 	
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 	
 	self assert: interface carts size equals: 1.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 20:54:55'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:07:15'!
 test18CheckoutCartShouldRaiseErrorWithInvalidCartId
 
 	| interface |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 		
 	self should: [interface checkoutCart: 'invalid id' withCreditCardNumber: factory notExpiredCreditCard number withCreditCardName:
 	factory notExpiredCreditCard name withExpritationDate: factory notExpiredCreditCard expirationDate on: factory today] 
@@ -503,15 +507,14 @@ test18CheckoutCartShouldRaiseErrorWithInvalidCartId
 		withMessageText: 'CartID inválido'.
 
 	self assert: interface carts isEmpty.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) first isEmpty. 
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) second equals: 0. ! !
+	self assertThatListPurchaseIn: interface isEmptyWithUsername: edenUser withPassword: edenPassword. ! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 20:55:01'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:02:58'!
 test19CheckoutCartShouldRaiseErrorWithEmptyCardName
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 		
@@ -520,16 +523,14 @@ test19CheckoutCartShouldRaiseErrorWithEmptyCardName
 		raise: Error - MessageNotUnderstood  
 		withMessageText: 'Nombre de la tarjeta inválido'.
 
-	self assert: interface carts size equals: 1.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) first isEmpty.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) second equals: 0.  ! !
+	self assertOnlyCartIn: interface wasNotCheckoutWithUsername: edenUser withPassword: edenPassword. ! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 20:55:07'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:02:51'!
 test20CheckoutCartShouldRaiseErrorWithTooLongCardName
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 		
@@ -538,16 +539,14 @@ test20CheckoutCartShouldRaiseErrorWithTooLongCardName
 		raise: Error - MessageNotUnderstood  
 		withMessageText: 'Nombre de la tarjeta inválido'.
 
-	self assert: interface carts size equals: 1.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) first isEmpty.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) second equals: 0.  ! !
+	self assertOnlyCartIn: interface wasNotCheckoutWithUsername: edenUser withPassword: edenPassword. ! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 20:55:12'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:02:45'!
 test21CheckoutCartShouldRaiseErrorWithExpiredCard
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 		
@@ -556,16 +555,14 @@ test21CheckoutCartShouldRaiseErrorWithExpiredCard
 		raise: Error - MessageNotUnderstood  
 		withMessageText: 'Can not charge an expired credit card'.
 
-	self assert: interface carts size equals: 1.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) first isEmpty. 
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) second equals: 0. ! !
+	self assertOnlyCartIn: interface wasNotCheckoutWithUsername: edenUser withPassword: edenPassword.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 20:55:23'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:02:38'!
 test22CheckoutCartShouldRaiseErrorWithEmptyCart
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 		
 	self should: [interface checkoutCart: cartID withCreditCardNumber: factory notExpiredCreditCard number withCreditCardName:
@@ -573,16 +570,14 @@ test22CheckoutCartShouldRaiseErrorWithEmptyCart
 		raise: Error - MessageNotUnderstood  
 		withMessageText: 'Can not check out an empty cart'.
 
-	self assert: interface carts size equals: 1.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) first isEmpty. 
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) second equals: 0. ! !
+	self assertOnlyCartIn: interface wasNotCheckoutWithUsername: edenUser withPassword: edenPassword. ! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 20:56:30'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:27:20'!
 test23CheckoutCartWithOneElementListsOnePurchase
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
@@ -591,17 +586,14 @@ test23CheckoutCartWithOneElementListsOnePurchase
 			    withCreditCardName: factory notExpiredCreditCard name withExpritationDate: factory notExpiredCreditCard
 			    expirationDate on: factory today.
 
+	self assertThatListPurchaseIn: interface withUsername: edenUser withPassword: edenPassword includesOneItem: factory itemSellByTheStore withPrice: factory itemSellByTheStorePrice. ! !
 
-	self assert: interface carts isEmpty.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) first includes: factory itemSellByTheStore .
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) second equals: factory itemSellByTheStorePrice .  ! !
-
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 21:00:44'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:42:07'!
 test24CheckoutCartWithTwoElementListsTwoPurchase
 
 	| interface cartID listPurchase totalPurchaseAmount |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
@@ -621,12 +613,12 @@ test24CheckoutCartWithTwoElementListsTwoPurchase
 	self assert: listPurchase second equals:  totalPurchaseAmount.  
 	! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 21:13:36'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:42:11'!
 test25CheckoutCartWithTwoEqualElementsListsTwoPurchase
 
 	| interface cartID listPurchase totalPurchaseAmount |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 2.
@@ -653,12 +645,12 @@ test25CheckoutCartWithTwoEqualElementsListsTwoPurchase
 	self assert: listPurchase second equals:  totalPurchaseAmount.  
 	! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 21:15:20'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:26:57'!
 test26CheckoutCartWithOneElementListsOnlySameUserPurchases
 
-	| interface cartID listPurchaseEden listPurchaseSanti |
+	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
@@ -675,62 +667,53 @@ test26CheckoutCartWithOneElementListsOnlySameUserPurchases
 			    withCreditCardName: factory notExpiredCreditCard name withExpritationDate: factory notExpiredCreditCard
 			    expirationDate on: factory today.
 			
-	listPurchaseEden := interface listPurchaseFor: edenUser withPassword: edenPassword.
-	listPurchaseSanti := interface listPurchaseFor: santiUser withPassword: santiPassword .
-
-	self assert: interface carts isEmpty.
-	self assert: listPurchaseEden first size equals: 1.
-	self assert: listPurchaseEden first includes: factory itemSellByTheStore .
-	self assert: listPurchaseEden second equals: factory itemSellByTheStorePrice .  
+	self assertThatListPurchaseIn: interface withUsername: edenUser withPassword: edenPassword includesOneItem: factory itemSellByTheStore withPrice: factory itemSellByTheStorePrice .
 	
-	self assert: listPurchaseSanti first size equals: 1.
-	self assert: listPurchaseSanti first includes: factory anotherItemSellByTheStore .
-	self assert: listPurchaseSanti second equals: factory anotherItemSellByTheStorePrice . ! !
+	self assertThatListPurchaseIn: interface withUsername: santiUser withPassword: santiPassword includesOneItem: factory anotherItemSellByTheStore withPrice: factory anotherItemSellByTheStorePrice . ! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 21:22:36'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:42:18'!
 test27ListPurchasesRaisesErrorWhenTheUserDoesNotExist
 
 	| interface |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: emptyUserRegistry .
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: emptyUserRegistry .
 			
 	self should: [interface listPurchaseFor: edenUser withPassword: edenPassword]
 		 raise: Error - MessageNotUnderstood 
 		 withMessageText: 'Usuario no registrado'.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 21:24:06'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:42:22'!
 test28ListPurchasesRaisesErrorWhenTheUserAndPasswordDontMatch
 
 	| interface |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry .
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry .
 			
 	self should: [interface listPurchaseFor: edenUser withPassword: santiPassword ]
 		 raise: Error - MessageNotUnderstood 
 		 withMessageText: 'Contraseña incorrecta'.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 21:28:07'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:00:46'!
 test29ListPurchasesIsEmptyWhenTheUserDoesntCheckout
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry .
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry .
 	cartID := interface createCartFor: edenUser withPassword: edenPassword .
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 38.
 			
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword ) first isEmpty .
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword ) second equals: 0 .! !
+	self assertOnlyCartIn: interface wasNotCheckoutWithUsername: edenUser withPassword: edenPassword.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 21:39:40'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 19:06:57'!
 test30CheckoutCartShouldRaiseErrorWithExpiredCart
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 38.
 	
-	stubbedTime := stubbedTime + 31 minutes totalMilliseconds.
+	self addExpiredTime.
 		
 	self should: [interface checkoutCart: cartID withCreditCardNumber: factory notExpiredCreditCard number withCreditCardName:
 	factory notExpiredCreditCard name withExpritationDate: factory notExpiredCreditCard expirationDate on: factory today] 
@@ -738,15 +721,14 @@ test30CheckoutCartShouldRaiseErrorWithExpiredCart
 		withMessageText: 'Carrito expirado'.
 
 	self assert: interface carts isEmpty.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) first isEmpty. 
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) second equals: 0. ! !
+	self assertThatListPurchaseIn: interface isEmptyWithUsername: edenUser withPassword: edenPassword.! !
 
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/14/2019 21:42:50'!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'Eden Torres 11/18/2019 18:57:38'!
 test31CheckoutCartShouldRaiseErrorWithMerchantProcessorError
 
 	| interface cartID |
 
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
 	cartID := interface createCartFor: edenUser withPassword: edenPassword.
 	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 38.
 	
@@ -756,55 +738,11 @@ test31CheckoutCartShouldRaiseErrorWithMerchantProcessorError
 	factory notExpiredCreditCard name withExpritationDate: factory notExpiredCreditCard expirationDate on: factory today] 
 		raise: Error - MessageNotUnderstood  
 		withMessageText: Cashier creditCardHasNoCreditErrorMessage.
-
-	self assert: interface carts size equals: 1.
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) first isEmpty. 
-	self assert: (interface listPurchaseFor: edenUser withPassword: edenPassword) second equals: 0. ! !
-
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/17/2019 18:28:36'!
-test32CheckoutCartWithOneElementHasOneItemInTicket
-
-	| interface cartID ticket |
-
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
-	cartID := interface createCartFor: edenUser withPassword: edenPassword.
-	
-	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
 		
-	ticket := interface checkoutCart: cartID withCreditCardNumber: factory notExpiredCreditCard number
-			    		 withCreditCardName: factory notExpiredCreditCard name withExpritationDate: factory notExpiredCreditCard
-			    		 expirationDate on: factory today.
+	self assertOnlyCartIn: interface wasNotCheckoutWithUsername: edenUser withPassword: edenPassword.! !
 
 
-	self assert: interface carts isEmpty.
-	self assert: ticket first includes: factory itemSellByTheStore .
-	self assert: ticket second equals: factory itemSellByTheStorePrice .  ! !
-
-!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/17/2019 18:35:05'!
-test33CheckoutCartWithManyElementHasItemsInTicket
-
-	| interface cartID ticket totalPurchaseAmount |
-
-	interface := self createTusLibrosInternalInterfaceWithSalesBook: OrderedCollection new userRegistry: userRegistry.
-	cartID := interface createCartFor: edenUser withPassword: edenPassword.
-	
-	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 3.
-	interface addToCart: cartID item: factory anotherItemSellByTheStore withQuantity: 2.
-		
-	ticket := interface checkoutCart: cartID withCreditCardNumber: factory notExpiredCreditCard number
-			    		 withCreditCardName: factory notExpiredCreditCard name withExpritationDate: factory notExpiredCreditCard
-			    		 expirationDate on: factory today.
-
-	totalPurchaseAmount := (factory itemSellByTheStorePrice * 3) + (factory anotherItemSellByTheStorePrice * 2).
-
-	self assert: interface carts isEmpty.
-	self assert: ticket first size equals: 5.
-	self assert: (ticket first occurrencesOf: factory itemSellByTheStore) equals: 3 .
-	self assert: (ticket first occurrencesOf: factory anotherItemSellByTheStore ) equals: 2 .
-	self assert: ticket second equals: totalPurchaseAmount.	! !
-
-
-!TusLibrosInternalInterfaceTest methodsFor: 'setUp/tearDown' stamp: 'Eden Torres 11/14/2019 21:22:23'!
+!TusLibrosInternalInterfaceTest methodsFor: 'setUp/tearDown' stamp: 'Eden Torres 11/18/2019 18:47:21'!
 setUp
 
 	edenUser := 'eden'.
@@ -818,16 +756,20 @@ setUp
 	debitBehavior := [ :anAmount :aCreditCard | ]! !
 
 
-!TusLibrosInternalInterfaceTest methodsFor: 'initialization' stamp: 'Eden Torres 11/11/2019 21:12:26'!
-createTusLibrosInternalInterface
-
-	! !
-
-!TusLibrosInternalInterfaceTest methodsFor: 'initialization' stamp: 'Eden Torres 11/14/2019 19:57:00'!
-createTusLibrosInternalInterfaceWithSalesBook: aSalesBook userRegistry: aUserRegistry
+!TusLibrosInternalInterfaceTest methodsFor: 'initialization' stamp: 'Eden Torres 11/18/2019 18:39:40'!
+createTusLibrosInternalInterfaceWithUserRegistry: aUserRegistry
 
 	^TusLibrosInternalInterface withUsers: aUserRegistry withCatalog: factory defaultCatalog 
 										withClock: self withAMerchantProcessor: self.! !
+
+
+!TusLibrosInternalInterfaceTest methodsFor: 'clock protocol - private' stamp: 'Eden Torres 11/18/2019 18:49:19'!
+addExpiredTime
+	stubbedTime := stubbedTime + 31 minutes totalMilliseconds.! !
+
+!TusLibrosInternalInterfaceTest methodsFor: 'clock protocol - private' stamp: 'Eden Torres 11/18/2019 18:49:28'!
+addUnexpiredTime
+	stubbedTime := stubbedTime + 30 minutes totalMilliseconds.! !
 
 
 !TusLibrosInternalInterfaceTest methodsFor: 'merchant procesor protocol' stamp: 'Eden Torres 11/14/2019 20:00:51'!
@@ -835,8 +777,56 @@ debit: anAmount from: aCreditCard
 
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
+
+!TusLibrosInternalInterfaceTest methodsFor: 'assertions' stamp: 'Eden Torres 11/18/2019 19:06:09'!
+assertOnlyCartIn: interface wasNotCheckoutWithUsername: aUserID withPassword: aPassword
+	 
+	self assert: interface carts size equals: 1.
+	self assertThatListPurchaseIn: interface isEmptyWithUsername: aUserID  withPassword: aPassword.
+	 ! !
+
+!TusLibrosInternalInterfaceTest methodsFor: 'assertions' stamp: 'Eden Torres 11/18/2019 19:11:54'!
+assertThatListCartIn: interface ofCartID: cartID includes: aBook aNumberOfTimes: aNumberOfOcurrences
+
+	|listCart |
+	
+	listCart := interface listCart: cartID.
+	
+	self assert: listCart includes: aBook.
+	self assert: (listCart occurrencesOf: aBook ) equals: aNumberOfOcurrences .! !
+
+!TusLibrosInternalInterfaceTest methodsFor: 'assertions' stamp: 'Eden Torres 11/18/2019 19:14:50'!
+assertThatListCartIsEmtyIn: interface ofCartID: cartID
+
+	|listCart |
+	
+	listCart := interface listCart: cartID.
+	
+	self assert: listCart isEmpty.! !
+
+!TusLibrosInternalInterfaceTest methodsFor: 'assertions' stamp: 'Eden Torres 11/18/2019 19:05:40'!
+assertThatListPurchaseIn: interface isEmptyWithUsername: aUserID withPassword: aPassword
+
+	| listPurchase |
+	
+	listPurchase := interface listPurchaseFor: aUserID withPassword: aPassword.
+	self assert: listPurchase first isEmpty. 
+	self assert: listPurchase second equals: 0. ! !
+
+!TusLibrosInternalInterfaceTest methodsFor: 'assertions' stamp: 'Eden Torres 11/18/2019 19:25:13'!
+assertThatListPurchaseIn: interface withUsername: aUserID withPassword: aPassword includesOneItem: aItem withPrice: aPrice
+
+	| listPurchase |
+	
+	listPurchase := interface listPurchaseFor: aUserID withPassword: aPassword.
+	
+	self assert: interface carts isEmpty.
+	self assert: listPurchase first size equals: 1.
+	self assert: listPurchase first includes: aItem .
+	self assert: listPurchase second equals: aPrice.! !
+
 
-!classDefinition: #Cart category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #Cart category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -916,7 +906,7 @@ list
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: 'Cart class' category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -926,7 +916,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #CartInterface category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #CartInterface category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Object subclass: #CartInterface
 	instanceVariableNames: 'catalog items cart timeLastModified clock userID'
 	classVariableNames: ''
@@ -977,7 +967,7 @@ userID
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CartInterface class' category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: 'CartInterface class' category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 CartInterface class
 	instanceVariableNames: ''!
 
@@ -987,7 +977,7 @@ withCatalog: aCatalog withClock: aClock withUserID: aUserID
 	^ self new initialiazeWithCatalog: aCatalog withClock: aClock withUserID: aUserID .! !
 
 
-!classDefinition: #Cashier category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #Cashier category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Object subclass: #Cashier
 	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total'
 	classVariableNames: ''
@@ -1038,7 +1028,7 @@ initializeToCheckout: aCart charging: aCreditCard throught: aMerchantProcessor r
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: 'Cashier class' category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -1078,7 +1068,7 @@ creditCardHasNoCreditErrorMessage
 	^'Credit card has no credit'! !
 
 
-!classDefinition: #CreditCard category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #CreditCard category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'expiration number name'
 	classVariableNames: ''
@@ -1116,7 +1106,7 @@ number
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -1129,7 +1119,7 @@ expiringOn: aMonth withName: aName withNumber: aNumber
 	^self new initializeExpiringOn: aMonth withName: aName withNumber: aNumber.! !
 
 
-!classDefinition: #Sale category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #Sale category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Object subclass: #Sale
 	instanceVariableNames: 'total items'
 	classVariableNames: ''
@@ -1161,7 +1151,7 @@ items
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Sale class' category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: 'Sale class' category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Sale class
 	instanceVariableNames: ''!
 
@@ -1172,7 +1162,7 @@ of: aTotal withItems: items
 	^self new initializeTotal: aTotal items: items.! !
 
 
-!classDefinition: #StoreTestObjectsFactory category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #StoreTestObjectsFactory category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Object subclass: #StoreTestObjectsFactory
 	instanceVariableNames: 'today'
 	classVariableNames: ''
@@ -1252,7 +1242,7 @@ today
 	^ today! !
 
 
-!classDefinition: #TusLibrosInternalInterface category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: #TusLibrosInternalInterface category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:15'!
 Object subclass: #TusLibrosInternalInterface
 	instanceVariableNames: 'userRegistry carts catalog lastCartID clock salesBooks merchantProcessor purchases'
 	classVariableNames: ''
@@ -1280,23 +1270,19 @@ addToCart: aCartID item: anItem withQuantity: anAmount
 	
 	(carts at: aCartID ) add: anAmount of: anItem .! !
 
-!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/17/2019 18:30:35'!
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'Eden Torres 11/14/2019 19:51:07'!
 checkoutCart: aCartID withCreditCardNumber: aNumber withCreditCardName: aName withExpritationDate: anExpirationDate on: aDate
 	
-	| creditCard cart cashier items total |
+	| creditCard cart cashier |
 	
 	self validateCartWith: aCartID.
 	cart := carts at: aCartID.
 	
 	creditCard := CreditCard expiringOn: anExpirationDate  withName: aName  withNumber: aNumber.
 	cashier := Cashier toCheckout: cart charging: creditCard  throught: merchantProcessor
-						 on: aDate registeringOn: (salesBooks at: cart userID ).
-	total := cashier checkOut.
-	items := cart list .
-	
-	carts removeKey: aCartID.
-	
-	^ OrderedCollection with: items with: total.! !
+						   on: aDate registeringOn: (salesBooks at: cart userID ).
+	cashier checkOut.
+	carts removeKey: aCartID.! !
 
 !TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'Eden Torres 11/14/2019 20:20:04'!
 createCartFor: aUserID withPassword: aPassword 
@@ -1386,7 +1372,7 @@ totalOfSales: sales
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosInternalInterface class' category: #TusLibros stamp: 'SN 11/17/2019 18:36:20'!
+!classDefinition: 'TusLibrosInternalInterface class' category: #TusLibros stamp: 'Eden Torres 11/18/2019 19:28:16'!
 TusLibrosInternalInterface class
 	instanceVariableNames: ''!
 
