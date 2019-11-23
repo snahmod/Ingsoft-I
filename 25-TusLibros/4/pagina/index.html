@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Substrings Finder</title>
+
+  <!-- Fonts to support Material Design -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <!-- Icons to support Material Design -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <script src="./lib/react.development.js" crossorigin="anonymous"></script>
+  <script src="./lib/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="./lib/material-ui.development.js" crossorigin="anonymous"></script>
+  <script src="./lib/babel.min.js" crossorigin="anonymous"></script>
+  <script src="./src/refreshbrowser.js" crossorigin="anonymous"></script>
+
+  <!-- Libraries fallback -->
+  <script>window.React || document.write('<script src="https://unpkg.com/react@16.11.0/umd/react.development.js">\x3C/script>')</script>
+  <script>window.ReactDOM || document.write('<script src="https://unpkg.com/react-dom@16.11.0/umd/react-dom.development.js">\x3C/script>')</script>
+  <script>window.MaterialUI || document.write('<script src="https://unpkg.com/@material-ui/core@4.6.1/umd/material-ui.development.js">\x3C/script>')</script>
+  <script>window.Babel || document.write('<script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js">\x3C/script>')</script>
+  <!-- end fallback -->
+
+  <script type="text/babel" type="module">
+    const {
+      AppBar,
+      Avatar,
+      Button,
+      colors,
+      CircularProgress,
+      Checkbox,
+      Container,
+      createMuiTheme,
+      CssBaseline,
+      Icon,
+      IconButton,
+      InputAdornment,
+      InputLabel,
+      FormControl,
+      Link,
+      List,
+      ListItem,
+      ListItemIcon,
+      ListItemText,
+      ListItemAvatar,
+      ListItemSecondaryAction,
+      makeStyles,
+      OutlinedInput,
+      TextField,
+      ThemeProvider,
+      Toolbar,
+      Typography,
+    } = MaterialUI;
+    const theme = createMuiTheme({
+      palette: {
+        primary: {
+          main: '#556cd6',
+        },
+        secondary: {
+          main: '#19857b',
+        },
+        error: {
+          main: colors.red.A400,
+        },
+        background: {
+          default: '#fff',
+          paper: '#f5f5f5',
+        },
+      },
+    });
+    const useStyles = makeStyles(theme => ({
+      list: {
+        margin: theme.spacing(0, 0, 0, 0),
+      },
+      login: {
+        height: "60vh",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      root: {
+        margin: theme.spacing(6, 0, 3),
+      },
+      lightBulb: {
+        verticalAlign: 'middle',
+        // marginRight: theme.spacing(1),
+      },
+      rootToolBar: {
+        flexGrow: 1,
+      },
+      menuButton: {
+        marginRight: theme.spacing(2),
+      },
+      textField: {
+            marginTop: theme.spacing(1),
+            marginBottom: theme.spacing(1),
+            width: '100%',
+            textAlign: 'center',
+      },
+      title: {
+        flexGrow: 1,
+      },
+      rootList: {
+        width: '100%',
+        backgroundColor: theme.palette.background.paper,
+        position: 'relative',
+        overflow: 'auto',
+        maxHeight: 300,
+      },
+      textFieldDetails: {
+        margin: theme.spacing(2),
+      }
+    }));
+
+    const getLocalAsJson = (path) => {
+      var port = 8082
+    
+      return fetch(`http://localhost:${port}/${path}`, {
+        method: "GET",
+        dataType: "JSON",
+        headers: {
+          "Access-Control-Request-Headers": "*"
+        }
+      })
+    }
+    
+    const getISBNApiAsJson = (isbn) => {
+      return fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`, {
+        method: "GET",
+        dataType: "JSON",
+        headers: {
+          "Access-Control-Request-Headers": "*"
+        }
+      })
+    }
+
+        function MyToolBar(props) {
+          const classes = useStyles();
+          const {title, router} = props;
+        
+          let menuButton = (
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              onClick={()=>router.navigate("/", {
+                substrings: [],
+                selectedSubstring: "",})}
+              >
+              <Icon>close</Icon>
+            </IconButton>
+          )
+    
+          let carritoButton = (
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              onClick={()=>router.navigate("/cart", {
+                substrings: [],
+                selectedSubstring: "",})}
+              >
+              <Icon>shopping_cart</Icon>
+            </IconButton>
+          )
+    
+          let catalogButton = (
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              onClick={()=>router.navigate("/catalog", {
+                substrings: [],
+                selectedSubstring: "",})}
+              >
+              <Icon>list</Icon>
+            </IconButton>
+          )
+    
+          let purchasesButton = (
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              onClick={()=>router.navigate("/", {
+                substrings: [],
+                selectedSubstring: "",})}
+              >
+              <Icon>account_circle</Icon>
+            </IconButton>
+          )
+    
+          if (router.current() === "/") {
+    
+            menuButton = (<div></div>)
+            carritoButton = (<div></div>)
+            purchasesButton = (<div></div>)
+            catalogButton = (<div></div>)
+          }
+        
+          // if (router.current() === "/cart") {
+          //   menuButton = (
+          //     <IconButton
+          //       edge="start"
+          //       className={classes.menuButton}
+          //       color="inherit"
+          //       onClick={()=>router.navigate("/catalog", {
+          //       selectedSubstring: "",})}
+          //     >
+          //       <Icon>keyboard_arrow_left</Icon>
+          //     </IconButton>
+          //   )
+          // }
+        
+          return (
+            <div className={classes.rootToolBar}>
+              <AppBar position="static">
+                <Toolbar>
+                  {menuButton}
+                  {catalogButton}
+                  {carritoButton}
+                  {purchasesButton}
+                  <Typography variant="h6" className={classes.title}>
+                    {title}
+                  </Typography>
+                  {/*<Button color="inherit">Login</Button>*/}
+                </Toolbar>
+              </AppBar>
+            </div>
+          )
+        }
+    
+    function StringInputView(props) {
+      const { router } = props
+      const classes = useStyles();
+      const [values, setValues] = React.useState({
+        text: '',
+      });
+      const handleChange = prop => event => {
+        setValues({ ...values, [prop]: event.target.value });
+      };
+      const handleSend = text => {
+        loading = true;
+        getLocalAsJson(`substrings?sentence=${text}`)
+          .then(function (response) {
+            loading = false;
+            return response.json()
+          })
+          .then(function (json) {
+            loading = false;
+            router.navigate("/catalog", { substrings: json })
+          })
+          .catch(function (error) {
+            loading = false;
+            console.log('Looks like there was a problem: \n', error);
+          });
+      }
+      var loading = false;
+    
+      return (
+        <div>
+              <FormControl fullWidth className={classes.login} variant="outlined">
+                        <Typography component="h1" gutterBottom style={{textAlignVertical: "center",textAlign: "center",}}>
+                Ingrese su usuario y contraseña
+                  </Typography>
+                <div>
+                <TextField 
+                  id="outlined-adornment-amount"
+                  value={values.text}
+                  onChange={handleChange('text')}
+                  className={classes.textField}
+                  label="User"
+                  autoComplete="off"
+                />
+                </div>
+                <div>
+                
+              <TextField 
+                id="standard-password-input"
+                label="Password"
+                className={classes.textField}
+                type="password"
+                autoComplete="current-password"
+                />
+              </div>
+    
+                          <div>
+        
+              <Button 
+              color="primary" 
+                 className={classes.button}
+                onClick={() => handleSend(values.text)}>
+                Ingresar
+                  </Button>
+              </div>
+              <div> </div>
+              {loading ? <div style={{display: 'flex', justifyContent: 'center'}}>
+              <CircularProgress />
+    </div> : <div> </div> }
+              </FormControl>
+    
+    
+    
+        
+        </div>
+      )
+    }
+    function CatalogView(props) {
+      const { router, substrings, carrito } = props
+      const classes = useStyles();
+    
+      const [count, setCount] = React.useState(carrito);
+    
+      const incrementCount = value => () => {
+        const newCount = [...count];
+        newCount[value] = count[value] + 1;
+        setCount(newCount)
+        router.setCart(newCount)
+      };
+      
+      const decrementCount = value => () => {
+        const newCount = [...count];
+        newCount[value] = count[value] - 1;
+        setCount(newCount)
+        router.setCart(newCount)
+      };
+    
+      const navigateTo = value => () => {
+        router.navigate("/book", { bookIndex: value })
+      };
+      
+    
+      return (
+        <div>
+        <List dense className={classes.list}>
+          {[...Array(substrings.length).keys()].map(value => {
+            const labelId = `checkbox-list-secondary-label-${value}`;
+            return (
+              <ListItem key={value} button onClick={navigateTo(value)}>
+                <ListItemAvatar>
+                  <Avatar
+                    variant="rounded" className={classes.rounded}
+                    src={substrings[value].cover.small}
+                  />
+                </ListItemAvatar>
+                <ListItemText id={labelId} primary={substrings[value].title} secondary={substrings[value].price} />
+                <ListItemSecondaryAction>
+                <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
+                 onClick={incrementCount(value)}>
+                <Icon>add</Icon>
+                </IconButton>
+                <Typography component="h1"style= {{display:'inline-block'}}>{count[value]} </Typography>
+                <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
+                onClick={decrementCount(value)} disabled={count[value] <= 0}>
+                <Icon>remove</Icon>
+                </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            );
+          })}
+        </List>
+        </div>
+      )
+    }
+    
+    function BookView(props) {
+      const { router, book } = props
+      const classes = useStyles();
+    
+      return (
+        <div>
+           <img src={book.cover.medium} style={{float: 'left', padding: '20px'}}></img>
+           <div style={{padding: '35px'}}>
+           <Typography component="h1">Title: {book.title} </Typography> <br></br>
+           <Typography component="h1">Author: {book.authors[0].name} </Typography> <br></br><br></br>
+           <Typography component="h2">Publisher: {book.publishers[0].name} </Typography> <br></br>
+           <Typography component="h2">Publish date: {book.publish_date} </Typography> <br></br>
+           <Typography component="h2">Number of pages: {book.number_of_pages} </Typography>
+           </div>
+        </div>
+      )
+    }
+    // Fetch Hook
+    const useFetchDetails = (substring) => {
+      const [details, setDetails] = React.useState([])
+      const [loading, setLoading] = React.useState(false)
+      const [error, setError] = React.useState(null)
+    
+      React.useEffect(() => {
+        setLoading(true)
+        setError(null)
+    
+        let details = {}
+    
+        getLocalAsJson(`sayhi`)
+          .then(function (response) {
+            return response.json()
+          })
+          .then(function (json) {
+            details["firstLetter"] = json
+    
+            setLoading(false)
+            if (details) {
+              setDetails(details)
+            } else {
+              setDetails([])
+            }
+          })
+          .then(function () {
+            setLoading(true)
+            setError(null)
+    
+            return getLocalAsJson(`touppercase?word=${substring}`)
+          })
+          .then(function (response) {
+            return response.json()
+          })
+          .then(function (json) {
+            details["uppercase"] = json
+    
+            setLoading(false)
+            if (details) {
+              setDetails(details)
+            } else {
+              setDetails([])
+            }
+          })
+          .then(function () {
+            setLoading(true)
+            setError(null)
+    
+            return getLocalAsJson(`vowels?word=${substring}`)
+          })
+          .then(function (response) {
+            return response.json()
+          })
+          .then(function (json) {
+            details["vowels"] = json
+    
+            setLoading(false)
+            if (details) {
+              setDetails(details)
+            } else {
+              setDetails([])
+            }
+          })
+          .catch(err => {
+            setError(err)
+            setLoading(false)
+          })
+      }, [substring])
+    
+      return { details, loading, error }
+    }
+    
+    // Component
+    function CarritoView(props) {
+      const { router, substrings } = props
+      const classes = useStyles();
+      
+      //const { details, loading, error } = useFetchDetails(selectedSubstring)
+    
+      // if (loading) return <div>Loading...</div>
+      // if (error) return <div>{error}</div>
+    
+      return (
+        <div>
+          <Button variant="contained" color="primary" className={classes.button} disabled = {substrings.length <= 0}>
+            Check out
+          </Button>
+    
+        </div>
+      )
+    }
+    
+    
+    class App extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          path: "/",
+          substrings: [],
+          selectedSubstring: "",
+          catalog: new Array(),
+          carrito: new Array(),
+          bookIndex: 0,
+        };
+    
+        this.data = [
+          {isbn: "0451526538", price: "$100"},
+          {isbn: "0439358078", price: "$100"},
+          {isbn: "0316015849", price: "$100"},
+        ];
+      }
+    
+      componentWillMount() {
+        this.getMyData();
+      }
+    
+      getMyData(){
+        var self = this;
+        this.data.forEach( function(value, index, array) {
+            self.handleBook(value)
+        });
+      }
+    
+      handleBook = data => {
+        var self = this;
+        getISBNApiAsJson(data.isbn)
+          .then(function (response) {
+            return response.json()
+          })
+          .then(function (json) {
+            var newCatalog = [...self.state.catalog]
+            var book = json[Object.keys(json)[0]]
+            book["price"] = data.price
+            newCatalog.push(book)
+    
+            var newCarrito = [...self.state.carrito]
+            newCarrito.push(0)
+            self.setState({ ...self.state, catalog: newCatalog, carrito: newCarrito})
+          })
+          .catch(function (error) {
+            console.log('Looks like there was a problem: \n', error);
+          });
+      }
+    
+      render() {
+        let title = "Tus Libros"
+        let content = "Where am I?"
+        const router = {
+          current: () => this.state.path,
+          navigate: (path, state) => {
+            this.setState({ ...state, path: path })
+          },
+          setCart: (carrito) => {
+            this.setState({ ...this.state, carrito: carrito })
+          }
+        }
+    
+        if (this.state.path === "/") {
+          content = (<StringInputView
+            router={router}
+          />)
+        } else if (this.state.path === "/catalog") {
+          console.log(this.state.catalog)
+          content = (<CatalogView
+            router={router}
+            substrings={this.state.catalog}
+            carrito={this.state.carrito}
+          />)
+        } else if (this.state.path === "/cart") {
+          content = ( <div>
+          <CatalogView
+            router={router}
+            substrings={this.state.catalog.filter(function (elem, index) {
+              return this.state.carrito[index] > 0
+          }.bind(this))}
+            carrito={this.state.carrito}
+          />
+          <CarritoView  router={router}
+          substrings={this.state.catalog.filter(function (elem, index) {
+            return this.state.carrito[index] > 0
+          }.bind(this))} />
+          </div>
+          )
+        } else if (this.state.path === "/book") {
+          content = (
+          <BookView
+            router={router}
+            book={this.state.catalog[this.state.bookIndex]}
+          />
+          )
+        }
+        return (
+          <div>
+            <MyToolBar
+              title={title}
+              router={router}
+            />
+            <Container maxWidth="md">
+              <div style={{ marginTop: 20, }}>
+                {content}
+              </div>
+            </Container>
+          </div>
+        );
+      }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Initial render
+    //
+    ReactDOM.render(
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <App />
+      </ThemeProvider>,
+      document.getElementById('root')
+    )
+  </script>
+
+  <!-- <button onclick="window.location.reload(true)">reload</button> -->
+</body>
+
+</html>
