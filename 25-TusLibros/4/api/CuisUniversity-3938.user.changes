@@ -12588,3 +12588,1143 @@ server := TusLibrosController listeningOn: 8082.!
 TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
 
 ----SNAPSHOT----(23 November 2019 20:49:39) CuisUniversity-3938.image priorSource: 16005079!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/24/2019 16:45:43' prior: 50831484!
+handleWith: aSelector
+
+	^ [ :request |
+		| response |
+		
+		req := request.
+		self safeSend: aSelector.
+	].! !
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 16:46:39' prior: 50831943!
+successResponse
+
+	^ self render: (self jsonSimpleResponseWithKey: 'message' value: 'success').! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 16:46:59' prior: 50832540!
+checkoutCart
+
+	| cartID items cardExpiration itemsResponse ticket |
+	
+	cartID := req fields at: 'cartID' ifAbsent: self badRequestResponse.
+	
+	cardExpiration := Month month: DateAndTime now monthIndex year: DateAndTime now yearNumber + 1.
+	ticket := tusLibros checkoutCart: cartID asInteger withCreditCardNumber: '4444444444444444' withCreditCardName: 'Eden Torres' withExpritationDate: cardExpiration on: DateAndTime now.
+	items := ticket first.
+	
+	itemsResponse := items asSet asArray collect: [:item | Dictionary new at: 'isbn' put: item; at: 'quantity' put: (items occurrencesOf: item); at: 'price' put: (self catalog at: item); yourself ].
+	^ self render: (WebUtils jsonEncode: (Dictionary new at: 'items' put: itemsResponse ; at: 'total_amount' put: ticket second; yourself )).! !
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 16:47:52' prior: 50832605!
+successResponse
+
+	^ self jsonSimpleResponseWithKey: 'message' value: 'success'.! !
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 16:48:00' prior: 50831935!
+jsonSimpleResponseWithKey: aKey value: aValue
+
+	^ self render: (WebUtils jsonEncode: (Dictionary new at: aKey put: aValue; yourself )).! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 16:48:19' prior: 50831798!
+getCatalog
+
+	^ self render: (WebUtils jsonEncode: (self catalog associations collect: [:e | Dictionary new at: 'isbn' put: e key; at: 'price' put: e value; yourself ])).! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 16:48:36' prior: 50832654!
+getCatalog
+
+	^ self render: (WebUtils jsonEncode: (self catalog associations collect: [:item | Dictionary new at: 'isbn' put: item key; at: 'price' put: item value; yourself ])).! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 16:48:50' prior: 50831471!
+helloWorld
+
+	^ self render: 'Hello World!!'.! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 16:49:01' prior: 50832490!
+listCart
+
+	| cartID items itemsResponse |
+
+	cartID := req fields at: 'cartID' ifAbsent: self badRequestResponse.
+	
+	items := tusLibros listCart: cartID asInteger .
+
+	itemsResponse := items asSet asArray collect: [:item | Dictionary new at: 'isbn' put: item; at: 'quantity' put: (items occurrencesOf: item) ; yourself ].
+	^ self render: (WebUtils jsonEncode: (Dictionary new at: 'items' put: itemsResponse ; at: 'total_quantity' put: items size; yourself )) .! !
+
+WebServer allInstances.!
+
+WebServer allInstances.!
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 16:52:21' prior: 50831475!
+render: aResponse
+
+	^ req send200Response: aResponse
+		   contentType: 'application/json; charset=utf-8'
+		   do: [:resp |  resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/24/2019 16:58:26' prior: 50832298!
+initializeWith: aListeningPort
+
+	tusLibros := TusLibrosInternalInterface withUsers: self userList withCatalog: self catalog withClock: Time withAMerchantProcessor: self merchantProcessor.
+	
+	port := aListeningPort .
+	
+	webServer := WebServer new listenOn: aListeningPort .
+	
+	webServer addService: '/helloWorld' action: (self handleWith: #helloWorld).
+	webServer addService: '/createCart' action: (self handleWith: #createCart).
+	webServer addService: '/getCatalog' action: (self handleWith: #getCatalog).
+	webServer addService: '/addToCart' action: (self handleWith: #addToCart).
+	webServer addService: '/listCart' action: (self handleWith: #listCart).
+	webServer addService: '/checkoutCart' action: (self handleWith: #checkoutCart).	
+	webServer addService: '/a' action: [:r | r send400Response ]! !
+!TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/24/2019 16:58:31' prior: 50832714!
+initializeWith: aListeningPort
+
+	tusLibros := TusLibrosInternalInterface withUsers: self userList withCatalog: self catalog withClock: Time withAMerchantProcessor: self merchantProcessor.
+	
+	port := aListeningPort .
+	
+	webServer := WebServer new listenOn: aListeningPort .
+	
+	webServer addService: '/helloWorld' action: (self handleWith: #helloWorld).
+	webServer addService: '/createCart' action: (self handleWith: #createCart).
+	webServer addService: '/getCatalog' action: (self handleWith: #getCatalog).
+	webServer addService: '/addToCart' action: (self handleWith: #addToCart).
+	webServer addService: '/listCart' action: (self handleWith: #listCart).
+	webServer addService: '/checkoutCart' action: (self handleWith: #checkoutCart).	
+	webServer addService: '/a' action: [:r | r send400Response ].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/24/2019 16:59:30' prior: 50832743!
+initializeWith: aListeningPort
+
+	tusLibros := TusLibrosInternalInterface withUsers: self userList withCatalog: self catalog withClock: Time withAMerchantProcessor: self merchantProcessor.
+	
+	port := aListeningPort .
+	
+	webServer := WebServer new listenOn: aListeningPort .
+	
+	webServer addService: '/helloWorld' action: (self handleWith: #helloWorld).
+	webServer addService: '/createCart' action: (self handleWith: #createCart).
+	webServer addService: '/getCatalog' action: (self handleWith: #getCatalog).
+	webServer addService: '/addToCart' action: (self handleWith: #addToCart).
+	webServer addService: '/listCart' action: (self handleWith: #listCart).
+	webServer addService: '/checkoutCart' action: (self handleWith: #checkoutCart).
+	webServer addService: '/listPurchases' action: (self handleWith: #listPurchases).! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 17:02:58'!
+listPurchases
+
+	! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 17:03:43' prior: 50832804!
+listPurchases
+
+	| password userID |
+
+	userID := req fields at: 'userID' ifAbsent: self badRequestResponse.
+	password := req fields at: 'password' ifAbsent: self badRequestResponse.
+	
+	tusLibros listPurchaseFor: userID withPassword: password .! !
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 17:05:54'!
+listItems: aTicket
+
+	| items itemsResponse |
+	items := aTicket first.
+	
+	itemsResponse := items asSet asArray collect: [:item | Dictionary new at: 'isbn' put: item; at: 'quantity' put: (items occurrencesOf: item); at: 'price' put: (self catalog at: item); yourself ].
+	^ self render: (WebUtils jsonEncode: (Dictionary new at: 'items' put: itemsResponse ; at: 'total_amount' put: aTicket second; yourself )).! !
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 17:06:36' prior: 50832819!
+listItems: aTicket
+
+	| items itemsResponse |
+
+	items := aTicket first.
+	
+	itemsResponse := items asSet asArray collect: [:item | Dictionary new at: 'isbn' put: item; at: 'quantity' put: (items occurrencesOf: item); at: 'price' put: (self catalog at: item); yourself ].
+	^ self render: (WebUtils jsonEncode: (Dictionary new at: 'items' put: itemsResponse ; at: 'total_amount' put: aTicket second; yourself )).! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 17:07:01' prior: 50832612!
+checkoutCart
+
+	| cartID cardExpiration ticket |
+	
+	cartID := req fields at: 'cartID' ifAbsent: self badRequestResponse.
+	
+	cardExpiration := Month month: DateAndTime now monthIndex year: DateAndTime now yearNumber + 1.
+	ticket := tusLibros checkoutCart: cartID asInteger withCreditCardNumber: '4444444444444444' withCreditCardName: 'Eden Torres' withExpritationDate: cardExpiration on: DateAndTime now.
+	
+	^ self listItems: ticket .! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 17:09:00' prior: 50832808!
+listPurchases
+
+	| password userID purchases |
+
+	userID := req fields at: 'userID' ifAbsent: self badRequestResponse.
+	password := req fields at: 'password' ifAbsent: self badRequestResponse.
+	
+	purchases := tusLibros listPurchaseFor: userID withPassword: password .
+	^ self listItems: purchases.! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:32:42'!
+test34RemoveFromCartRaisesErrorWhenCartIDDoesNotExist
+
+	| interface |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+		
+	self should: [interface removeFromCart: 'INVALID CART ID' item: factory itemSellByTheStore]
+		 raise: Error - MessageNotUnderstood 
+		 withMessageText: 'CartID inválido'.
+		
+	self assert: interface carts isEmpty.! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test34RemoveFromCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:32:45'!
+ERROR!
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/24/2019 17:33:02'!
+removeFromCart: aString item: aString2 
+	self shouldBeImplemented.! !
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/24/2019 17:33:38' prior: 50832905!
+removeFromCart: aCartID item: anItem 
+	
+	self error: 'CartID inválido'.! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test34RemoveFromCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test01CreateCartRaisesErrorWhenNonExistentUser stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test02CreateCartRaisesErrorWhenPasswordDoesNotMatch stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test03CreateCartCreatesACartWithValidUser stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test04CreateCartTwiceCreatesTwoCartsWithDifferentIDs stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test05ListCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test06ListCartListsNothingWhenCartIsJustCreated stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test07AddToCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test08AddToCartRaisesErrorWhenItemIsNotSoldByTheStore stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test09AddToCartRaisesErrorWhenQuantityIsZero stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test10AddToCartListsOneItem stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test11AddABookTwiceToCartListsTwoItem stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test12AddTwoDifferentBookToCartListsTwoDifferentItems stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test13ListCartDoesNotListItemNotIncludedInCart stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test14ShouldRaiseErrorWhenAddingAnItemToAnExpiredCart stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test15ShouldRaiseErrorWhenListingAnExpiredCart stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test16ShouldNotRaiseErrorWhenAddingAnItemTo30minOldCart stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test17ShouldNotRaiseErrorWhenAddingBooksToCartWithLagOf30minutes stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test18CheckoutCartShouldRaiseErrorWithInvalidCartId stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test19CheckoutCartShouldRaiseErrorWithEmptyCardName stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test20CheckoutCartShouldRaiseErrorWithTooLongCardName stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test21CheckoutCartShouldRaiseErrorWithExpiredCard stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test22CheckoutCartShouldRaiseErrorWithEmptyCart stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test23CheckoutCartWithOneElementListsOnePurchase stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test24CheckoutCartWithTwoElementListsTwoPurchase stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test25CheckoutCartWithTwoEqualElementsListsTwoPurchase stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test26CheckoutCartWithOneElementListsOnlySameUserPurchases stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test27ListPurchasesRaisesErrorWhenTheUserDoesNotExist stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test28ListPurchasesRaisesErrorWhenTheUserAndPasswordDontMatch stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test29ListPurchasesIsEmptyWhenTheUserDoesntCheckout stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test30CheckoutCartShouldRaiseErrorWithExpiredCart stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test31CheckoutCartShouldRaiseErrorWithMerchantProcessorError stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test32CheckoutCartWithOneElementHasOneItemInTicket stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test33CheckoutCartWithManyElementHasItemsInTicket stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test34RemoveFromCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:33:58'!
+PASSED!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:35:16'!
+test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart
+
+	| interface cartID |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+		
+	self should: [interface removeFromCart: cartID item: factory itemNotSellByTheStore]
+		 raise: Error - MessageNotUnderstood 
+		 withMessageText: 'Item is not in cart'.
+		
+	self assertThatListCartIsEmtyIn: interface ofCartID: cartID.! !
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:36:40' prior: 50833065!
+test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart
+
+	| interface cartID |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
+		
+	self should: [interface removeFromCart: cartID item: factory itemNotSellByTheStore]
+		 raise: Error - MessageNotUnderstood 
+		 withMessageText: 'Item is not in cart'.
+		
+	self assertThatListCartIsEmtyIn: interface ofCartID: cartID.! !
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:37:33' prior: 50833083!
+test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart
+
+	| interface cartID |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
+		
+	self should: [interface removeFromCart: cartID item: factory itemNotSellByTheStore]
+		 raise: Error - MessageNotUnderstood 
+		 withMessageText: 'Item is not in cart'.
+		
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory itemSellByTheStore aNumberOfTimes: 1.! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart stamp: 'SN 11/24/2019 17:37:35'!
+FAILURE!
+
+!testRun: #TusLibrosInternalInterfaceTest #test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart stamp: 'SN 11/24/2019 17:37:59'!
+FAILURE!
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/24/2019 17:39:19' prior: 50832911!
+removeFromCart: aCartID item: anItem 
+	
+	self validateCartWith: aCartID.
+	self error: 'Item not in cart'.! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test01CreateCartRaisesErrorWhenNonExistentUser stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test02CreateCartRaisesErrorWhenPasswordDoesNotMatch stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test03CreateCartCreatesACartWithValidUser stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test04CreateCartTwiceCreatesTwoCartsWithDifferentIDs stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test05ListCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test06ListCartListsNothingWhenCartIsJustCreated stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test07AddToCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test08AddToCartRaisesErrorWhenItemIsNotSoldByTheStore stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test09AddToCartRaisesErrorWhenQuantityIsZero stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test10AddToCartListsOneItem stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test11AddABookTwiceToCartListsTwoItem stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test12AddTwoDifferentBookToCartListsTwoDifferentItems stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test13ListCartDoesNotListItemNotIncludedInCart stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test14ShouldRaiseErrorWhenAddingAnItemToAnExpiredCart stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test15ShouldRaiseErrorWhenListingAnExpiredCart stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test16ShouldNotRaiseErrorWhenAddingAnItemTo30minOldCart stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test17ShouldNotRaiseErrorWhenAddingBooksToCartWithLagOf30minutes stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test18CheckoutCartShouldRaiseErrorWithInvalidCartId stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test19CheckoutCartShouldRaiseErrorWithEmptyCardName stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test20CheckoutCartShouldRaiseErrorWithTooLongCardName stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test21CheckoutCartShouldRaiseErrorWithExpiredCard stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test22CheckoutCartShouldRaiseErrorWithEmptyCart stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test23CheckoutCartWithOneElementListsOnePurchase stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test24CheckoutCartWithTwoElementListsTwoPurchase stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test25CheckoutCartWithTwoEqualElementsListsTwoPurchase stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test26CheckoutCartWithOneElementListsOnlySameUserPurchases stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test27ListPurchasesRaisesErrorWhenTheUserDoesNotExist stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test28ListPurchasesRaisesErrorWhenTheUserAndPasswordDontMatch stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test29ListPurchasesIsEmptyWhenTheUserDoesntCheckout stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test30CheckoutCartShouldRaiseErrorWithExpiredCart stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test31CheckoutCartShouldRaiseErrorWithMerchantProcessorError stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test32CheckoutCartWithOneElementHasOneItemInTicket stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test33CheckoutCartWithManyElementHasItemsInTicket stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test34RemoveFromCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:39:26'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart stamp: 'SN 11/24/2019 17:39:26'!
+FAILURE!
+
+!testRun: #TusLibrosInternalInterfaceTest #test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart stamp: 'SN 11/24/2019 17:39:26'!
+FAILURE!
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/24/2019 17:40:42' prior: 50833135!
+removeFromCart: aCartID item: anItem 
+	
+	self validateCartWith: aCartID.
+	self error: 'Item is not in cart'.! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test01CreateCartRaisesErrorWhenNonExistentUser stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test02CreateCartRaisesErrorWhenPasswordDoesNotMatch stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test03CreateCartCreatesACartWithValidUser stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test04CreateCartTwiceCreatesTwoCartsWithDifferentIDs stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test05ListCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test06ListCartListsNothingWhenCartIsJustCreated stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test07AddToCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test08AddToCartRaisesErrorWhenItemIsNotSoldByTheStore stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test09AddToCartRaisesErrorWhenQuantityIsZero stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test10AddToCartListsOneItem stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test11AddABookTwiceToCartListsTwoItem stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test12AddTwoDifferentBookToCartListsTwoDifferentItems stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test13ListCartDoesNotListItemNotIncludedInCart stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test14ShouldRaiseErrorWhenAddingAnItemToAnExpiredCart stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test15ShouldRaiseErrorWhenListingAnExpiredCart stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test16ShouldNotRaiseErrorWhenAddingAnItemTo30minOldCart stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test17ShouldNotRaiseErrorWhenAddingBooksToCartWithLagOf30minutes stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test18CheckoutCartShouldRaiseErrorWithInvalidCartId stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test19CheckoutCartShouldRaiseErrorWithEmptyCardName stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test20CheckoutCartShouldRaiseErrorWithTooLongCardName stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test21CheckoutCartShouldRaiseErrorWithExpiredCard stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test22CheckoutCartShouldRaiseErrorWithEmptyCart stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test23CheckoutCartWithOneElementListsOnePurchase stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test24CheckoutCartWithTwoElementListsTwoPurchase stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test25CheckoutCartWithTwoEqualElementsListsTwoPurchase stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test26CheckoutCartWithOneElementListsOnlySameUserPurchases stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test27ListPurchasesRaisesErrorWhenTheUserDoesNotExist stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test28ListPurchasesRaisesErrorWhenTheUserAndPasswordDontMatch stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test29ListPurchasesIsEmptyWhenTheUserDoesntCheckout stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test30CheckoutCartShouldRaiseErrorWithExpiredCart stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test31CheckoutCartShouldRaiseErrorWithMerchantProcessorError stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test32CheckoutCartWithOneElementHasOneItemInTicket stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test33CheckoutCartWithManyElementHasItemsInTicket stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test34RemoveFromCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart stamp: 'SN 11/24/2019 17:40:49'!
+PASSED!
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:43:23'!
+test36RemoveFromCartRemovesCorrectItemFromCart
+
+	| interface cartID |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+	
+	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
+	interface addToCart: cartID item: factory anotherItemSellByTheStore withQuantity: 1.
+	
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory itemSellByTheStore aNumberOfTimes: 1.! !
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:44:14' prior: 50833450!
+test36RemoveFromCartRemovesCorrectItemFromCart
+
+	| interface cartID |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+	
+	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
+	interface addToCart: cartID item: factory anotherItemSellByTheStore withQuantity: 1.
+	
+	interface removeFromCart: cartID item: factory anotherItemSellByTheStore .
+	
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory itemSellByTheStore aNumberOfTimes: 1.! !
+!TusLibrosInternalInterfaceTest methodsFor: 'assertions' stamp: 'SN 11/24/2019 17:46:23'!
+denyThatListCartIn: interface ofCartID: cartID includes: aBook
+
+	|listCart |
+	
+	listCart := interface listCart: cartID.
+	
+	self deny: (listCart includes: aBook).! !
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:47:40' prior: 50833470!
+test36RemoveFromCartRemovesCorrectItemFromCart
+
+	| interface cartID |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+	
+	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
+	interface addToCart: cartID item: factory anotherItemSellByTheStore withQuantity: 1.
+	
+	interface removeFromCart: cartID item: factory anotherItemSellByTheStore .
+	
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory itemSellByTheStore aNumberOfTimes: 1.
+	self denyThatListCartIn: interface ofCartID: cartID includes: factory anotherItemSellByTheStore .! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test36RemoveFromCartRemovesCorrectItemFromCart stamp: 'SN 11/24/2019 17:47:43'!
+ERROR!
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/24/2019 17:49:03' prior: 50833295!
+removeFromCart: aCartID item: anItem 
+	
+	self validateCartWith: aCartID.
+	self error: 'Item is not in cart'.
+	
+	(carts at: aCartID ) remove: anItem ifAbsent: [].! !
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/24/2019 17:49:11' prior: 50833530!
+removeFromCart: aCartID item: anItem 
+	
+	self validateCartWith: aCartID.
+	
+	(carts at: aCartID ) remove: anItem ifAbsent: [self error: 'Item is not in cart'.].! !
+!CartInterface methodsFor: 'initialization' stamp: 'SN 11/24/2019 17:51:36'!
+remove: anItem ifAbsent: aColsure
+
+	cart remove: anItem ifAbsent: aColsure.
+	timeLastModified := clock localMillisecondClock.! !
+!CartInterface methodsFor: 'initialization' stamp: 'SN 11/24/2019 17:53:27'!
+remove: anItem
+
+	cart remove: anItem.
+	timeLastModified := clock localMillisecondClock.! !
+
+!methodRemoval: CartInterface #remove:ifAbsent: stamp: 'SN 11/24/2019 17:53:32'!
+remove: anItem ifAbsent: aColsure
+
+	cart remove: anItem ifAbsent: aColsure.
+	timeLastModified := clock localMillisecondClock.!
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:55:08'!
+test09CanNotRemoveItemsThatDoNotBelongToCart
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	
+	self 
+		should: [ cart remove: testObjectsFactory itemNotSellByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = 'Item is not in cart'.
+			self assert: cart isEmpty ]! !
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:56:04' prior: 50833566!
+test09CanNotRemoveItemsThatDoNotBelongToCart
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	
+	self 
+		should: [ cart remove: testObjectsFactory anotherItemSellByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = 'Item is not in cart'.
+			self assert: cart isEmpty ]! !
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:56:09' prior: 50833580!
+test09CanNotRemoveItemsThatDoNotBelongToCart
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	
+	self 
+		should: [ cart remove: testObjectsFactory anotherItemSellByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = 'Item is not in cart'.
+			self deny: cart isEmpty ]! !
+
+!testRun: #CartTest #test09CanNotRemoveItemsThatDoNotBelongToCart stamp: 'SN 11/24/2019 17:56:11'!
+ERROR!
+!Cart methodsFor: 'as yet unclassified' stamp: 'SN 11/24/2019 17:56:36'!
+remove: aString 
+	self shouldBeImplemented.! !
+!Cart methodsFor: 'as yet unclassified' stamp: 'SN 11/24/2019 17:56:54' prior: 50833613!
+remove: anItem 
+	
+	self error: 'Item is not in cart'.! !
+
+!testRun: #CartTest #test09CanNotRemoveItemsThatDoNotBelongToCart stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+
+!testRun: #CartTest #test09CanNotRemoveItemsThatDoNotBelongToCart stamp: 'SN 11/24/2019 17:56:59'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:57:56'!
+test10RemoveCorrectItem
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	cart add: testObjectsFactory anotherItemSellByTheStore .
+	
+	self 
+		should: [ cart remove: testObjectsFactory anotherItemSellByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = 'Item is not in cart'.
+			self deny: cart isEmpty ]! !
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:58:46' prior: 50833655!
+test10RemoveCorrectItem
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	cart add: testObjectsFactory anotherItemSellByTheStore .
+	
+	cart remove: testObjectsFactory itemSellByTheStore .! !
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:59:49' prior: 50833671!
+test10RemoveCorrectItem
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	cart add: testObjectsFactory anotherItemSellByTheStore .
+	
+	cart remove: testObjectsFactory itemSellByTheStore .
+	
+	self assert: cart list includes: testObjectsFactory anotherItemSellByTheStore .
+	self deny: (cart list includes: testObjectsFactory itemNotSellByTheStore ).! !
+
+!testRun: #CartTest #test10RemoveCorrectItem stamp: 'SN 11/24/2019 17:59:51'!
+ERROR!
+!Cart methodsFor: 'as yet unclassified' stamp: 'SN 11/24/2019 18:00:40' prior: 50833618!
+remove: anItem 
+	
+	items remove: anItem ifAbsent: [self error: 'Item is not in cart'.].! !
+
+!testRun: #CartTest #test10RemoveCorrectItem stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test09CanNotRemoveItemsThatDoNotBelongToCart stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+
+!testRun: #CartTest #test10RemoveCorrectItem stamp: 'SN 11/24/2019 18:00:51'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 18:02:05'!
+test11RemoveCorrectItemOnce
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: 5 of: testObjectsFactory itemSellByTheStore .
+	cart add: testObjectsFactory anotherItemSellByTheStore .
+	
+	cart remove: testObjectsFactory itemSellByTheStore .
+	
+	self assert: cart list includes: testObjectsFactory anotherItemSellByTheStore .
+	self assert: (cart list occurrencesOf: testObjectsFactory itemNotSellByTheStore ) equals: 4.! !
+
+!testRun: #CartTest #test11RemoveCorrectItemOnce stamp: 'SN 11/24/2019 18:02:06'!
+FAILURE!
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 18:02:37' prior: 50833741!
+test11RemoveCorrectItemOnce
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: 5 of: testObjectsFactory itemSellByTheStore .
+	cart add: testObjectsFactory anotherItemSellByTheStore .
+	
+	cart remove: testObjectsFactory itemSellByTheStore .
+	
+	self assert: cart list includes: testObjectsFactory anotherItemSellByTheStore .
+	self assert: (cart list occurrencesOf: testObjectsFactory itemSellByTheStore ) equals: 4.! !
+
+!testRun: #CartTest #test11RemoveCorrectItemOnce stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test09CanNotRemoveItemsThatDoNotBelongToCart stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test10RemoveCorrectItem stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+
+!testRun: #CartTest #test11RemoveCorrectItemOnce stamp: 'SN 11/24/2019 18:02:37'!
+PASSED!
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 18:02:47' prior: 50833682!
+test10RemoveCorrectItem
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	cart add: testObjectsFactory anotherItemSellByTheStore .
+	
+	cart remove: testObjectsFactory itemSellByTheStore .
+	
+	self assert: cart list includes: testObjectsFactory anotherItemSellByTheStore .
+	self deny: (cart list includes: testObjectsFactory itemSellByTheStore ).! !
+
+!testRun: #CartTest #test10RemoveCorrectItem stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test01NewCartsAreCreatedEmpty stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test02CanNotAddItemsThatDoNotBelongToStore stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test03AfterAddingAnItemTheCartIsNotEmptyAnymore stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test04CanNotAddNonPositiveNumberOfItems stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test05CanNotAddMoreThanOneItemNotSellByTheStore stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test06CartRemembersAddedItems stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test07CartDoesNotHoldNotAddedItems stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test08CartRemembersTheNumberOfAddedItems stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test09CanNotRemoveItemsThatDoNotBelongToCart stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test10RemoveCorrectItem stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+
+!testRun: #CartTest #test11RemoveCorrectItemOnce stamp: 'SN 11/24/2019 18:02:48'!
+PASSED!
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/24/2019 18:03:18' prior: 50833539!
+removeFromCart: aCartID item: anItem 
+	
+	self validateCartWith: aCartID.
+	
+	(carts at: aCartID ) remove: anItem.! !
+
+!testRun: #TusLibrosInternalInterfaceTest #test01CreateCartRaisesErrorWhenNonExistentUser stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test02CreateCartRaisesErrorWhenPasswordDoesNotMatch stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test03CreateCartCreatesACartWithValidUser stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test04CreateCartTwiceCreatesTwoCartsWithDifferentIDs stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test05ListCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test06ListCartListsNothingWhenCartIsJustCreated stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test07AddToCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test08AddToCartRaisesErrorWhenItemIsNotSoldByTheStore stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test09AddToCartRaisesErrorWhenQuantityIsZero stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test10AddToCartListsOneItem stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test11AddABookTwiceToCartListsTwoItem stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test12AddTwoDifferentBookToCartListsTwoDifferentItems stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test13ListCartDoesNotListItemNotIncludedInCart stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test14ShouldRaiseErrorWhenAddingAnItemToAnExpiredCart stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test15ShouldRaiseErrorWhenListingAnExpiredCart stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test16ShouldNotRaiseErrorWhenAddingAnItemTo30minOldCart stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test17ShouldNotRaiseErrorWhenAddingBooksToCartWithLagOf30minutes stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test18CheckoutCartShouldRaiseErrorWithInvalidCartId stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test19CheckoutCartShouldRaiseErrorWithEmptyCardName stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test20CheckoutCartShouldRaiseErrorWithTooLongCardName stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test21CheckoutCartShouldRaiseErrorWithExpiredCard stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test22CheckoutCartShouldRaiseErrorWithEmptyCart stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test23CheckoutCartWithOneElementListsOnePurchase stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test24CheckoutCartWithTwoElementListsTwoPurchase stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test25CheckoutCartWithTwoEqualElementsListsTwoPurchase stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test26CheckoutCartWithOneElementListsOnlySameUserPurchases stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test27ListPurchasesRaisesErrorWhenTheUserDoesNotExist stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test28ListPurchasesRaisesErrorWhenTheUserAndPasswordDontMatch stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test29ListPurchasesIsEmptyWhenTheUserDoesntCheckout stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test30CheckoutCartShouldRaiseErrorWithExpiredCart stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test31CheckoutCartShouldRaiseErrorWithMerchantProcessorError stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test32CheckoutCartWithOneElementHasOneItemInTicket stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test33CheckoutCartWithManyElementHasItemsInTicket stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test34RemoveFromCartRaisesErrorWhenCartIDDoesNotExist stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+
+!testRun: #TusLibrosInternalInterfaceTest #test36RemoveFromCartRemovesCorrectItemFromCart stamp: 'SN 11/24/2019 18:03:31'!
+PASSED!
+!TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/24/2019 18:04:11' prior: 50832775!
+initializeWith: aListeningPort
+
+	tusLibros := TusLibrosInternalInterface withUsers: self userList withCatalog: self catalog withClock: Time withAMerchantProcessor: self merchantProcessor.
+	
+	port := aListeningPort .
+	
+	webServer := WebServer new listenOn: aListeningPort .
+	
+	webServer addService: '/helloWorld' action: (self handleWith: #helloWorld).
+	webServer addService: '/createCart' action: (self handleWith: #createCart).
+	webServer addService: '/getCatalog' action: (self handleWith: #getCatalog).
+	webServer addService: '/addToCart' action: (self handleWith: #addToCart).
+	webServer addService: '/listCart' action: (self handleWith: #listCart).
+	webServer addService: '/checkoutCart' action: (self handleWith: #checkoutCart).
+	webServer addService: '/listPurchases' action: (self handleWith: #listPurchases).
+	webServer addService: '/removeFromCart' action: (self handleWith: #removeFromCart).! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 18:04:24'!
+removeFromCart
+
+	! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 18:04:53' prior: 50834060!
+removeFromCart
+
+	
+	| bookISBN cartID |
+
+	cartID := req fields at: 'cartID' ifAbsent: self badRequestResponse.
+	bookISBN := req fields at: 'isbn' ifAbsent: self badRequestResponse.! !
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 18:05:31' prior: 50834064!
+removeFromCart
+
+	
+	| bookISBN cartID |
+
+	cartID := req fields at: 'cartID' ifAbsent: self badRequestResponse.
+	bookISBN := req fields at: 'isbn' ifAbsent: self badRequestResponse.
+	
+	tusLibros removeFromCart: cartID item: bookISBN .
+	^ self successResponse .! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 18:07:03' prior: 50834073!
+removeFromCart
+
+	
+	| bookISBN cartID |
+
+	cartID := req fields at: 'cartID' ifAbsent: self badRequestResponse.
+	bookISBN := req fields at: 'isbn' ifAbsent: self badRequestResponse.
+	
+	tusLibros removeFromCart: cartID asInteger item: bookISBN .
+	^ self successResponse .! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/24/2019 18:09:13' prior: 50831830!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (anError messageText) ].! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/24/2019 18:09:40' prior: 50834105!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (anError messageText) ].! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/24/2019 18:09:56' prior: 50834113!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: anError messageText ].! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/24/2019 18:10:35' prior: 50834121!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self jsonSimpleResponseWithKey: 'message' value: anError messageText) ].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+
+----SNAPSHOT----(24 November 2019 18:12:22) CuisUniversity-3938.image priorSource: 16030196!

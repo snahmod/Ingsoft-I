@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #CartTest category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 TestCase subclass: #CartTest
 	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
@@ -91,6 +91,49 @@ test08CartRemembersTheNumberOfAddedItems
 	cart add: 2 of: testObjectsFactory itemSellByTheStore.
 	self assert: (cart occurrencesOf: testObjectsFactory itemSellByTheStore) = 2! !
 
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:56:09'!
+test09CanNotRemoveItemsThatDoNotBelongToCart
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	
+	self 
+		should: [ cart remove: testObjectsFactory anotherItemSellByTheStore ]
+		raise: Error - MessageNotUnderstood
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = 'Item is not in cart'.
+			self deny: cart isEmpty ]! !
+
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 18:02:47'!
+test10RemoveCorrectItem
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: testObjectsFactory itemSellByTheStore .
+	cart add: testObjectsFactory anotherItemSellByTheStore .
+	
+	cart remove: testObjectsFactory itemSellByTheStore .
+	
+	self assert: cart list includes: testObjectsFactory anotherItemSellByTheStore .
+	self deny: (cart list includes: testObjectsFactory itemSellByTheStore ).! !
+
+!CartTest methodsFor: 'tests' stamp: 'SN 11/24/2019 18:02:37'!
+test11RemoveCorrectItemOnce
+
+	| cart |
+	
+	cart := testObjectsFactory createCart.
+	cart add: 5 of: testObjectsFactory itemSellByTheStore .
+	cart add: testObjectsFactory anotherItemSellByTheStore .
+	
+	cart remove: testObjectsFactory itemSellByTheStore .
+	
+	self assert: cart list includes: testObjectsFactory anotherItemSellByTheStore .
+	self assert: (cart list occurrencesOf: testObjectsFactory itemSellByTheStore ) equals: 4.! !
+
 
 !CartTest methodsFor: 'setup' stamp: 'HernanWilkinson 6/17/2013 18:09'!
 setUp 
@@ -98,7 +141,7 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!classDefinition: #CashierTest category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #CashierTest category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'testObjectsFactory debitBehavior'
 	classVariableNames: ''
@@ -246,7 +289,7 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
 
-!classDefinition: #TusLibrosInternalInterfaceTest category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #TusLibrosInternalInterfaceTest category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 TestCase subclass: #TusLibrosInternalInterfaceTest
 	instanceVariableNames: 'edenUser edenPassword userRegistry factory stubbedTime debitBehavior santiUser santiPassword emptyUserRegistry'
 	classVariableNames: ''
@@ -783,6 +826,50 @@ test33CheckoutCartWithManyElementHasItemsInTicket
 	self assert: (ticket first occurrencesOf: factory anotherItemSellByTheStore ) equals: 2 .
 	self assert: ticket second equals: totalPurchaseAmount.! !
 
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:32:42'!
+test34RemoveFromCartRaisesErrorWhenCartIDDoesNotExist
+
+	| interface |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+		
+	self should: [interface removeFromCart: 'INVALID CART ID' item: factory itemSellByTheStore]
+		 raise: Error - MessageNotUnderstood 
+		 withMessageText: 'CartID inválido'.
+		
+	self assert: interface carts isEmpty.! !
+
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:37:33'!
+test35RemoveFromCartCartRaisesErrorWhenItemIsNotInCart
+
+	| interface cartID |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
+		
+	self should: [interface removeFromCart: cartID item: factory itemNotSellByTheStore]
+		 raise: Error - MessageNotUnderstood 
+		 withMessageText: 'Item is not in cart'.
+		
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory itemSellByTheStore aNumberOfTimes: 1.! !
+
+!TusLibrosInternalInterfaceTest methodsFor: 'tests' stamp: 'SN 11/24/2019 17:47:40'!
+test36RemoveFromCartRemovesCorrectItemFromCart
+
+	| interface cartID |
+
+	interface := self createTusLibrosInternalInterfaceWithUserRegistry: userRegistry.
+	cartID := interface createCartFor: edenUser withPassword: edenPassword.
+	
+	interface addToCart: cartID item: factory itemSellByTheStore withQuantity: 1.
+	interface addToCart: cartID item: factory anotherItemSellByTheStore withQuantity: 1.
+	
+	interface removeFromCart: cartID item: factory anotherItemSellByTheStore .
+	
+	self assertThatListCartIn: interface ofCartID: cartID includes: factory itemSellByTheStore aNumberOfTimes: 1.
+	self denyThatListCartIn: interface ofCartID: cartID includes: factory anotherItemSellByTheStore .! !
+
 
 !TusLibrosInternalInterfaceTest methodsFor: 'setUp/tearDown' stamp: 'Eden Torres 11/18/2019 18:47:21'!
 setUp
@@ -867,8 +954,17 @@ assertThatListPurchaseIn: interface withUsername: aUserID withPassword: aPasswor
 	self assert: listPurchase first includes: aItem .
 	self assert: listPurchase second equals: aPrice.! !
 
+!TusLibrosInternalInterfaceTest methodsFor: 'assertions' stamp: 'SN 11/24/2019 17:46:23'!
+denyThatListCartIn: interface ofCartID: cartID includes: aBook
+
+	|listCart |
+	
+	listCart := interface listCart: cartID.
+	
+	self deny: (listCart includes: aBook).! !
+
 
-!classDefinition: #Cart category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #Cart category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -946,9 +1042,15 @@ list
 
 	^items copy .! !
 
+
+!Cart methodsFor: 'as yet unclassified' stamp: 'SN 11/24/2019 18:00:40'!
+remove: anItem 
+	
+	items remove: anItem ifAbsent: [self error: 'Item is not in cart'.].! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: 'Cart class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -958,7 +1060,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #CartInterface category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #CartInterface category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Object subclass: #CartInterface
 	instanceVariableNames: 'catalog items cart timeLastModified clock userID'
 	classVariableNames: ''
@@ -985,6 +1087,12 @@ list
 	timeLastModified := clock localMillisecondClock.
 	^ cart list.! !
 
+!CartInterface methodsFor: 'initialization' stamp: 'SN 11/24/2019 17:53:27'!
+remove: anItem
+
+	cart remove: anItem.
+	timeLastModified := clock localMillisecondClock.! !
+
 
 !CartInterface methodsFor: 'testing' stamp: 'Eden Torres 11/11/2019 18:42:16'!
 IsExpired
@@ -1009,7 +1117,7 @@ userID
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CartInterface class' category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: 'CartInterface class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 CartInterface class
 	instanceVariableNames: ''!
 
@@ -1019,7 +1127,7 @@ withCatalog: aCatalog withClock: aClock withUserID: aUserID
 	^ self new initialiazeWithCatalog: aCatalog withClock: aClock withUserID: aUserID .! !
 
 
-!classDefinition: #Cashier category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #Cashier category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Object subclass: #Cashier
 	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total'
 	classVariableNames: ''
@@ -1070,7 +1178,7 @@ initializeToCheckout: aCart charging: aCreditCard throught: aMerchantProcessor r
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: 'Cashier class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -1110,7 +1218,7 @@ creditCardHasNoCreditErrorMessage
 	^'Credit card has no credit'! !
 
 
-!classDefinition: #CreditCard category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #CreditCard category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'expiration number name'
 	classVariableNames: ''
@@ -1148,7 +1256,7 @@ number
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -1161,7 +1269,7 @@ expiringOn: aMonth withName: aName withNumber: aNumber
 	^self new initializeExpiringOn: aMonth withName: aName withNumber: aNumber.! !
 
 
-!classDefinition: #MerchantProcessorStub category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #MerchantProcessorStub category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Object subclass: #MerchantProcessorStub
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -1173,7 +1281,7 @@ debit: aValue from: aCard
 ! !
 
 
-!classDefinition: #Sale category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #Sale category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Object subclass: #Sale
 	instanceVariableNames: 'total items'
 	classVariableNames: ''
@@ -1205,7 +1313,7 @@ items
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Sale class' category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: 'Sale class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Sale class
 	instanceVariableNames: ''!
 
@@ -1216,7 +1324,7 @@ of: aTotal withItems: items
 	^self new initializeTotal: aTotal items: items.! !
 
 
-!classDefinition: #StoreTestObjectsFactory category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #StoreTestObjectsFactory category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Object subclass: #StoreTestObjectsFactory
 	instanceVariableNames: 'today'
 	classVariableNames: ''
@@ -1296,7 +1404,7 @@ today
 	^ today! !
 
 
-!classDefinition: #TusLibrosController category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #TusLibrosController category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Object subclass: #TusLibrosController
 	instanceVariableNames: 'webServer port tusLibros req'
 	classVariableNames: ''
@@ -1331,7 +1439,7 @@ catalog
 					   at: '0201558025' put: 260;
 					   yourself.! !
 
-!TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/23/2019 20:24:09'!
+!TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/24/2019 18:04:11'!
 initializeWith: aListeningPort
 
 	tusLibros := TusLibrosInternalInterface withUsers: self userList withCatalog: self catalog withClock: Time withAMerchantProcessor: self merchantProcessor.
@@ -1345,7 +1453,9 @@ initializeWith: aListeningPort
 	webServer addService: '/getCatalog' action: (self handleWith: #getCatalog).
 	webServer addService: '/addToCart' action: (self handleWith: #addToCart).
 	webServer addService: '/listCart' action: (self handleWith: #listCart).
-	webServer addService: '/checkoutCart' action: (self handleWith: #checkoutCart).	! !
+	webServer addService: '/checkoutCart' action: (self handleWith: #checkoutCart).
+	webServer addService: '/listPurchases' action: (self handleWith: #listPurchases).
+	webServer addService: '/removeFromCart' action: (self handleWith: #removeFromCart).! !
 
 !TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/23/2019 20:48:11'!
 merchantProcessor
@@ -1379,19 +1489,17 @@ addToCart
 	tusLibros addToCart: cartID asInteger item: bookISBN withQuantity: quantity asInteger .
 	^ self successResponse .! !
 
-!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/23/2019 20:43:36'!
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 17:07:01'!
 checkoutCart
 
-	| cartID items cardExpiration itemsResponse ticket |
+	| cartID cardExpiration ticket |
 	
 	cartID := req fields at: 'cartID' ifAbsent: self badRequestResponse.
 	
 	cardExpiration := Month month: DateAndTime now monthIndex year: DateAndTime now yearNumber + 1.
 	ticket := tusLibros checkoutCart: cartID asInteger withCreditCardNumber: '4444444444444444' withCreditCardName: 'Eden Torres' withExpritationDate: cardExpiration on: DateAndTime now.
-	items := ticket first.
 	
-	itemsResponse := items asSet asArray collect: [:item | Dictionary new at: 'isbn' put: item; at: 'quantity' put: (items occurrencesOf: item); at: 'price' put: (self catalog at: item); yourself ].
-	^ WebUtils jsonEncode: (Dictionary new at: 'items' put: itemsResponse ; at: 'total_amount' put: ticket second; yourself ) .! !
+	^ self listItems: ticket .! !
 
 !TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/23/2019 19:29:15'!
 createCart
@@ -1404,17 +1512,17 @@ createCart
 	cartID := tusLibros createCartFor: userID withPassword: password .
 	^ self jsonSimpleResponseWithKey: 'cartID' value:  cartID.! !
 
-!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/22/2019 17:38:35'!
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 16:48:36'!
 getCatalog
 
-	^ WebUtils jsonEncode: (self catalog associations collect: [:e | Dictionary new at: 'isbn' put: e key; at: 'price' put: e value; yourself ]).! !
+	^ self render: (WebUtils jsonEncode: (self catalog associations collect: [:item | Dictionary new at: 'isbn' put: item key; at: 'price' put: item value; yourself ])).! !
 
-!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/21/2019 21:41:46'!
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 16:48:50'!
 helloWorld
 
-	^ 'Hello World!!'.! !
+	^ self render: 'Hello World!!'.! !
 
-!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/23/2019 20:40:38'!
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 16:49:01'!
 listCart
 
 	| cartID items itemsResponse |
@@ -1424,7 +1532,30 @@ listCart
 	items := tusLibros listCart: cartID asInteger .
 
 	itemsResponse := items asSet asArray collect: [:item | Dictionary new at: 'isbn' put: item; at: 'quantity' put: (items occurrencesOf: item) ; yourself ].
-	^ WebUtils jsonEncode: (Dictionary new at: 'items' put: itemsResponse ; at: 'total_quantity' put: items size; yourself ) .! !
+	^ self render: (WebUtils jsonEncode: (Dictionary new at: 'items' put: itemsResponse ; at: 'total_quantity' put: items size; yourself )) .! !
+
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 17:09:00'!
+listPurchases
+
+	| password userID purchases |
+
+	userID := req fields at: 'userID' ifAbsent: self badRequestResponse.
+	password := req fields at: 'password' ifAbsent: self badRequestResponse.
+	
+	purchases := tusLibros listPurchaseFor: userID withPassword: password .
+	^ self listItems: purchases.! !
+
+!TusLibrosController methodsFor: 'services - private' stamp: 'SN 11/24/2019 18:07:03'!
+removeFromCart
+
+	
+	| bookISBN cartID |
+
+	cartID := req fields at: 'cartID' ifAbsent: self badRequestResponse.
+	bookISBN := req fields at: 'isbn' ifAbsent: self badRequestResponse.
+	
+	tusLibros removeFromCart: cartID asInteger item: bookISBN .
+	^ self successResponse .! !
 
 
 !TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/23/2019 19:24:04'!
@@ -1432,44 +1563,55 @@ badRequestResponse
 
 	^ [ ^ req send400Response. ]! !
 
-!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/23/2019 19:30:14'!
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 16:48:00'!
 jsonSimpleResponseWithKey: aKey value: aValue
 
-	^ WebUtils jsonEncode: (Dictionary new at: aKey put: aValue; yourself )! !
+	^ self render: (WebUtils jsonEncode: (Dictionary new at: aKey put: aValue; yourself )).! !
 
-!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/21/2019 21:36:18'!
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 17:06:36'!
+listItems: aTicket
+
+	| items itemsResponse |
+
+	items := aTicket first.
+	
+	itemsResponse := items asSet asArray collect: [:item | Dictionary new at: 'isbn' put: item; at: 'quantity' put: (items occurrencesOf: item); at: 'price' put: (self catalog at: item); yourself ].
+	^ self render: (WebUtils jsonEncode: (Dictionary new at: 'items' put: itemsResponse ; at: 'total_amount' put: aTicket second; yourself )).! !
+
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 16:52:21'!
 render: aResponse
 
 	^ req send200Response: aResponse
-		   contentType: 'application/json; charset=utf-8' do: [:resp |  resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]! !
+		   contentType: 'application/json; charset=utf-8'
+		   do: [:resp |  resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]! !
 
-!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/23/2019 19:30:45'!
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 16:47:52'!
 successResponse
 
 	^ self jsonSimpleResponseWithKey: 'message' value: 'success'.! !
 
 
-!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/21/2019 21:38:21'!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/24/2019 16:45:43'!
 handleWith: aSelector
 
 	^ [ :request |
 		| response |
 		
 		req := request.
-		self render: (self safeSend: aSelector ) .
+		self safeSend: aSelector.
 	].! !
 
-!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/23/2019 19:11:40'!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/24/2019 18:10:35'!
 safeSend: aSelector
 
 	^ [ aSelector sendTo: self ]
 	   on: Error 
 	   do: [ :anError |
-			req send404Response: (anError messageText) ].! !
+			req send404Response: (self jsonSimpleResponseWithKey: 'message' value: anError messageText) ].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosController class' category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: 'TusLibrosController class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 TusLibrosController class
 	instanceVariableNames: ''!
 
@@ -1479,7 +1621,7 @@ listeningOn: aPortNumber
 	^self new initializeWith: aPortNumber.! !
 
 
-!classDefinition: #TusLibrosInternalInterface category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: #TusLibrosInternalInterface category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 Object subclass: #TusLibrosInternalInterface
 	instanceVariableNames: 'userRegistry carts catalog lastCartID clock salesBooks merchantProcessor purchases'
 	classVariableNames: ''
@@ -1544,6 +1686,13 @@ listCart: aCartID
 	self validateCartWith: aCartID. 
 
 	^ (carts at: aCartID ) list.! !
+
+!TusLibrosInternalInterface methodsFor: 'cart managment' stamp: 'SN 11/24/2019 18:03:18'!
+removeFromCart: aCartID item: anItem 
+	
+	self validateCartWith: aCartID.
+	
+	(carts at: aCartID ) remove: anItem.! !
 
 
 !TusLibrosInternalInterface methodsFor: 'testing' stamp: 'SN 11/7/2019 21:06:52'!
@@ -1614,7 +1763,7 @@ totalOfSales: sales
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosInternalInterface class' category: #TusLibros stamp: 'SN 11/23/2019 20:49:34'!
+!classDefinition: 'TusLibrosInternalInterface class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
 TusLibrosInternalInterface class
 	instanceVariableNames: ''!
 
