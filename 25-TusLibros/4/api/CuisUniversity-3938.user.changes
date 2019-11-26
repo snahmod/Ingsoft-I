@@ -13941,3 +13941,51 @@ render: aResponse
 TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
 
 server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/26/2019 17:47:14' prior: 50831421!
+catalog
+
+	^Dictionary new at: '9789500763035' put: 3020;
+					   at: '0201558025' put: 260;
+					   at: '0451526538' put: 420;
+					   at: '0439358078' put: 100;
+					   at: '0316015849' put: 1500;
+					   yourself.! !
+
+a := 2!
+
+a := 2!
+
+!classDefinition: #TusLibrosController category: #TusLibros stamp: 'SN 11/26/2019 17:49:51'!
+Object subclass: #TusLibrosController
+	instanceVariableNames: 'webServer port tusLibros req catalog'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/26/2019 17:49:49' prior: 50834421!
+catalog
+
+	^catalog ifNil: [
+		catalog := Dictionary new at: '9789500763035' put: 3020;
+					   			 at: '0201558025' put: 260;
+					   			 at: '0451526538' put: 420;
+					   			 at: '0439358078' put: 100;
+					   			 at: '0316015849' put: 1500;
+					   			 yourself.]! !
+
+!classDefinition: #TusLibrosController category: #TusLibros stamp: 'SN 11/26/2019 17:50:37'!
+Object subclass: #TusLibrosController
+	instanceVariableNames: 'webServer port tusLibros req catalog userList'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!TusLibrosController methodsFor: 'initialization' stamp: 'SN 11/26/2019 17:50:35' prior: 50831456!
+userList
+
+	^userList ifNil: [
+		userList := Dictionary new at: 'Eden' put: '12345678';
+					   			  at: 'Santi' put: '12345678';
+					   			  yourself.]! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
