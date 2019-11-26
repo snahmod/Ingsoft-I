@@ -4,18 +4,16 @@ class App extends React.Component {
     super(props);
     this.state = {
       path: "/",
-      substrings: [],
-      selectedSubstring: "",
       catalog: new Array(),
       carrito: { items: new Array(), cartID: 0 },
       bookIndex: 0,
     };
 
-    this.data = [
-      {isbn: "0451526538", price: "$100"},
-      {isbn: "0439358078", price: "$100"},
-      {isbn: "0316015849", price: "$100"},
-    ];
+    // this.data = [
+    //   {isbn: "0451526538", price: "$100"},
+    //   {isbn: "0439358078", price: "$100"},
+    //   {isbn: "0316015849", price: "$100"},
+    // ];
   }
 
   componentWillMount() {
@@ -24,9 +22,17 @@ class App extends React.Component {
 
   getMyData(){
     var self = this;
-    this.data.forEach( function(value, index, array) {
-        self.handleBook(value)
-    });
+    getLocalAsJson(`getCatalog`)
+      .then(response => {
+        if (response.ok) return response.json()
+        throw Error('Oops')
+      })
+      .then(data => {
+          data.forEach( function(value, index, array) {
+            self.handleBook(value)
+        });
+      })
+      .catch(error => console.log(error.message))
   }
 
   handleBook = data => {
@@ -38,13 +44,14 @@ class App extends React.Component {
       .then(function (json) {
         var newCatalog = [...self.state.catalog]
         var book = json[Object.keys(json)[0]]
-        book["price"] = data.price
+        book["price"] = '$' + data.price
+        book["isbn"] = data.isbn
         newCatalog.push(book)
         console.log(newCatalog)
 
         var newCarritoItems = [...self.state.carrito.items]
         newCarritoItems.push(0)
-        self.setState({ ...self.state, catalog: newCatalog, carrito: { items: newCarritoItems, cartID: self.state.carrito.cartID }})
+        self.setState({ ...self.state, catalog: newCatalog, carrito: { ...self.state.carrito, items: newCarritoItems }})
       })
       .catch(function (error) {
         console.log('Looks like there was a problem: \n', error);
@@ -65,8 +72,9 @@ class App extends React.Component {
     }
 
     if (this.state.path === "/") {
-      content = (<StringInputView
+      content = (<LoginView
         router={router}
+        carrito={this.state.carrito}
       />)
     } else if (this.state.path === "/catalog") {
       console.log(this.state.catalog)

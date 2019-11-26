@@ -8,14 +8,14 @@ function CatalogView(props) {
     const newCount = [...itemsCount];
     newCount[bookIndex] = itemsCount[bookIndex] + 1;
     setItemsCount(newCount)
-    router.setCart({ items: newCount, cartID: carrito.id })
+    router.setCart({ items: newCount, cartID: carrito.cartID })
   };
   
   const decrementCount = bookIndex => () => {
     const newCount = [...itemsCount];
     newCount[bookIndex] = itemsCount[bookIndex] - 1;
     setItemsCount(newCount)
-    router.setCart({ items: newCount, cartID: carrito.id })
+    router.setCart({ items: newCount, cartID: carrito.cartID })
   };
 
   const navigateTo = bookIndex => () => {
@@ -52,24 +52,6 @@ function CatalogView(props) {
         );
       })}
     </List>
-    </div>
-  )
-}
-
-function BookView(props) {
-  const { router, book } = props
-  const classes = useStyles();
-
-  return (
-    <div>
-       <img src={book.cover.medium} style={{float: 'left', padding: '20px'}}></img>
-       <div style={{padding: '35px'}}>
-       <Typography component="h1">Title: {book.title} </Typography> <br></br>
-       <Typography component="h1">Author: {book.authors[0].name} </Typography> <br></br><br></br>
-       <Typography component="h2">Publisher: {book.publishers[0].name} </Typography> <br></br>
-       <Typography component="h2">Publish date: {book.publish_date} </Typography> <br></br>
-       <Typography component="h2">Number of pages: {book.number_of_pages} </Typography>
-       </div>
     </div>
   )
 }

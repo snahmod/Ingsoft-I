@@ -26,4 +26,9 @@ const {
   ThemeProvider,
   Toolbar,
   Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle
 } = MaterialUI;

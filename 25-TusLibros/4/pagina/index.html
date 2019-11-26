@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Substrings Finder</title>
+  <title>Tus Libros</title>
 
   <!-- Fonts to support Material Design -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
@@ -58,6 +58,11 @@
       ThemeProvider,
       Toolbar,
       Typography,
+      Dialog,
+      DialogActions,
+      DialogContent,
+      DialogContentText,
+      DialogTitle
     } = MaterialUI;
     const theme = createMuiTheme({
       palette: {
@@ -238,13 +243,19 @@
           )
         }
     
-    function StringInputView(props) {
-      const { router } = props
+    function LoginView(props) {
+      const { router, carrito } = props
       const classes = useStyles();
       const [userCredentials, setUserCredentials] = React.useState({
         userID: '',
         password: ''
       });
+    
+      const [dialog, setDialog] = React.useState({ open: false, message: '' });
+    
+      const closeDialog = () => {
+        setDialog({ open: false, message: '' });
+      };
     
       const handleChange = prop => event => {
         setUserCredentials({ ...userCredentials, [prop]: event.target.value });
@@ -256,17 +267,18 @@
           .then(function (response) {
             loading = false;
             console.log(response)
-            if (response.status == 200) return response.json()
-            alert('holaala')
+            if (response.ok) return response.json()
+    
+            response.json().then(data => { setDialog({ open: true, message: data.message }) });
+            throw new Error('Login Failed')
           })
           .then(function (json) {
             loading = false;
-            router.navigate("/catalog", { substrings: json })
+            router.navigate("/catalog", { carrito: { ...carrito, cartID: json.cartID } })
           })
           .catch(function (error) {
             loading = false;
             console.log('Looks like there was a problem: \n', error);
-            alert('hola');
           });
       }
       var loading = false;
@@ -316,7 +328,26 @@
               </FormControl>
     
     
-    
+              <Dialog
+                open={dialog.open}
+                keepMounted
+                style={{backgroundColor: 'red'}}
+                onClose={closeDialog}
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description"
+              >
+                <DialogTitle id="alert-dialog-slide-title">{"Login Failed"}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="alert-dialog-slide-description">
+                    {dialog.message}
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={closeDialog} color="primary">
+                    Ok
+                  </Button>
+                </DialogActions>
+              </Dialog>
         
         </div>
       )
@@ -331,14 +362,14 @@
         const newCount = [...itemsCount];
         newCount[bookIndex] = itemsCount[bookIndex] + 1;
         setItemsCount(newCount)
-        router.setCart({ items: newCount, cartID: carrito.id })
+        router.setCart({ items: newCount, cartID: carrito.cartID })
       };
       
       const decrementCount = bookIndex => () => {
         const newCount = [...itemsCount];
         newCount[bookIndex] = itemsCount[bookIndex] - 1;
         setItemsCount(newCount)
-        router.setCart({ items: newCount, cartID: carrito.id })
+        router.setCart({ items: newCount, cartID: carrito.cartID })
       };
     
       const navigateTo = bookIndex => () => {
@@ -375,24 +406,6 @@
             );
           })}
         </List>
-        </div>
-      )
-    }
-    
-    function BookView(props) {
-      const { router, book } = props
-      const classes = useStyles();
-    
-      return (
-        <div>
-           <img src={book.cover.medium} style={{float: 'left', padding: '20px'}}></img>
-           <div style={{padding: '35px'}}>
-           <Typography component="h1">Title: {book.title} </Typography> <br></br>
-           <Typography component="h1">Author: {book.authors[0].name} </Typography> <br></br><br></br>
-           <Typography component="h2">Publisher: {book.publishers[0].name} </Typography> <br></br>
-           <Typography component="h2">Publish date: {book.publish_date} </Typography> <br></br>
-           <Typography component="h2">Number of pages: {book.number_of_pages} </Typography>
-           </div>
         </div>
       )
     }
@@ -489,24 +502,41 @@
       )
     }
     
+    function BookView(props) {
+      const { router, book } = props
+      const classes = useStyles();
+    
+      console.log('isbn:', book.isbn)
+      return (
+        <div>
+           <img src={book.cover.medium} style={{float: 'left', padding: '20px'}}></img>
+           <div style={{padding: '35px'}}>
+           <Typography component="h1"><b>Title:</b> {book.title} </Typography> <br></br>
+           <Typography component="h1"><b>Author:</b> {book.authors[0].name} </Typography> <br></br><br></br>
+           <Typography component="h2"><b>Publisher:</b> {book.publishers[0].name} </Typography> <br></br>
+           <Typography component="h2"><b>Publish date:</b> {book.publish_date} </Typography> <br></br>
+           <Typography component="h2"><b>Number of pages:</b> {book.number_of_pages} </Typography> <br></br>
+           <Typography component="h2"><b>Price:</b> {book.price} </Typography>
+           </div>
+        </div>
+      )
+    }
     
     class App extends React.Component {
       constructor(props) {
         super(props);
         this.state = {
           path: "/",
-          substrings: [],
-          selectedSubstring: "",
           catalog: new Array(),
           carrito: { items: new Array(), cartID: 0 },
           bookIndex: 0,
         };
     
-        this.data = [
-          {isbn: "0451526538", price: "$100"},
-          {isbn: "0439358078", price: "$100"},
-          {isbn: "0316015849", price: "$100"},
-        ];
+        // this.data = [
+        //   {isbn: "0451526538", price: "$100"},
+        //   {isbn: "0439358078", price: "$100"},
+        //   {isbn: "0316015849", price: "$100"},
+        // ];
       }
     
       componentWillMount() {
@@ -515,9 +545,17 @@
     
       getMyData(){
         var self = this;
-        this.data.forEach( function(value, index, array) {
-            self.handleBook(value)
-        });
+        getLocalAsJson(`getCatalog`)
+          .then(response => {
+            if (response.ok) return response.json()
+            throw Error('Oops')
+          })
+          .then(data => {
+              data.forEach( function(value, index, array) {
+                self.handleBook(value)
+            });
+          })
+          .catch(error => console.log(error.message))
       }
     
       handleBook = data => {
@@ -529,13 +567,14 @@
           .then(function (json) {
             var newCatalog = [...self.state.catalog]
             var book = json[Object.keys(json)[0]]
-            book["price"] = data.price
+            book["price"] = '$' + data.price
+            book["isbn"] = data.isbn
             newCatalog.push(book)
             console.log(newCatalog)
     
             var newCarritoItems = [...self.state.carrito.items]
             newCarritoItems.push(0)
-            self.setState({ ...self.state, catalog: newCatalog, carrito: { items: newCarritoItems, cartID: self.state.carrito.cartID }})
+            self.setState({ ...self.state, catalog: newCatalog, carrito: { ...self.state.carrito, items: newCarritoItems }})
           })
           .catch(function (error) {
             console.log('Looks like there was a problem: \n', error);
@@ -556,8 +595,9 @@
         }
     
         if (this.state.path === "/") {
-          content = (<StringInputView
+          content = (<LoginView
             router={router}
+            carrito={this.state.carrito}
           />)
         } else if (this.state.path === "/catalog") {
           console.log(this.state.catalog)

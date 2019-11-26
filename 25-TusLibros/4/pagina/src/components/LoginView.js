@@ -1,11 +1,17 @@
 
-function StringInputView(props) {
-  const { router } = props
+function LoginView(props) {
+  const { router, carrito } = props
   const classes = useStyles();
   const [userCredentials, setUserCredentials] = React.useState({
     userID: '',
     password: ''
   });
+
+  const [dialog, setDialog] = React.useState({ open: false, message: '' });
+
+  const closeDialog = () => {
+    setDialog({ open: false, message: '' });
+  };
 
   const handleChange = prop => event => {
     setUserCredentials({ ...userCredentials, [prop]: event.target.value });
@@ -17,17 +23,18 @@ function StringInputView(props) {
       .then(function (response) {
         loading = false;
         console.log(response)
-        if (response.status == 200) return response.json()
-        alert('holaala')
+        if (response.ok) return response.json()
+
+        response.json().then(data => { setDialog({ open: true, message: data.message }) });
+        throw new Error('Login Failed')
       })
       .then(function (json) {
         loading = false;
-        router.navigate("/catalog", { substrings: json })
+        router.navigate("/catalog", { carrito: { ...carrito, cartID: json.cartID } })
       })
       .catch(function (error) {
         loading = false;
         console.log('Looks like there was a problem: \n', error);
-        alert('hola');
       });
   }
   var loading = false;
@@ -77,7 +84,26 @@ function StringInputView(props) {
           </FormControl>
 
 
-
+          <Dialog
+            open={dialog.open}
+            keepMounted
+            style={{backgroundColor: 'red'}}
+            onClose={closeDialog}
+            aria-labelledby="alert-dialog-slide-title"
+            aria-describedby="alert-dialog-slide-description"
+          >
+            <DialogTitle id="alert-dialog-slide-title">{"Login Failed"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-slide-description">
+                {dialog.message}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={closeDialog} color="primary">
+                Ok
+              </Button>
+            </DialogActions>
+          </Dialog>
     
     </div>
   )
