@@ -13918,3 +13918,26 @@ safeSend: aSelector
 TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
 
 server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/26/2019 15:49:27' prior: 50834374!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self buildSimpleJsonWithKey: 'message' value: anError messageText) do: self responseHeaders].! !
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/26/2019 15:50:04'!
+responseHeaders
+
+	^ [:resp | 
+		resp headerAt: 'Access-Control-Allow-Origin' put: '*'.
+		resp headerAt: 'Content-Type' put: 'application/json; charset=utf-8'.]! !
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/26/2019 15:50:58' prior: 50832701!
+render: aResponse
+
+	^ req send200Response: aResponse
+		   contentType: 'application/json; charset=utf-8'
+		   do: self responseHeaders .! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
