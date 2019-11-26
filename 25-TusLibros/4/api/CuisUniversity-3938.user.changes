@@ -13728,3 +13728,193 @@ TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
 server := TusLibrosController listeningOn: 8082.!
 
 ----SNAPSHOT----(24 November 2019 18:12:22) CuisUniversity-3938.image priorSource: 16030196!
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:16:05' prior: 50834129!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self jsonSimpleResponseWithKey: 'message_eden' value: anError messageText) ].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:17:45' prior: 50834153!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			^ req send404Response: (self jsonSimpleResponseWithKey: 'message_eden' value: anError messageText) ].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:18:08' prior: 50834167!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self jsonSimpleResponseWithKey: 'message_eden' value: anError messageText) ].! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:18:48' prior: 50834181!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send400Response ].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:19:14' prior: 50834191!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self jsonSimpleResponseWithKey: 'message_eden' value: anError messageText). ].! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:19:52' prior: 50834202!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self jsonSimpleResponseWithKey: 'message_eden' value: anError messageText). ].! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:20:15' prior: 50834212!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self jsonSimpleResponseWithKey: 'message_eden' value: anError messageText) do: [:resp |  resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]. ].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!WebRequest methodsFor: 'responses' stamp: 'SN 11/25/2019 20:23:54' prior: 50825402!
+send404Response: body do: aBlock
+	"Send a 404 not found response"
+
+	| resp |
+	resp := self newResponse protocol: 'HTTP/1.1' code: 404.
+	resp headerAt: 'Content-Type' put: 'text/html; charset=utf-8'.
+	aBlock value: resp.
+	"self sendResponse: resp content: body."
+	self sendResponseCode: 404 
+		content: body
+		type: 'text/plain; charset=utf-8'
+		close: true
+! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!WebRequest methodsFor: 'responses' stamp: 'ar 2/25/2010 16:32' prior: 50834237!
+send404Response: body do: aBlock
+	"Send a 404 not found response"
+
+	| resp |
+	resp := self newResponse protocol: 'HTTP/1.1' code: 404.
+	resp headerAt: 'Content-Type' put: 'text/html; charset=utf-8'.
+	aBlock value: resp.
+	^self sendResponse: resp content: body.
+! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:25:05' prior: 50834222!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self jsonSimpleResponseWithKey: 'message_eden' value: anError messageText)].! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:25:28' prior: 50834267!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self jsonSimpleResponseWithKey: 'messfgddgage_eden' value: anError messageText)].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:29:40' prior: 50834277!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send405Response: (self jsonSimpleResponseWithKey: 'messfgddgage_eden' value: anError messageText)].! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:30:55' prior: 50834291!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			self halt.
+			req send405Response: (self jsonSimpleResponseWithKey: 'messfgddgage_eden' value: anError messageText)].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:32:36' prior: 50834301!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send405Response: (self jsonSimpleResponseWithKey: 'messfgddgage_eden' value: anError messageText)].! !
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/25/2019 20:34:09' prior: 50832646!
+jsonSimpleResponseWithKey: aKey value: aValue
+
+	^ self render: self buildSimpleJsonWithKey: aKey value: aValue .! !
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/25/2019 20:34:39'!
+buildSimpleJsonWithKey: aKey value: aValue
+
+	^ (WebUtils jsonEncode: (Dictionary new at: aKey put: aValue; yourself )).! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:35:05' prior: 50834315!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send405Response: (self buildSimpleJsonWithKey: 'message' value: anError messageText)].! !
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:35:16' prior: 50834340!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self buildSimpleJsonWithKey: 'message' value: anError messageText)].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/25/2019 20:39:56' prior: 50834325!
+jsonSimpleResponseWithKey: aKey value: aValue
+
+	^ self render: (self buildSimpleJsonWithKey: aKey value: aValue) .! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:43:56' prior: 50834350!
+safeSend: aSelector
+
+	^ [ aSelector sendTo: self ]
+	   on: Error 
+	   do: [ :anError |
+			req send404Response: (self buildSimpleJsonWithKey: 'message' value: anError messageText) do: [:resp |  resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]].! !
+
+TusLibrosController allInstancesDo: [:e | e stopListening; destroy].!
+
+server := TusLibrosController listeningOn: 8082.!

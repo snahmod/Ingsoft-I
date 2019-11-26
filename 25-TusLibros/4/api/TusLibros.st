@@ -1,4 +1,4 @@
-!classDefinition: #CartTest category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #CartTest category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 TestCase subclass: #CartTest
 	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
@@ -141,7 +141,7 @@ setUp
 	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
-!classDefinition: #CashierTest category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #CashierTest category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 TestCase subclass: #CashierTest
 	instanceVariableNames: 'testObjectsFactory debitBehavior'
 	classVariableNames: ''
@@ -289,7 +289,7 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
 
-!classDefinition: #TusLibrosInternalInterfaceTest category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #TusLibrosInternalInterfaceTest category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 TestCase subclass: #TusLibrosInternalInterfaceTest
 	instanceVariableNames: 'edenUser edenPassword userRegistry factory stubbedTime debitBehavior santiUser santiPassword emptyUserRegistry'
 	classVariableNames: ''
@@ -964,7 +964,7 @@ denyThatListCartIn: interface ofCartID: cartID includes: aBook
 	self deny: (listCart includes: aBook).! !
 
 
-!classDefinition: #Cart category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #Cart category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Object subclass: #Cart
 	instanceVariableNames: 'catalog items'
 	classVariableNames: ''
@@ -1050,7 +1050,7 @@ remove: anItem
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cart class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: 'Cart class' category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Cart class
 	instanceVariableNames: ''!
 
@@ -1060,7 +1060,7 @@ acceptingItemsOf: aCatalog
 	^self new initializeAcceptingItemsOf: aCatalog ! !
 
 
-!classDefinition: #CartInterface category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #CartInterface category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Object subclass: #CartInterface
 	instanceVariableNames: 'catalog items cart timeLastModified clock userID'
 	classVariableNames: ''
@@ -1117,7 +1117,7 @@ userID
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CartInterface class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: 'CartInterface class' category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 CartInterface class
 	instanceVariableNames: ''!
 
@@ -1127,7 +1127,7 @@ withCatalog: aCatalog withClock: aClock withUserID: aUserID
 	^ self new initialiazeWithCatalog: aCatalog withClock: aClock withUserID: aUserID .! !
 
 
-!classDefinition: #Cashier category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #Cashier category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Object subclass: #Cashier
 	instanceVariableNames: 'cart salesBook merchantProcessor creditCard total'
 	classVariableNames: ''
@@ -1178,7 +1178,7 @@ initializeToCheckout: aCart charging: aCreditCard throught: aMerchantProcessor r
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Cashier class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: 'Cashier class' category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Cashier class
 	instanceVariableNames: ''!
 
@@ -1218,7 +1218,7 @@ creditCardHasNoCreditErrorMessage
 	^'Credit card has no credit'! !
 
 
-!classDefinition: #CreditCard category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #CreditCard category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Object subclass: #CreditCard
 	instanceVariableNames: 'expiration number name'
 	classVariableNames: ''
@@ -1256,7 +1256,7 @@ number
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: 'CreditCard class' category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 CreditCard class
 	instanceVariableNames: ''!
 
@@ -1269,7 +1269,7 @@ expiringOn: aMonth withName: aName withNumber: aNumber
 	^self new initializeExpiringOn: aMonth withName: aName withNumber: aNumber.! !
 
 
-!classDefinition: #MerchantProcessorStub category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #MerchantProcessorStub category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Object subclass: #MerchantProcessorStub
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -1281,7 +1281,7 @@ debit: aValue from: aCard
 ! !
 
 
-!classDefinition: #Sale category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #Sale category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Object subclass: #Sale
 	instanceVariableNames: 'total items'
 	classVariableNames: ''
@@ -1313,7 +1313,7 @@ items
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'Sale class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: 'Sale class' category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Sale class
 	instanceVariableNames: ''!
 
@@ -1324,7 +1324,7 @@ of: aTotal withItems: items
 	^self new initializeTotal: aTotal items: items.! !
 
 
-!classDefinition: #StoreTestObjectsFactory category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #StoreTestObjectsFactory category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Object subclass: #StoreTestObjectsFactory
 	instanceVariableNames: 'today'
 	classVariableNames: ''
@@ -1404,7 +1404,7 @@ today
 	^ today! !
 
 
-!classDefinition: #TusLibrosController category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #TusLibrosController category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Object subclass: #TusLibrosController
 	instanceVariableNames: 'webServer port tusLibros req'
 	classVariableNames: ''
@@ -1563,10 +1563,15 @@ badRequestResponse
 
 	^ [ ^ req send400Response. ]! !
 
-!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 16:48:00'!
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/25/2019 20:34:39'!
+buildSimpleJsonWithKey: aKey value: aValue
+
+	^ (WebUtils jsonEncode: (Dictionary new at: aKey put: aValue; yourself )).! !
+
+!TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/25/2019 20:39:56'!
 jsonSimpleResponseWithKey: aKey value: aValue
 
-	^ self render: (WebUtils jsonEncode: (Dictionary new at: aKey put: aValue; yourself )).! !
+	^ self render: (self buildSimpleJsonWithKey: aKey value: aValue) .! !
 
 !TusLibrosController methodsFor: 'rendering - private' stamp: 'SN 11/24/2019 17:06:36'!
 listItems: aTicket
@@ -1601,17 +1606,17 @@ handleWith: aSelector
 		self safeSend: aSelector.
 	].! !
 
-!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/24/2019 18:10:35'!
+!TusLibrosController methodsFor: 'dispatching - private' stamp: 'SN 11/25/2019 20:43:56'!
 safeSend: aSelector
 
 	^ [ aSelector sendTo: self ]
 	   on: Error 
 	   do: [ :anError |
-			req send404Response: (self jsonSimpleResponseWithKey: 'message' value: anError messageText) ].! !
+			req send404Response: (self buildSimpleJsonWithKey: 'message' value: anError messageText) do: [:resp |  resp headerAt: 'Access-Control-Allow-Origin' put: '*'.]].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosController class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: 'TusLibrosController class' category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 TusLibrosController class
 	instanceVariableNames: ''!
 
@@ -1621,7 +1626,7 @@ listeningOn: aPortNumber
 	^self new initializeWith: aPortNumber.! !
 
 
-!classDefinition: #TusLibrosInternalInterface category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: #TusLibrosInternalInterface category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 Object subclass: #TusLibrosInternalInterface
 	instanceVariableNames: 'userRegistry carts catalog lastCartID clock salesBooks merchantProcessor purchases'
 	classVariableNames: ''
@@ -1763,7 +1768,7 @@ totalOfSales: sales
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
-!classDefinition: 'TusLibrosInternalInterface class' category: #TusLibros stamp: 'SN 11/24/2019 18:12:17'!
+!classDefinition: 'TusLibrosInternalInterface class' category: #TusLibros stamp: 'SN 11/25/2019 21:36:58'!
 TusLibrosInternalInterface class
 	instanceVariableNames: ''!
 
