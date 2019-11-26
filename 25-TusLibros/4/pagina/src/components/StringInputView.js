@@ -2,18 +2,23 @@
 function StringInputView(props) {
   const { router } = props
   const classes = useStyles();
-  const [values, setValues] = React.useState({
-    text: '',
+  const [userCredentials, setUserCredentials] = React.useState({
+    userID: '',
+    password: ''
   });
+
   const handleChange = prop => event => {
-    setValues({ ...values, [prop]: event.target.value });
+    setUserCredentials({ ...userCredentials, [prop]: event.target.value });
   };
-  const handleSend = text => {
+
+  const handleSend = (userID, password) => {
     loading = true;
-    getLocalAsJson(`substrings?sentence=${text}`)
+    getLocalAsJson(`createCart?userID=${userID}&password=${password}`)
       .then(function (response) {
         loading = false;
-        return response.json()
+        console.log(response)
+        if (response.status == 200) return response.json()
+        alert('holaala')
       })
       .then(function (json) {
         loading = false;
@@ -22,6 +27,7 @@ function StringInputView(props) {
       .catch(function (error) {
         loading = false;
         console.log('Looks like there was a problem: \n', error);
+        alert('hola');
       });
   }
   var loading = false;
@@ -35,8 +41,8 @@ function StringInputView(props) {
             <div>
             <TextField 
               id="outlined-adornment-amount"
-              value={values.text}
-              onChange={handleChange('text')}
+              value={userCredentials.userID}
+              onChange={handleChange('userID')}
               className={classes.textField}
               label="User"
               autoComplete="off"
@@ -46,6 +52,8 @@ function StringInputView(props) {
             
           <TextField 
             id="standard-password-input"
+            value={userCredentials.password}
+            onChange={handleChange('password')}
             label="Password"
             className={classes.textField}
             type="password"
@@ -58,7 +66,7 @@ function StringInputView(props) {
           <Button 
           color="primary" 
              className={classes.button}
-            onClick={() => handleSend(values.text)}>
+            onClick={() => handleSend(userCredentials.userID, userCredentials.password)}>
             Ingresar
               </Button>
           </div>

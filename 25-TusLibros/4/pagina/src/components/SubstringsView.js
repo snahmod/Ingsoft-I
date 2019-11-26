@@ -1,50 +1,50 @@
 function CatalogView(props) {
-  const { router, substrings, carrito } = props
+  const { router, catalog, carrito } = props
   const classes = useStyles();
 
-  const [count, setCount] = React.useState(carrito);
+  const [itemsCount, setItemsCount] = React.useState(carrito.items);
 
-  const incrementCount = value => () => {
-    const newCount = [...count];
-    newCount[value] = count[value] + 1;
-    setCount(newCount)
-    router.setCart(newCount)
+  const incrementCount = bookIndex => () => {
+    const newCount = [...itemsCount];
+    newCount[bookIndex] = itemsCount[bookIndex] + 1;
+    setItemsCount(newCount)
+    router.setCart({ items: newCount, cartID: carrito.id })
   };
   
-  const decrementCount = value => () => {
-    const newCount = [...count];
-    newCount[value] = count[value] - 1;
-    setCount(newCount)
-    router.setCart(newCount)
+  const decrementCount = bookIndex => () => {
+    const newCount = [...itemsCount];
+    newCount[bookIndex] = itemsCount[bookIndex] - 1;
+    setItemsCount(newCount)
+    router.setCart({ items: newCount, cartID: carrito.id })
   };
 
-  const navigateTo = value => () => {
-    router.navigate("/book", { bookIndex: value })
+  const navigateTo = bookIndex => () => {
+    router.navigate("/book", { bookIndex: bookIndex })
   };
   
-
+  console.log(catalog)
   return (
     <div>
     <List dense className={classes.list}>
-      {[...Array(substrings.length).keys()].map(value => {
-        const labelId = `checkbox-list-secondary-label-${value}`;
+      {[...Array(catalog.length).keys()].map(bookIndex => {
+        const labelId = `checkbox-list-secondary-label-${bookIndex}`;
         return (
-          <ListItem key={value} button onClick={navigateTo(value)}>
+          <ListItem key={bookIndex} button onClick={navigateTo(bookIndex)}>
             <ListItemAvatar>
               <Avatar
                 variant="rounded" className={classes.rounded}
-                src={substrings[value].cover.small}
+                src={catalog[bookIndex].cover.small}
               />
             </ListItemAvatar>
-            <ListItemText id={labelId} primary={substrings[value].title} secondary={substrings[value].price} />
+            <ListItemText id={labelId} primary={catalog[bookIndex].title} secondary={catalog[bookIndex].price} />
             <ListItemSecondaryAction>
             <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
-             onClick={incrementCount(value)}>
+             onClick={incrementCount(bookIndex)}>
             <Icon>add</Icon>
             </IconButton>
-            <Typography component="h1"style= {{display:'inline-block'}}>{count[value]} </Typography>
+            <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIndex]} </Typography>
             <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
-            onClick={decrementCount(value)} disabled={count[value] <= 0}>
+            onClick={decrementCount(bookIndex)} disabled={itemsCount[bookIndex] <= 0}>
             <Icon>remove</Icon>
             </IconButton>
             </ListItemSecondaryAction>

@@ -7,7 +7,7 @@ class App extends React.Component {
       substrings: [],
       selectedSubstring: "",
       catalog: new Array(),
-      carrito: new Array(),
+      carrito: { items: new Array(), cartID: 0 },
       bookIndex: 0,
     };
 
@@ -40,10 +40,11 @@ class App extends React.Component {
         var book = json[Object.keys(json)[0]]
         book["price"] = data.price
         newCatalog.push(book)
+        console.log(newCatalog)
 
-        var newCarrito = [...self.state.carrito]
-        newCarrito.push(0)
-        self.setState({ ...self.state, catalog: newCatalog, carrito: newCarrito})
+        var newCarritoItems = [...self.state.carrito.items]
+        newCarritoItems.push(0)
+        self.setState({ ...self.state, catalog: newCatalog, carrito: { items: newCarritoItems, cartID: self.state.carrito.cartID }})
       })
       .catch(function (error) {
         console.log('Looks like there was a problem: \n', error);
@@ -71,21 +72,21 @@ class App extends React.Component {
       console.log(this.state.catalog)
       content = (<CatalogView
         router={router}
-        substrings={this.state.catalog}
+        catalog={this.state.catalog}
         carrito={this.state.carrito}
       />)
     } else if (this.state.path === "/cart") {
       content = ( <div>
       <CatalogView
         router={router}
-        substrings={this.state.catalog.filter(function (elem, index) {
-          return this.state.carrito[index] > 0
+        catalog={this.state.catalog.filter(function (elem, index) {
+          return this.state.carrito.items[index] > 0
       }.bind(this))}
         carrito={this.state.carrito}
       />
       <CarritoView  router={router}
       substrings={this.state.catalog.filter(function (elem, index) {
-        return this.state.carrito[index] > 0
+        return this.state.carrito.items[index] > 0
       }.bind(this))} />
       </div>
       )

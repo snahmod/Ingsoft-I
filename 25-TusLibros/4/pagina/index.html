@@ -241,18 +241,23 @@
     function StringInputView(props) {
       const { router } = props
       const classes = useStyles();
-      const [values, setValues] = React.useState({
-        text: '',
+      const [userCredentials, setUserCredentials] = React.useState({
+        userID: '',
+        password: ''
       });
+    
       const handleChange = prop => event => {
-        setValues({ ...values, [prop]: event.target.value });
+        setUserCredentials({ ...userCredentials, [prop]: event.target.value });
       };
-      const handleSend = text => {
+    
+      const handleSend = (userID, password) => {
         loading = true;
-        getLocalAsJson(`substrings?sentence=${text}`)
+        getLocalAsJson(`createCart?userID=${userID}&password=${password}`)
           .then(function (response) {
             loading = false;
-            return response.json()
+            console.log(response)
+            if (response.status == 200) return response.json()
+            alert('holaala')
           })
           .then(function (json) {
             loading = false;
@@ -261,6 +266,7 @@
           .catch(function (error) {
             loading = false;
             console.log('Looks like there was a problem: \n', error);
+            alert('hola');
           });
       }
       var loading = false;
@@ -274,8 +280,8 @@
                 <div>
                 <TextField 
                   id="outlined-adornment-amount"
-                  value={values.text}
-                  onChange={handleChange('text')}
+                  value={userCredentials.userID}
+                  onChange={handleChange('userID')}
                   className={classes.textField}
                   label="User"
                   autoComplete="off"
@@ -285,6 +291,8 @@
                 
               <TextField 
                 id="standard-password-input"
+                value={userCredentials.password}
+                onChange={handleChange('password')}
                 label="Password"
                 className={classes.textField}
                 type="password"
@@ -297,7 +305,7 @@
               <Button 
               color="primary" 
                  className={classes.button}
-                onClick={() => handleSend(values.text)}>
+                onClick={() => handleSend(userCredentials.userID, userCredentials.password)}>
                 Ingresar
                   </Button>
               </div>
@@ -314,52 +322,52 @@
       )
     }
     function CatalogView(props) {
-      const { router, substrings, carrito } = props
+      const { router, catalog, carrito } = props
       const classes = useStyles();
     
-      const [count, setCount] = React.useState(carrito);
+      const [itemsCount, setItemsCount] = React.useState(carrito.items);
     
-      const incrementCount = value => () => {
-        const newCount = [...count];
-        newCount[value] = count[value] + 1;
-        setCount(newCount)
-        router.setCart(newCount)
+      const incrementCount = bookIndex => () => {
+        const newCount = [...itemsCount];
+        newCount[bookIndex] = itemsCount[bookIndex] + 1;
+        setItemsCount(newCount)
+        router.setCart({ items: newCount, cartID: carrito.id })
       };
       
-      const decrementCount = value => () => {
-        const newCount = [...count];
-        newCount[value] = count[value] - 1;
-        setCount(newCount)
-        router.setCart(newCount)
+      const decrementCount = bookIndex => () => {
+        const newCount = [...itemsCount];
+        newCount[bookIndex] = itemsCount[bookIndex] - 1;
+        setItemsCount(newCount)
+        router.setCart({ items: newCount, cartID: carrito.id })
       };
     
-      const navigateTo = value => () => {
-        router.navigate("/book", { bookIndex: value })
+      const navigateTo = bookIndex => () => {
+        router.navigate("/book", { bookIndex: bookIndex })
       };
       
-    
+      console.log(catalog)
       return (
         <div>
         <List dense className={classes.list}>
-          {[...Array(substrings.length).keys()].map(value => {
-            const labelId = `checkbox-list-secondary-label-${value}`;
+          {[...Array(catalog.length).keys()].map(bookIndex => {
+            const labelId = `checkbox-list-secondary-label-${bookIndex}`;
             return (
-              <ListItem key={value} button onClick={navigateTo(value)}>
+              <ListItem key={bookIndex} button onClick={navigateTo(bookIndex)}>
                 <ListItemAvatar>
                   <Avatar
                     variant="rounded" className={classes.rounded}
-                    src={substrings[value].cover.small}
+                    src={catalog[bookIndex].cover.small}
                   />
                 </ListItemAvatar>
-                <ListItemText id={labelId} primary={substrings[value].title} secondary={substrings[value].price} />
+                <ListItemText id={labelId} primary={catalog[bookIndex].title} secondary={catalog[bookIndex].price} />
                 <ListItemSecondaryAction>
                 <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
-                 onClick={incrementCount(value)}>
+                 onClick={incrementCount(bookIndex)}>
                 <Icon>add</Icon>
                 </IconButton>
-                <Typography component="h1"style= {{display:'inline-block'}}>{count[value]} </Typography>
+                <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIndex]} </Typography>
                 <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
-                onClick={decrementCount(value)} disabled={count[value] <= 0}>
+                onClick={decrementCount(bookIndex)} disabled={itemsCount[bookIndex] <= 0}>
                 <Icon>remove</Icon>
                 </IconButton>
                 </ListItemSecondaryAction>
@@ -490,7 +498,7 @@
           substrings: [],
           selectedSubstring: "",
           catalog: new Array(),
-          carrito: new Array(),
+          carrito: { items: new Array(), cartID: 0 },
           bookIndex: 0,
         };
     
@@ -523,10 +531,11 @@
             var book = json[Object.keys(json)[0]]
             book["price"] = data.price
             newCatalog.push(book)
+            console.log(newCatalog)
     
-            var newCarrito = [...self.state.carrito]
-            newCarrito.push(0)
-            self.setState({ ...self.state, catalog: newCatalog, carrito: newCarrito})
+            var newCarritoItems = [...self.state.carrito.items]
+            newCarritoItems.push(0)
+            self.setState({ ...self.state, catalog: newCatalog, carrito: { items: newCarritoItems, cartID: self.state.carrito.cartID }})
           })
           .catch(function (error) {
             console.log('Looks like there was a problem: \n', error);
@@ -554,21 +563,21 @@
           console.log(this.state.catalog)
           content = (<CatalogView
             router={router}
-            substrings={this.state.catalog}
+            catalog={this.state.catalog}
             carrito={this.state.carrito}
           />)
         } else if (this.state.path === "/cart") {
           content = ( <div>
           <CatalogView
             router={router}
-            substrings={this.state.catalog.filter(function (elem, index) {
-              return this.state.carrito[index] > 0
+            catalog={this.state.catalog.filter(function (elem, index) {
+              return this.state.carrito.items[index] > 0
           }.bind(this))}
             carrito={this.state.carrito}
           />
           <CarritoView  router={router}
           substrings={this.state.catalog.filter(function (elem, index) {
-            return this.state.carrito[index] > 0
+            return this.state.carrito.items[index] > 0
           }.bind(this))} />
           </div>
           )
