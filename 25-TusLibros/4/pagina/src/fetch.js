@@ -19,3 +19,22 @@ const getISBNApiAsJson = (isbn) => {
     }
   })
 }
+
+const modifyCart = (action, cartID, isbn, handleResponse) => {
+  getLocalAsJson(`${action}?quantity=1&isbn=${isbn}&cartID=${cartID}`)
+    .then(function (response) {
+      return response.json()
+    })
+    .then(handleResponse)
+    .catch(function (error) {
+      console.log('Looks like there was a problem: \n', error);
+    });
+}
+
+const addToCart = (cartID, isbn, handleResponse) => {
+  modifyCart('addToCart', cartID, isbn, handleResponse)
+}
+
+const removeFromCart = (cartID, isbn, handleResponse) => {
+  modifyCart('removeFromCart', cartID, isbn, handleResponse)
+}

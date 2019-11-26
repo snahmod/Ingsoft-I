@@ -47,10 +47,9 @@ class App extends React.Component {
         book["price"] = '$' + data.price
         book["isbn"] = data.isbn
         newCatalog.push(book)
-        console.log(newCatalog)
 
         var newCarritoItems = [...self.state.carrito.items]
-        newCarritoItems.push(0)
+        newCarritoItems.push({isbn: data.isbn, quantity: 0})
         self.setState({ ...self.state, catalog: newCatalog, carrito: { ...self.state.carrito, items: newCarritoItems }})
       })
       .catch(function (error) {
@@ -88,13 +87,13 @@ class App extends React.Component {
       <CatalogView
         router={router}
         catalog={this.state.catalog.filter(function (elem, index) {
-          return this.state.carrito.items[index] > 0
+          return this.state.carrito.items[index].quantity > 0
       }.bind(this))}
         carrito={this.state.carrito}
       />
       <CarritoView  router={router}
       substrings={this.state.catalog.filter(function (elem, index) {
-        return this.state.carrito.items[index] > 0
+        return this.state.carrito.items[index].quantity > 0
       }.bind(this))} />
       </div>
       )
