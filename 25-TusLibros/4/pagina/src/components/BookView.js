@@ -2,7 +2,6 @@ function BookView(props) {
   const { router, book } = props
   const classes = useStyles();
 
-  console.log('isbn:', book.isbn)
   return (
     <div>
        <img src={book.cover.medium} style={{float: 'left', padding: '20px'}}></img>

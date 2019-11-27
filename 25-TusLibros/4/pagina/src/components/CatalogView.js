@@ -42,15 +42,15 @@ function CatalogView(props) {
             </ListItemAvatar>
             <ListItemText id={labelId} primary={catalog[bookIndex].title} secondary={catalog[bookIndex].price} />
             <ListItemSecondaryAction>
-            <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
-             onClick={incrementCount(bookIndex)}>
-            <Icon>add</Icon>
-            </IconButton>
-            <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIndex].quantity} </Typography>
-            <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
-            onClick={decrementCount(bookIndex)} disabled={itemsCount[bookIndex].quantity <= 0}>
-            <Icon>remove</Icon>
-            </IconButton>
+              <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
+              onClick={incrementCount(bookIndex)}>
+              <Icon>add</Icon>
+              </IconButton>
+              <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIndex].quantity} </Typography>
+              <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
+              onClick={decrementCount(bookIndex)} disabled={itemsCount[bookIndex].quantity <= 0}>
+              <Icon>remove</Icon>
+              </IconButton>
             </ListItemSecondaryAction>
           </ListItem>
         );

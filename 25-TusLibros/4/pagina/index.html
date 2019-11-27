@@ -415,15 +415,15 @@
                 </ListItemAvatar>
                 <ListItemText id={labelId} primary={catalog[bookIndex].title} secondary={catalog[bookIndex].price} />
                 <ListItemSecondaryAction>
-                <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
-                 onClick={incrementCount(bookIndex)}>
-                <Icon>add</Icon>
-                </IconButton>
-                <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIndex].quantity} </Typography>
-                <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
-                onClick={decrementCount(bookIndex)} disabled={itemsCount[bookIndex].quantity <= 0}>
-                <Icon>remove</Icon>
-                </IconButton>
+                  <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
+                  onClick={incrementCount(bookIndex)}>
+                  <Icon>add</Icon>
+                  </IconButton>
+                  <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIndex].quantity} </Typography>
+                  <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
+                  onClick={decrementCount(bookIndex)} disabled={itemsCount[bookIndex].quantity <= 0}>
+                  <Icon>remove</Icon>
+                  </IconButton>
                 </ListItemSecondaryAction>
               </ListItem>
             );
@@ -507,7 +507,7 @@
     
     // Component
     function CarritoView(props) {
-      const { router, substrings } = props
+      const { router, reducedCatalog } = props
       const classes = useStyles();
       
       //const { details, loading, error } = useFetchDetails(selectedSubstring)
@@ -517,7 +517,7 @@
     
       return (
         <div>
-          <Button variant="contained" color="primary" className={classes.button} disabled = {substrings.length <= 0}>
+          <Button variant="contained" color="primary" className={classes.button} disabled = {reducedCatalog.length <= 0}>
             Check out
           </Button>
     
@@ -529,7 +529,6 @@
       const { router, book } = props
       const classes = useStyles();
     
-      console.log('isbn:', book.isbn)
       return (
         <div>
            <img src={book.cover.medium} style={{float: 'left', padding: '20px'}}></img>
@@ -637,8 +636,9 @@
           }.bind(this))}
             carrito={this.state.carrito}
           />
-          <CarritoView  router={router}
-          substrings={this.state.catalog.filter(function (elem, index) {
+          <CarritoView
+          router={router}
+          reducedCatalog={this.state.catalog.filter(function (elem, index) {
             return this.state.carrito.items[index].quantity > 0
           }.bind(this))} />
           </div>

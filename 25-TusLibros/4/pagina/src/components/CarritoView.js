@@ -73,7 +73,7 @@ const useFetchDetails = (substring) => {
 
 // Component
 function CarritoView(props) {
-  const { router, substrings } = props
+  const { router, reducedCatalog } = props
   const classes = useStyles();
   
   //const { details, loading, error } = useFetchDetails(selectedSubstring)
@@ -83,7 +83,7 @@ function CarritoView(props) {
 
   return (
     <div>
-      <Button variant="contained" color="primary" className={classes.button} disabled = {substrings.length <= 0}>
+      <Button variant="contained" color="primary" className={classes.button} disabled = {reducedCatalog.length <= 0}>
         Check out
       </Button>
 

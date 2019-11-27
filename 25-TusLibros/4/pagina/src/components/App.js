@@ -91,8 +91,9 @@ class App extends React.Component {
       }.bind(this))}
         carrito={this.state.carrito}
       />
-      <CarritoView  router={router}
-      substrings={this.state.catalog.filter(function (elem, index) {
+      <CarritoView
+      router={router}
+      reducedCatalog={this.state.catalog.filter(function (elem, index) {
         return this.state.carrito.items[index].quantity > 0
       }.bind(this))} />
       </div>
