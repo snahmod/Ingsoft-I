@@ -67,6 +67,10 @@ class App extends React.Component {
       },
       setCart: (carrito) => {
         this.setState({ ...this.state, carrito: carrito })
+      },
+      emptyCart: () => {
+        const emptyItems = this.state.carrito.items.map(item => { return {isbn: item.isbn, quantity: 0} })
+        this.setState({ ...this.state, carrito: { items: emptyItems, cartID: 0 } })
       }
     }
 
@@ -102,7 +106,9 @@ class App extends React.Component {
       content = (
       <BookView
         router={router}
-        book={this.state.catalog[this.state.bookIndex]}
+        bookIndex={this.state.bookIndex}
+        catalog={this.state.catalog}
+        carrito={this.state.carrito}
       />
       )
     }

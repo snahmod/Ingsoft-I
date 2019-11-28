@@ -147,7 +147,7 @@
       })
     }
     
-    const modifyCart = (action, cartID, isbn, handleResponse) => {
+    const modifyCart = (action, cartID, isbn, handleResponse, onFailureDo) => {
       getLocalAsJson(`${action}?quantity=1&isbn=${isbn}&cartID=${cartID}`)
         .then(function (response) {
           return response.json()
@@ -155,15 +155,16 @@
         .then(handleResponse)
         .catch(function (error) {
           console.log('Looks like there was a problem: \n', error);
+          onFailureDo()
         });
     }
     
-    const addToCart = (cartID, isbn, handleResponse) => {
-      modifyCart('addToCart', cartID, isbn, handleResponse)
+    const addToCart = (cartID, isbn, handleResponse, onFailureDo) => {
+      modifyCart('addToCart', cartID, isbn, handleResponse, onFailureDo)
     }
     
-    const removeFromCart = (cartID, isbn, handleResponse) => {
-      modifyCart('removeFromCart', cartID, isbn, handleResponse)
+    const removeFromCart = (cartID, isbn, handleResponse, onFailureDo) => {
+      modifyCart('removeFromCart', cartID, isbn, handleResponse, onFailureDo)
     }
 
         function MyToolBar(props) {
@@ -175,9 +176,13 @@
               edge="start"
               className={classes.menuButton}
               color="inherit"
-              onClick={()=>router.navigate("/", {
+              onClick={()=> {
+                router.emptyCart()
+                router.navigate("/", {
                 substrings: [],
-                selectedSubstring: "",})}
+                selectedSubstring: "",})
+                }
+              }
               >
               <Icon>close</Icon>
             </IconButton>
@@ -375,26 +380,7 @@
       const { router, catalog, carrito } = props
       const classes = useStyles();
     
-      const [itemsCount, setItemsCount] = React.useState(carrito.items);
-    
-      const modifyItemCount = (bookIndex, quantity) => {
-        const newCount = [...itemsCount];
-        newCount[bookIndex].quantity = itemsCount[bookIndex].quantity + quantity;
-        setItemsCount(newCount)
-        router.setCart({ items: newCount, cartID: carrito.cartID })
-      }
-    
-      const incrementCount = bookIndex => () => {
-        addToCart(carrito.cartID, catalog[bookIndex].isbn, (data) => {
-          modifyItemCount(bookIndex, 1)
-        })
-      };
-      
-      const decrementCount = bookIndex => () => {
-        removeFromCart(carrito.cartID, catalog[bookIndex].isbn, (data) => {
-          modifyItemCount(bookIndex, -1)
-        })
-      };
+      console.log('Cart ID:', carrito.cartID)
     
       const navigateTo = bookIndex => () => {
         router.navigate("/book", { bookIndex: bookIndex })
@@ -415,15 +401,12 @@
                 </ListItemAvatar>
                 <ListItemText id={labelId} primary={catalog[bookIndex].title} secondary={catalog[bookIndex].price} />
                 <ListItemSecondaryAction>
-                  <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
-                  onClick={incrementCount(bookIndex)}>
-                  <Icon>add</Icon>
-                  </IconButton>
-                  <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIndex].quantity} </Typography>
-                  <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
-                  onClick={decrementCount(bookIndex)} disabled={itemsCount[bookIndex].quantity <= 0}>
-                  <Icon>remove</Icon>
-                  </IconButton>
+                  <QuantityButtons
+                    bookIndex={bookIndex}
+                    router={router}
+                    catalog={catalog}
+                    carrito={carrito}
+                  />
                 </ListItemSecondaryAction>
               </ListItem>
             );
@@ -526,8 +509,9 @@
     }
     
     function BookView(props) {
-      const { router, book } = props
-      const classes = useStyles();
+      const { router, bookIndex, catalog, carrito } = props
+    
+      const book = catalog[bookIndex]
     
       return (
         <div>
@@ -539,7 +523,58 @@
            <Typography component="h2"><b>Publish date:</b> {book.publish_date} </Typography> <br></br>
            <Typography component="h2"><b>Number of pages:</b> {book.number_of_pages} </Typography> <br></br>
            <Typography component="h2"><b>Price:</b> {book.price} </Typography>
+    
+           <QuantityButtons
+              bookIndex={bookIndex}
+              router={router}
+              catalog={catalog}
+              carrito={carrito}
+            />
            </div>
+        </div>
+      )
+    }
+    function QuantityButtons(props) {
+      const { bookIndex, router, catalog, carrito } = props
+      const classes = useStyles();
+    
+      const [itemsCount, setItemsCount] = React.useState(carrito.items);
+    
+      const modifyItemCount = (bookIndex, quantity) => {
+        const newCount = [...itemsCount];
+        newCount[bookIndex].quantity = itemsCount[bookIndex].quantity + quantity;
+        setItemsCount(newCount)
+        router.setCart({ items: newCount, cartID: carrito.cartID })
+      };
+    
+      const handleInvalidResponse = () => {
+        router.emptyCart()
+        router.navigate("/", {})
+      };
+    
+      const incrementCount = bookIndex => () => {
+        addToCart(carrito.cartID, catalog[bookIndex].isbn, (data) => {
+          modifyItemCount(bookIndex, 1)
+        }, handleInvalidResponse)
+      };
+      
+      const decrementCount = bookIndex => () => {
+        removeFromCart(carrito.cartID, catalog[bookIndex].isbn, (data) => {
+          modifyItemCount(bookIndex, -1)
+        }, handleInvalidResponse)
+      };
+    
+      return (
+        <div>
+        <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
+        onClick={incrementCount(bookIndex)}>
+        <Icon>add</Icon>
+        </IconButton>
+        <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIndex].quantity} </Typography>
+        <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
+        onClick={decrementCount(bookIndex)} disabled={itemsCount[bookIndex].quantity <= 0}>
+        <Icon>remove</Icon>
+        </IconButton>
         </div>
       )
     }
@@ -612,6 +647,10 @@
           },
           setCart: (carrito) => {
             this.setState({ ...this.state, carrito: carrito })
+          },
+          emptyCart: () => {
+            const emptyItems = this.state.carrito.items.map(item => { return {isbn: item.isbn, quantity: 0} })
+            this.setState({ ...this.state, carrito: { items: emptyItems, cartID: 0 } })
           }
         }
     
@@ -647,7 +686,9 @@
           content = (
           <BookView
             router={router}
-            book={this.state.catalog[this.state.bookIndex]}
+            bookIndex={this.state.bookIndex}
+            catalog={this.state.catalog}
+            carrito={this.state.carrito}
           />
           )
         }

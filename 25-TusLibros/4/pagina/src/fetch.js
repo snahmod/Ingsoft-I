@@ -20,7 +20,7 @@ const getISBNApiAsJson = (isbn) => {
   })
 }
 
-const modifyCart = (action, cartID, isbn, handleResponse) => {
+const modifyCart = (action, cartID, isbn, handleResponse, onFailureDo) => {
   getLocalAsJson(`${action}?quantity=1&isbn=${isbn}&cartID=${cartID}`)
     .then(function (response) {
       return response.json()
@@ -28,13 +28,14 @@ const modifyCart = (action, cartID, isbn, handleResponse) => {
     .then(handleResponse)
     .catch(function (error) {
       console.log('Looks like there was a problem: \n', error);
+      onFailureDo()
     });
 }
 
-const addToCart = (cartID, isbn, handleResponse) => {
-  modifyCart('addToCart', cartID, isbn, handleResponse)
+const addToCart = (cartID, isbn, handleResponse, onFailureDo) => {
+  modifyCart('addToCart', cartID, isbn, handleResponse, onFailureDo)
 }
 
-const removeFromCart = (cartID, isbn, handleResponse) => {
-  modifyCart('removeFromCart', cartID, isbn, handleResponse)
+const removeFromCart = (cartID, isbn, handleResponse, onFailureDo) => {
+  modifyCart('removeFromCart', cartID, isbn, handleResponse, onFailureDo)
 }

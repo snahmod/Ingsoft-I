@@ -1,6 +1,7 @@
 function BookView(props) {
-  const { router, book } = props
-  const classes = useStyles();
+  const { router, bookIndex, catalog, carrito } = props
+
+  const book = catalog[bookIndex]
 
   return (
     <div>
@@ -12,6 +13,13 @@ function BookView(props) {
        <Typography component="h2"><b>Publish date:</b> {book.publish_date} </Typography> <br></br>
        <Typography component="h2"><b>Number of pages:</b> {book.number_of_pages} </Typography> <br></br>
        <Typography component="h2"><b>Price:</b> {book.price} </Typography>
+
+       <QuantityButtons
+          bookIndex={bookIndex}
+          router={router}
+          catalog={catalog}
+          carrito={carrito}
+        />
        </div>
     </div>
   )

@@ -7,9 +7,13 @@
           edge="start"
           className={classes.menuButton}
           color="inherit"
-          onClick={()=>router.navigate("/", {
+          onClick={()=> {
+            router.emptyCart()
+            router.navigate("/", {
             substrings: [],
-            selectedSubstring: "",})}
+            selectedSubstring: "",})
+            }
+          }
           >
           <Icon>close</Icon>
         </IconButton>
