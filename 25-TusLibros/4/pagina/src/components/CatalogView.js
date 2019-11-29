@@ -4,27 +4,29 @@ function CatalogView(props) {
 
   console.log('Cart ID:', carrito.cartID)
 
-  const navigateTo = bookIndex => () => {
-    router.navigate("/book", { bookIndex: bookIndex })
+  const navigateTo = bookIsbn => () => {
+    router.navigate("/book", { bookIsbn: bookIsbn })
   };
+
+  console.log('Catalgo:', catalog)
 
   return (
     <div>
     <List dense className={classes.list}>
-      {[...Array(catalog.length).keys()].map(bookIndex => {
-        const labelId = `checkbox-list-secondary-label-${bookIndex}`;
+      {Object.keys(catalog).map(bookIsbn => {
+        const labelId = `checkbox-list-secondary-label-${bookIsbn}`;
         return (
-          <ListItem key={bookIndex} button onClick={navigateTo(bookIndex)}>
+          <ListItem key={bookIsbn} button onClick={navigateTo(bookIsbn)}>
             <ListItemAvatar>
               <Avatar
                 variant="rounded" className={classes.rounded}
-                src={catalog[bookIndex].cover.small}
+                src={catalog[bookIsbn].cover.small}
               />
             </ListItemAvatar>
-            <ListItemText id={labelId} primary={catalog[bookIndex].title} secondary={catalog[bookIndex].price} />
+            <ListItemText id={labelId} primary={catalog[bookIsbn].title} secondary={catalog[bookIsbn].price} />
             <ListItemSecondaryAction>
               <QuantityButtons
-                bookIndex={bookIndex}
+                bookIsbn={bookIsbn}
                 router={router}
                 catalog={catalog}
                 carrito={carrito}

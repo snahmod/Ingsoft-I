@@ -382,27 +382,29 @@
     
       console.log('Cart ID:', carrito.cartID)
     
-      const navigateTo = bookIndex => () => {
-        router.navigate("/book", { bookIndex: bookIndex })
+      const navigateTo = bookIsbn => () => {
+        router.navigate("/book", { bookIsbn: bookIsbn })
       };
+    
+      console.log('Catalgo:', catalog)
     
       return (
         <div>
         <List dense className={classes.list}>
-          {[...Array(catalog.length).keys()].map(bookIndex => {
-            const labelId = `checkbox-list-secondary-label-${bookIndex}`;
+          {Object.keys(catalog).map(bookIsbn => {
+            const labelId = `checkbox-list-secondary-label-${bookIsbn}`;
             return (
-              <ListItem key={bookIndex} button onClick={navigateTo(bookIndex)}>
+              <ListItem key={bookIsbn} button onClick={navigateTo(bookIsbn)}>
                 <ListItemAvatar>
                   <Avatar
                     variant="rounded" className={classes.rounded}
-                    src={catalog[bookIndex].cover.small}
+                    src={catalog[bookIsbn].cover.small}
                   />
                 </ListItemAvatar>
-                <ListItemText id={labelId} primary={catalog[bookIndex].title} secondary={catalog[bookIndex].price} />
+                <ListItemText id={labelId} primary={catalog[bookIsbn].title} secondary={catalog[bookIsbn].price} />
                 <ListItemSecondaryAction>
                   <QuantityButtons
-                    bookIndex={bookIndex}
+                    bookIsbn={bookIsbn}
                     router={router}
                     catalog={catalog}
                     carrito={carrito}
@@ -415,88 +417,10 @@
         </div>
       )
     }
-    // Fetch Hook
-    const useFetchDetails = (substring) => {
-      const [details, setDetails] = React.useState([])
-      const [loading, setLoading] = React.useState(false)
-      const [error, setError] = React.useState(null)
-    
-      React.useEffect(() => {
-        setLoading(true)
-        setError(null)
-    
-        let details = {}
-    
-        getLocalAsJson(`sayhi`)
-          .then(function (response) {
-            return response.json()
-          })
-          .then(function (json) {
-            details["firstLetter"] = json
-    
-            setLoading(false)
-            if (details) {
-              setDetails(details)
-            } else {
-              setDetails([])
-            }
-          })
-          .then(function () {
-            setLoading(true)
-            setError(null)
-    
-            return getLocalAsJson(`touppercase?word=${substring}`)
-          })
-          .then(function (response) {
-            return response.json()
-          })
-          .then(function (json) {
-            details["uppercase"] = json
-    
-            setLoading(false)
-            if (details) {
-              setDetails(details)
-            } else {
-              setDetails([])
-            }
-          })
-          .then(function () {
-            setLoading(true)
-            setError(null)
-    
-            return getLocalAsJson(`vowels?word=${substring}`)
-          })
-          .then(function (response) {
-            return response.json()
-          })
-          .then(function (json) {
-            details["vowels"] = json
-    
-            setLoading(false)
-            if (details) {
-              setDetails(details)
-            } else {
-              setDetails([])
-            }
-          })
-          .catch(err => {
-            setError(err)
-            setLoading(false)
-          })
-      }, [substring])
-    
-      return { details, loading, error }
-    }
-    
     // Component
     function CarritoView(props) {
       const { router, reducedCatalog } = props
       const classes = useStyles();
-      
-      //const { details, loading, error } = useFetchDetails(selectedSubstring)
-    
-      // if (loading) return <div>Loading...</div>
-      // if (error) return <div>{error}</div>
     
       return (
         <div>
@@ -509,9 +433,9 @@
     }
     
     function BookView(props) {
-      const { router, bookIndex, catalog, carrito } = props
+      const { router, bookIsbn, catalog, carrito } = props
     
-      const book = catalog[bookIndex]
+      const book = catalog[bookIsbn]
     
       return (
         <div>
@@ -525,7 +449,7 @@
            <Typography component="h2"><b>Price:</b> {book.price} </Typography>
     
            <QuantityButtons
-              bookIndex={bookIndex}
+              bookIsbn={bookIsbn}
               router={router}
               catalog={catalog}
               carrito={carrito}
@@ -535,14 +459,14 @@
       )
     }
     function QuantityButtons(props) {
-      const { bookIndex, router, catalog, carrito } = props
+      const { bookIsbn, router, catalog, carrito } = props
       const classes = useStyles();
     
       const [itemsCount, setItemsCount] = React.useState(carrito.items);
     
-      const modifyItemCount = (bookIndex, quantity) => {
-        const newCount = [...itemsCount];
-        newCount[bookIndex].quantity = itemsCount[bookIndex].quantity + quantity;
+      const modifyItemCount = (bookIsbn, quantity) => {
+        const newCount = {...itemsCount};
+        newCount[bookIsbn].quantity = itemsCount[bookIsbn].quantity + quantity;
         setItemsCount(newCount)
         router.setCart({ items: newCount, cartID: carrito.cartID })
       };
@@ -552,27 +476,27 @@
         router.navigate("/", {})
       };
     
-      const incrementCount = bookIndex => () => {
-        addToCart(carrito.cartID, catalog[bookIndex].isbn, (data) => {
-          modifyItemCount(bookIndex, 1)
+      const incrementCount = bookIsbn => () => {
+        addToCart(carrito.cartID, bookIsbn, (data) => {
+          modifyItemCount(bookIsbn, 1)
         }, handleInvalidResponse)
       };
       
-      const decrementCount = bookIndex => () => {
-        removeFromCart(carrito.cartID, catalog[bookIndex].isbn, (data) => {
-          modifyItemCount(bookIndex, -1)
+      const decrementCount = bookIsbn => () => {
+        removeFromCart(carrito.cartID, bookIsbn, (data) => {
+          modifyItemCount(bookIsbn, -1)
         }, handleInvalidResponse)
       };
     
       return (
         <div>
         <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
-        onClick={incrementCount(bookIndex)}>
+        onClick={incrementCount(bookIsbn)}>
         <Icon>add</Icon>
         </IconButton>
-        <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIndex].quantity} </Typography>
+        <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIsbn].quantity} </Typography>
         <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
-        onClick={decrementCount(bookIndex)} disabled={itemsCount[bookIndex].quantity <= 0}>
+        onClick={decrementCount(bookIsbn)} disabled={itemsCount[bookIsbn].quantity <= 0}>
         <Icon>remove</Icon>
         </IconButton>
         </div>
@@ -584,9 +508,10 @@
         super(props);
         this.state = {
           path: "/",
-          catalog: new Array(),
-          carrito: { items: new Array(), cartID: 0 },
-          bookIndex: 0,
+          catalog: {},
+          carrito: { items: {}, cartID: 0 },
+          emptyCarrito: { items: {}, cartID: 0 },
+          bookIsbn: 0,
         };
     
         // this.data = [
@@ -622,15 +547,15 @@
             return response.json()
           })
           .then(function (json) {
-            var newCatalog = [...self.state.catalog]
+            var newCatalog = {...self.state.catalog}
             var book = json[Object.keys(json)[0]]
             book["price"] = '$' + data.price
             book["isbn"] = data.isbn
-            newCatalog.push(book)
+            newCatalog[data.isbn] = book
     
-            var newCarritoItems = [...self.state.carrito.items]
-            newCarritoItems.push({isbn: data.isbn, quantity: 0})
-            self.setState({ ...self.state, catalog: newCatalog, carrito: { ...self.state.carrito, items: newCarritoItems }})
+            var newCarrito = {...self.state.carrito}
+            newCarrito.items[data.isbn] = { isbn: data.isbn, quantity: 0 }
+            self.setState({ ...self.state, catalog: newCatalog, carrito: newCarrito, emptyCarrito: newCarrito })
           })
           .catch(function (error) {
             console.log('Looks like there was a problem: \n', error);
@@ -649,8 +574,7 @@
             this.setState({ ...this.state, carrito: carrito })
           },
           emptyCart: () => {
-            const emptyItems = this.state.carrito.items.map(item => { return {isbn: item.isbn, quantity: 0} })
-            this.setState({ ...this.state, carrito: { items: emptyItems, cartID: 0 } })
+            this.setState({ ...this.state, carrito: this.state.emptyCarrito })
           }
         }
     
@@ -667,26 +591,26 @@
             carrito={this.state.carrito}
           />)
         } else if (this.state.path === "/cart") {
+          const reducedCatalog = {...this.state.catalog}
+          Object.keys(this.state.catalog).forEach(isbn => {
+            if (this.state.carrito.items[isbn].quantity == 0) delete reducedCatalog[isbn]
+          })
           content = ( <div>
           <CatalogView
             router={router}
-            catalog={this.state.catalog.filter(function (elem, index) {
-              return this.state.carrito.items[index].quantity > 0
-          }.bind(this))}
+            catalog={reducedCatalog}
             carrito={this.state.carrito}
           />
           <CarritoView
           router={router}
-          reducedCatalog={this.state.catalog.filter(function (elem, index) {
-            return this.state.carrito.items[index].quantity > 0
-          }.bind(this))} />
+          reducedCatalog={reducedCatalog} />
           </div>
           )
         } else if (this.state.path === "/book") {
           content = (
           <BookView
             router={router}
-            bookIndex={this.state.bookIndex}
+            bookIsbn={this.state.bookIsbn}
             catalog={this.state.catalog}
             carrito={this.state.carrito}
           />
