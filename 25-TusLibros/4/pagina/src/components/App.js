@@ -7,20 +7,16 @@ class App extends React.Component {
       catalog: new Array(),
       carrito: { items: new Array(), cartID: 0 },
       bookIndex: 0,
+      userCredentials: {userID: '', password: ''},
+      purchases: { items: [], total_amount: 0 }
     };
-
-    // this.data = [
-    //   {isbn: "0451526538", price: "$100"},
-    //   {isbn: "0439358078", price: "$100"},
-    //   {isbn: "0316015849", price: "$100"},
-    // ];
   }
 
   componentWillMount() {
-    this.getMyData();
+    this.getCatalog();
   }
 
-  getMyData(){
+  getCatalog(){
     var self = this;
     getLocalAsJson(`getCatalog`)
       .then(response => {
@@ -57,6 +53,14 @@ class App extends React.Component {
       });
   }
 
+  getPurchases(){
+    var self = this;
+    listPurchases(this.state.userCredentials.userID, this.state.userCredentials.password, 
+                     (data) => {
+                      self.setState({ ...self.state, purchases: data})
+    })
+  }
+
   render() {
     let title = "Tus Libros"
     let content = "Where am I?"
@@ -70,7 +74,11 @@ class App extends React.Component {
       },
       emptyCart: () => {
         const emptyItems = this.state.carrito.items.map(item => { return {isbn: item.isbn, quantity: 0} })
-        this.setState({ ...this.state, carrito: { items: emptyItems, cartID: 0 } })
+        this.setState({ ...this.state, carrito: { items: emptyItems, cartID: 0 }})
+      }, 
+
+      setUserCredentials: (userID, password) => {
+        this.setState({ ...this.state, userCredentials: {userID: userID, password: password} })
       }
     }
 
@@ -80,7 +88,6 @@ class App extends React.Component {
         carrito={this.state.carrito}
       />)
     } else if (this.state.path === "/catalog") {
-      console.log(this.state.catalog)
       content = (<CatalogView
         router={router}
         catalog={this.state.catalog}
@@ -111,6 +118,13 @@ class App extends React.Component {
         carrito={this.state.carrito}
       />
       )
+    } else if (this.state.path === "/listPurchases") {
+      this.getPurchases()
+      content = (<CatalogView
+        router={router}
+        catalog={this.state.purchases}
+        carrito={this.state.carrito}
+      />)
     }
     return (
       <div>

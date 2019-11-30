@@ -20,6 +20,17 @@ const getISBNApiAsJson = (isbn) => {
   })
 }
 
+const listPurchases = (userID, password, handleResponse) => {
+  getLocalAsJson(`listPurchases?userID=${userID}&password=${password}`)
+    .then(function (response) {
+      return response.json()
+    })
+    .then(handleResponse)
+    .catch(function (error) {
+      console.log('Looks like there was a problem: \n', error);
+    });
+}
+
 const modifyCart = (action, cartID, isbn, handleResponse, onFailureDo) => {
   getLocalAsJson(`${action}?quantity=1&isbn=${isbn}&cartID=${cartID}`)
     .then(function (response) {

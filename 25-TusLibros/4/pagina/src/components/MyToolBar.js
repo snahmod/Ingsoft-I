@@ -50,7 +50,7 @@
           edge="start"
           className={classes.menuButton}
           color="inherit"
-          onClick={()=>router.navigate("/", {
+          onClick={()=>router.navigate("/listPurchases", {
             substrings: [],
             selectedSubstring: "",})}
           >
@@ -65,20 +65,6 @@
         purchasesButton = (<div></div>)
         catalogButton = (<div></div>)
       }
-    
-      // if (router.current() === "/cart") {
-      //   menuButton = (
-      //     <IconButton
-      //       edge="start"
-      //       className={classes.menuButton}
-      //       color="inherit"
-      //       onClick={()=>router.navigate("/catalog", {
-      //       selectedSubstring: "",})}
-      //     >
-      //       <Icon>keyboard_arrow_left</Icon>
-      //     </IconButton>
-      //   )
-      // }
     
       return (
         <div className={classes.rootToolBar}>

@@ -147,6 +147,17 @@
       })
     }
     
+    const listPurchases = (userID, password, handleResponse) => {
+      getLocalAsJson(`listPurchases?userID=${userID}&password=${password}`)
+        .then(function (response) {
+          return response.json()
+        })
+        .then(handleResponse)
+        .catch(function (error) {
+          console.log('Looks like there was a problem: \n', error);
+        });
+    }
+    
     const modifyCart = (action, cartID, isbn, handleResponse, onFailureDo) => {
       getLocalAsJson(`${action}?quantity=1&isbn=${isbn}&cartID=${cartID}`)
         .then(function (response) {
@@ -219,7 +230,7 @@
               edge="start"
               className={classes.menuButton}
               color="inherit"
-              onClick={()=>router.navigate("/", {
+              onClick={()=>router.navigate("/listPurchases", {
                 substrings: [],
                 selectedSubstring: "",})}
               >
@@ -234,20 +245,6 @@
             purchasesButton = (<div></div>)
             catalogButton = (<div></div>)
           }
-        
-          // if (router.current() === "/cart") {
-          //   menuButton = (
-          //     <IconButton
-          //       edge="start"
-          //       className={classes.menuButton}
-          //       color="inherit"
-          //       onClick={()=>router.navigate("/catalog", {
-          //       selectedSubstring: "",})}
-          //     >
-          //       <Icon>keyboard_arrow_left</Icon>
-          //     </IconButton>
-          //   )
-          // }
         
           return (
             <div className={classes.rootToolBar}>
@@ -285,7 +282,7 @@
         setUserCredentials({ ...userCredentials, [prop]: event.target.value });
       };
     
-      const handleSend = (userID, password) => {
+      const login = (userID, password) => {
         loading = true;
         getLocalAsJson(`createCart?userID=${userID}&password=${password}`)
           .then(function (response) {
@@ -298,6 +295,7 @@
           })
           .then(function (json) {
             loading = false;
+            router.setUserCredentials(userID, password)
             router.navigate("/catalog", { carrito: { ...carrito, cartID: json.cartID } })
           })
           .catch(function (error) {
@@ -341,7 +339,7 @@
               <Button 
               color="primary" 
                  className={classes.button}
-                onClick={() => handleSend(userCredentials.userID, userCredentials.password)}>
+                onClick={() => login(userCredentials.userID, userCredentials.password)}>
                 Ingresar
                   </Button>
               </div>
@@ -587,20 +585,16 @@
           catalog: new Array(),
           carrito: { items: new Array(), cartID: 0 },
           bookIndex: 0,
+          userCredentials: {userID: '', password: ''},
+          purchases: { items: [], total_amount: 0 }
         };
-    
-        // this.data = [
-        //   {isbn: "0451526538", price: "$100"},
-        //   {isbn: "0439358078", price: "$100"},
-        //   {isbn: "0316015849", price: "$100"},
-        // ];
       }
     
       componentWillMount() {
-        this.getMyData();
+        this.getCatalog();
       }
     
-      getMyData(){
+      getCatalog(){
         var self = this;
         getLocalAsJson(`getCatalog`)
           .then(response => {
@@ -637,6 +631,14 @@
           });
       }
     
+      getPurchases(){
+        var self = this;
+        listPurchases(this.state.userCredentials.userID, this.state.userCredentials.password, 
+                         (data) => {
+                          self.setState({ ...self.state, purchases: data})
+        })
+      }
+    
       render() {
         let title = "Tus Libros"
         let content = "Where am I?"
@@ -650,7 +652,11 @@
           },
           emptyCart: () => {
             const emptyItems = this.state.carrito.items.map(item => { return {isbn: item.isbn, quantity: 0} })
-            this.setState({ ...this.state, carrito: { items: emptyItems, cartID: 0 } })
+            this.setState({ ...this.state, carrito: { items: emptyItems, cartID: 0 }})
+          }, 
+    
+          setUserCredentials: (userID, password) => {
+            this.setState({ ...this.state, userCredentials: {userID: userID, password: password} })
           }
         }
     
@@ -660,7 +666,6 @@
             carrito={this.state.carrito}
           />)
         } else if (this.state.path === "/catalog") {
-          console.log(this.state.catalog)
           content = (<CatalogView
             router={router}
             catalog={this.state.catalog}
@@ -691,6 +696,13 @@
             carrito={this.state.carrito}
           />
           )
+        } else if (this.state.path === "/listPurchases") {
+          this.getPurchases()
+          content = (<CatalogView
+            router={router}
+            catalog={this.state.purchases}
+            carrito={this.state.carrito}
+          />)
         }
         return (
           <div>

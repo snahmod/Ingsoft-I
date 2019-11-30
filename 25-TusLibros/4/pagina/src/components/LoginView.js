@@ -17,7 +17,7 @@ function LoginView(props) {
     setUserCredentials({ ...userCredentials, [prop]: event.target.value });
   };
 
-  const handleSend = (userID, password) => {
+  const login = (userID, password) => {
     loading = true;
     getLocalAsJson(`createCart?userID=${userID}&password=${password}`)
       .then(function (response) {
@@ -30,6 +30,7 @@ function LoginView(props) {
       })
       .then(function (json) {
         loading = false;
+        router.setUserCredentials(userID, password)
         router.navigate("/catalog", { carrito: { ...carrito, cartID: json.cartID } })
       })
       .catch(function (error) {
@@ -73,7 +74,7 @@ function LoginView(props) {
           <Button 
           color="primary" 
              className={classes.button}
-            onClick={() => handleSend(userCredentials.userID, userCredentials.password)}>
+            onClick={() => login(userCredentials.userID, userCredentials.password)}>
             Ingresar
               </Button>
           </div>
