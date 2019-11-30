@@ -1,7 +1,7 @@
 function BookView(props) {
-  const { router, bookIndex, catalog, carrito } = props
+  const { router, bookIsbn, catalog, carrito } = props
 
-  const book = catalog[bookIndex]
+  const book = catalog[bookIsbn]
 
   return (
     <div>
@@ -15,7 +15,7 @@ function BookView(props) {
        <Typography component="h2"><b>Price:</b> {book.price} </Typography>
 
        <QuantityButtons
-          bookIndex={bookIndex}
+          bookIsbn={bookIsbn}
           router={router}
           catalog={catalog}
           carrito={carrito}

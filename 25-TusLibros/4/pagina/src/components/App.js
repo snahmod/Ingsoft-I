@@ -4,11 +4,18 @@ class App extends React.Component {
     super(props);
     this.state = {
       path: "/",
+<<<<<<< HEAD
       catalog: new Array(),
       carrito: { items: new Array(), cartID: 0 },
       bookIndex: 0,
       userCredentials: {userID: '', password: ''},
       purchases: { items: [], total_amount: 0 }
+=======
+      catalog: {},
+      carrito: { items: {}, cartID: 0 },
+      emptyCarrito: { items: {}, cartID: 0 },
+      bookIsbn: 0,
+>>>>>>> 0e40140ec4a2ce0f7f1fd88f3f73aa6facf66d75
     };
   }
 
@@ -38,15 +45,15 @@ class App extends React.Component {
         return response.json()
       })
       .then(function (json) {
-        var newCatalog = [...self.state.catalog]
+        var newCatalog = {...self.state.catalog}
         var book = json[Object.keys(json)[0]]
         book["price"] = '$' + data.price
         book["isbn"] = data.isbn
-        newCatalog.push(book)
+        newCatalog[data.isbn] = book
 
-        var newCarritoItems = [...self.state.carrito.items]
-        newCarritoItems.push({isbn: data.isbn, quantity: 0})
-        self.setState({ ...self.state, catalog: newCatalog, carrito: { ...self.state.carrito, items: newCarritoItems }})
+        var newCarrito = {...self.state.carrito}
+        newCarrito.items[data.isbn] = { isbn: data.isbn, quantity: 0 }
+        self.setState({ ...self.state, catalog: newCatalog, carrito: newCarrito, emptyCarrito: newCarrito })
       })
       .catch(function (error) {
         console.log('Looks like there was a problem: \n', error);
@@ -73,12 +80,16 @@ class App extends React.Component {
         this.setState({ ...this.state, carrito: carrito })
       },
       emptyCart: () => {
+<<<<<<< HEAD
         const emptyItems = this.state.carrito.items.map(item => { return {isbn: item.isbn, quantity: 0} })
         this.setState({ ...this.state, carrito: { items: emptyItems, cartID: 0 }})
       }, 
 
       setUserCredentials: (userID, password) => {
         this.setState({ ...this.state, userCredentials: {userID: userID, password: password} })
+=======
+        this.setState({ ...this.state, carrito: this.state.emptyCarrito })
+>>>>>>> 0e40140ec4a2ce0f7f1fd88f3f73aa6facf66d75
       }
     }
 
@@ -94,26 +105,26 @@ class App extends React.Component {
         carrito={this.state.carrito}
       />)
     } else if (this.state.path === "/cart") {
+      const reducedCatalog = {...this.state.catalog}
+      Object.keys(this.state.catalog).forEach(isbn => {
+        if (this.state.carrito.items[isbn].quantity == 0) delete reducedCatalog[isbn]
+      })
       content = ( <div>
       <CatalogView
         router={router}
-        catalog={this.state.catalog.filter(function (elem, index) {
-          return this.state.carrito.items[index].quantity > 0
-      }.bind(this))}
+        catalog={reducedCatalog}
         carrito={this.state.carrito}
       />
       <CarritoView
       router={router}
-      reducedCatalog={this.state.catalog.filter(function (elem, index) {
-        return this.state.carrito.items[index].quantity > 0
-      }.bind(this))} />
+      reducedCatalog={reducedCatalog} />
       </div>
       )
     } else if (this.state.path === "/book") {
       content = (
       <BookView
         router={router}
-        bookIndex={this.state.bookIndex}
+        bookIsbn={this.state.bookIsbn}
         catalog={this.state.catalog}
         carrito={this.state.carrito}
       />
