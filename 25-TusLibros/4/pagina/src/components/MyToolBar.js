@@ -9,9 +9,7 @@
           color="inherit"
           onClick={()=> {
             router.emptyCart()
-            router.navigate("/", {
-            substrings: [],
-            selectedSubstring: "",})
+            router.navigate("/", {})
             }
           }
           >
@@ -24,9 +22,7 @@
           edge="start"
           className={classes.menuButton}
           color="inherit"
-          onClick={()=>router.navigate("/cart", {
-            substrings: [],
-            selectedSubstring: "",})}
+          onClick={()=>router.navigate("/cart", {})}
           >
           <Icon>shopping_cart</Icon>
         </IconButton>
@@ -37,9 +33,7 @@
           edge="start"
           className={classes.menuButton}
           color="inherit"
-          onClick={()=>router.navigate("/catalog", {
-            substrings: [],
-            selectedSubstring: "",})}
+          onClick={()=>router.navigate("/catalog", {})}
           >
           <Icon>list</Icon>
         </IconButton>
@@ -50,15 +44,13 @@
           edge="start"
           className={classes.menuButton}
           color="inherit"
-          onClick={()=>router.navigate("/listPurchases", {
-            substrings: [],
-            selectedSubstring: "",})}
+          onClick={()=>router.navigate("/listPurchases", {})}
           >
           <Icon>account_circle</Icon>
         </IconButton>
       )
 
-      if (router.current() === "/") {
+      if (router.current() === "/" || router.current() === "/error") {
 
         menuButton = (<div></div>)
         carritoButton = (<div></div>)

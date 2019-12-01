@@ -1,4 +1,4 @@
-function QuantityButtons(props) {
+function QuantityButtonsView(props) {
   const { bookIsbn, router, catalog, carrito } = props
   const classes = useStyles();
 
@@ -11,9 +11,8 @@ function QuantityButtons(props) {
     router.setCart({ items: newCount, cartID: carrito.cartID })
   };
 
-  const handleInvalidResponse = () => {
-    router.emptyCart()
-    router.navigate("/", {})
+  const handleInvalidResponse = (data) => {
+    router.navigate('/error', { error: data.message })
   };
 
   const incrementCount = bookIsbn => () => {

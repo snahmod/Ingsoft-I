@@ -5,7 +5,10 @@ function CarritoView(props) {
 
   return (
     <div>
-      <Button variant="contained" color="primary" className={classes.button} disabled = {reducedCatalog.length <= 0}>
+      <Button variant="contained" color="primary" className={classes.button}
+              disabled = {Object.keys(reducedCatalog).length <= 0}
+              onClick = {() => {router.navigate("/checkout", {})} }
+              >
         Check out
       </Button>
 

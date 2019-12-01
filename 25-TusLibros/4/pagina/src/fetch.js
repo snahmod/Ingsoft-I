@@ -20,27 +20,37 @@ const getISBNApiAsJson = (isbn) => {
   })
 }
 
-const listPurchases = (userID, password, handleResponse) => {
-  getLocalAsJson(`listPurchases?userID=${userID}&password=${password}`)
+const getApiCall = (path, handleResponse, onFailureDo) => {
+  getLocalAsJson(path)
     .then(function (response) {
-      return response.json()
+      console.log(response)
+      if (response.ok) return response.json()
+
+      response.json().then(data => { onFailureDo(data) });
+      throw new Error
     })
-    .then(handleResponse)
+    .then(function (json) {
+      handleResponse(json)
+    })
     .catch(function (error) {
       console.log('Looks like there was a problem: \n', error);
     });
 }
 
+const login = (userID, password, handleResponse, onFailureDo) => {
+  getApiCall(`createCart?userID=${userID}&password=${password}`, handleResponse, onFailureDo)
+}
+
+const checkoutCart = (cartID, handleResponse, onFailureDo) => {
+  getApiCall(`checkoutCart?cartID=${cartID}`, handleResponse, onFailureDo)
+}
+
+const listPurchases = (userID, password, handleResponse, onFailureDo) => {
+  getApiCall(`listPurchases?userID=${userID}&password=${password}`, handleResponse, onFailureDo)
+}
+
 const modifyCart = (action, cartID, isbn, handleResponse, onFailureDo) => {
-  getLocalAsJson(`${action}?quantity=1&isbn=${isbn}&cartID=${cartID}`)
-    .then(function (response) {
-      return response.json()
-    })
-    .then(handleResponse)
-    .catch(function (error) {
-      console.log('Looks like there was a problem: \n', error);
-      onFailureDo()
-    });
+  getApiCall(`${action}?quantity=1&isbn=${isbn}&cartID=${cartID}`, handleResponse, onFailureDo)
 }
 
 const addToCart = (cartID, isbn, handleResponse, onFailureDo) => {

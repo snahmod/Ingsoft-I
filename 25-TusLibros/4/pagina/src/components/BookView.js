@@ -14,7 +14,7 @@ function BookView(props) {
        <Typography component="h2"><b>Number of pages:</b> {book.number_of_pages} </Typography> <br></br>
        <Typography component="h2"><b>Price:</b> {book.price} </Typography>
 
-       <QuantityButtons
+       <QuantityButtonsView
           bookIsbn={bookIsbn}
           router={router}
           catalog={catalog}

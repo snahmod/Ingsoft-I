@@ -4,19 +4,15 @@ class App extends React.Component {
     super(props);
     this.state = {
       path: "/",
-<<<<<<< HEAD
-      catalog: new Array(),
-      carrito: { items: new Array(), cartID: 0 },
-      bookIndex: 0,
-      userCredentials: {userID: '', password: ''},
-      purchases: { items: [], total_amount: 0 }
-=======
       catalog: {},
       carrito: { items: {}, cartID: 0 },
-      emptyCarrito: { items: {}, cartID: 0 },
       bookIsbn: 0,
->>>>>>> 0e40140ec4a2ce0f7f1fd88f3f73aa6facf66d75
+      userCredentials: { userID: '', password: '' },
+      purchases: { items: [], total_amount: 0 },
+      error: ''
     };
+
+    this.emptyCarrito = { items: {}, cartID: 0 }
   }
 
   componentWillMount() {
@@ -53,19 +49,12 @@ class App extends React.Component {
 
         var newCarrito = {...self.state.carrito}
         newCarrito.items[data.isbn] = { isbn: data.isbn, quantity: 0 }
-        self.setState({ ...self.state, catalog: newCatalog, carrito: newCarrito, emptyCarrito: newCarrito })
+        self.emptyCarrito = JSON.parse(JSON.stringify(newCarrito))
+        self.setState({ ...self.state, catalog: newCatalog, carrito: JSON.parse(JSON.stringify(newCarrito)) })
       })
       .catch(function (error) {
         console.log('Looks like there was a problem: \n', error);
       });
-  }
-
-  getPurchases(){
-    var self = this;
-    listPurchases(this.state.userCredentials.userID, this.state.userCredentials.password, 
-                     (data) => {
-                      self.setState({ ...self.state, purchases: data})
-    })
   }
 
   render() {
@@ -79,27 +68,26 @@ class App extends React.Component {
       setCart: (carrito) => {
         this.setState({ ...this.state, carrito: carrito })
       },
+      setCartID: (cartID) => {
+        this.setState({ ...this.state, carrito: {items: this.state.carrito.items, cartID: cartID }})
+        console.log('carto:', this.state.carrito)
+      },
       emptyCart: () => {
-<<<<<<< HEAD
-        const emptyItems = this.state.carrito.items.map(item => { return {isbn: item.isbn, quantity: 0} })
-        this.setState({ ...this.state, carrito: { items: emptyItems, cartID: 0 }})
-      }, 
-
+        this.setState({ ...this.state, carrito: JSON.parse(JSON.stringify(this.emptyCarrito)) })
+        console.log('empty:', this.state.carrito)
+      },
       setUserCredentials: (userID, password) => {
-        this.setState({ ...this.state, userCredentials: {userID: userID, password: password} })
-=======
-        this.setState({ ...this.state, carrito: this.state.emptyCarrito })
->>>>>>> 0e40140ec4a2ce0f7f1fd88f3f73aa6facf66d75
+        this.setState({ ...this.state, userCredentials: { userID: userID, password: password } })
       }
     }
 
     if (this.state.path === "/") {
-      content = (<LoginView
+        content = (<LoginView
         router={router}
         carrito={this.state.carrito}
       />)
     } else if (this.state.path === "/catalog") {
-      content = (<CatalogView
+        content = (<CatalogView
         router={router}
         catalog={this.state.catalog}
         carrito={this.state.carrito}
@@ -130,13 +118,25 @@ class App extends React.Component {
       />
       )
     } else if (this.state.path === "/listPurchases") {
-      this.getPurchases()
-      content = (<CatalogView
+      content = (<PurchasesView
         router={router}
-        catalog={this.state.purchases}
+        catalog={this.state.catalog}
+        userCredentials={this.state.userCredentials}
+      />)
+    } else if (this.state.path === "/checkout") {
+      content = (<CheckoutView
+        router={router}
+        catalog={this.state.catalog}
         carrito={this.state.carrito}
+        userCredentials={this.state.userCredentials}
+      />)
+    } else if (this.state.path === "/error") {
+      content = (<ErrorView
+        router={router}
+        error={this.state.error}
       />)
     }
+
     return (
       <div>
         <MyToolBar
