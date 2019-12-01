@@ -8,7 +8,7 @@ function QuantityButtonsView(props) {
     const newCount = {...itemsCount};
     newCount[bookIsbn].quantity = itemsCount[bookIsbn].quantity + quantity;
     setItemsCount(newCount)
-    router.setCart({ items: newCount, cartID: carrito.cartID })
+    carrito.setCartItems(newCount)
   };
 
   const handleInvalidResponse = (data) => {

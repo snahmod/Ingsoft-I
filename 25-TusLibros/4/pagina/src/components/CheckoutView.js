@@ -7,8 +7,13 @@ function CheckoutView(props) {
     checkoutCart(carrito.cartID, (data) => {
       setPurchase(data)
       login(userCredentials.userID, userCredentials.password, json => {
-        router.emptyCart()
-        router.setCartID(json.cartID)
+        console.log('carrito')
+        console.log(carrito)
+        carrito.emptyCart()
+        carrito.setCartID(json.cartID)
+        console.log('carrito')
+        console.log(carrito)
+        
       }, data => {})
     }, (data) => {
       router.navigate('/error', { error: data.message })

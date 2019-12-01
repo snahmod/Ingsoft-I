@@ -1,9 +1,9 @@
 function ErrorView(props) {
-  const { router, error } = props
+  const { router, error, carrito} = props
   const classes = useStyles();
 
   const navigateTo = () => () => {
-    router.emptyCart()
+    carrito.emptyCart()
     router.navigate("/", {})
   };
 

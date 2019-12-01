@@ -1,6 +1,6 @@
     function MyToolBar(props) {
       const classes = useStyles();
-      const {title, router} = props;
+      const {title, router, carrito} = props;
     
       let menuButton = (
         <IconButton
@@ -8,7 +8,7 @@
           className={classes.menuButton}
           color="inherit"
           onClick={()=> {
-            router.emptyCart()
+            carrito.emptyCart()
             router.navigate("/", {})
             }
           }

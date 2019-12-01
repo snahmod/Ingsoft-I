@@ -2,9 +2,6 @@ function CatalogView(props) {
   const { router, catalog, carrito } = props
   const classes = useStyles();
 
-  console.log('Cart ID:', carrito.cartID)
-  console.log('Catalgo:', catalog)
-
   return (
     <div>
     <List dense className={classes.list}>

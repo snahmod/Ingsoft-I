@@ -6,7 +6,6 @@ function PurchasesView(props) {
   React.useEffect(() => {
     listPurchases(userCredentials.userID, userCredentials.password, (data) => {
       setPurchases(data)
-      console.log('Purchases:', data)
     }, (data) => {
       router.navigate('/error', { error: data.message })
     })
