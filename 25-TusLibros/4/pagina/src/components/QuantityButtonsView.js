@@ -29,15 +29,19 @@ function QuantityButtonsView(props) {
 
   return (
     <div>
-    <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
-    onClick={incrementCount(bookIsbn)}>
-    <Icon>add</Icon>
-    </IconButton>
-    <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIsbn].quantity} </Typography>
-    <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
-    onClick={decrementCount(bookIsbn)} disabled={itemsCount[bookIsbn].quantity <= 0}>
-    <Icon>remove</Icon>
-    </IconButton>
+      <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
+      onClick={incrementCount(bookIsbn)}>
+        < Icon>add</Icon>
+      </IconButton>
+
+      <Typography component="h1"style= {{display:'inline-block'}}>
+        {itemsCount[bookIsbn].quantity}
+      </Typography>
+
+      <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
+      onClick={decrementCount(bookIsbn)} disabled={itemsCount[bookIsbn].quantity <= 0}>
+        <Icon>remove</Icon>
+      </IconButton>
     </div>
   )
 }

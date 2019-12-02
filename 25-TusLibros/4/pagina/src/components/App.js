@@ -6,7 +6,7 @@ class App extends React.Component {
     super(props);
     var carrito = new Carrrito();
     this.state = {
-      path: {path: "/", navigate: false},
+      path: '/',
       catalog: {},
       carrito: carrito,
       bookIsbn: 0,
@@ -65,73 +65,31 @@ class App extends React.Component {
 
   render() {
     let title = "Tus Libros"
-    let content = ""
-
-    if (this.state.path.navigate) {
-      //this.setNavigateFalse()
-      return <ReactRouterDOM.Redirect to={this.state.path.path} />
-    }
 
     const router = {
       current: () => this.state.path,
       navigate: (path, state) => {
-        this.setState({ ...state, path: {path: path, navigate: true}})
+        this.setState({ ...state, path: path})
       }
     }
 
-    if (this.state.path === "/") {
-        content = (<LoginView
-        router={router}
-        carrito={this.state.carrito}
-      />)
-    } else if (this.state.path === "/catalog") {
-        content = (<CatalogView
-        router={router}
-        catalog={this.state.catalog}
-        carrito={this.state.carrito}
-      />)
-    } else if (this.state.path === "/cart") {
-      const reducedCatalog = {...this.state.catalog}
-      Object.keys(this.state.catalog).forEach(isbn => {
-        if (this.state.carrito.items[isbn].quantity == 0) delete reducedCatalog[isbn]
-      })
-      content = ( <div>
-      <CatalogView
-        router={router}
-        catalog={reducedCatalog}
-        carrito={this.state.carrito}
-      />
-      <CarritoView
-      router={router}
-      reducedCatalog={reducedCatalog} />
-      </div>
-      )
-    } else if (this.state.path === "/book") {
-      content = ( <BookView
-        router={router}
-        bookIsbn={this.state.bookIsbn}
-        catalog={this.state.catalog}
-        carrito={this.state.carrito}
-      /> )
-    } else if (this.state.path === "/listPurchases") {
-      content = (<PurchasesView
-        router={router}
-        catalog={this.state.catalog}
-        userCredentials={this.state.userCredentials}
-      />)
-    } else if (this.state.path === "/checkout") {
-      content = (<CheckoutView
-        router={router}
-        catalog={this.state.catalog}
-        carrito={this.state.carrito}
-        userCredentials={this.state.userCredentials}
-      />)
-    } else if (this.state.path === "/error") {
-      content = (<ErrorView
-        router={router}
-        error={this.state.error}
-        carrito = {this.state.carrito}
-      />)
+    const reducedCatalog = {...this.state.catalog}
+    Object.keys(this.state.catalog).forEach(isbn => {
+      if (this.state.carrito.items[isbn].quantity == 0) delete reducedCatalog[isbn]
+    })
+
+    let routes = {
+      '/': <LoginView router={router} carrito={this.state.carrito} />,
+      '/catalog': <CatalogView router={router} catalog={this.state.catalog} carrito={this.state.carrito}/>,
+      '/cart': 
+          <div>
+            <CatalogView router={router} catalog={reducedCatalog} carrito={this.state.carrito}/>
+            <CarritoView router={router} reducedCatalog={reducedCatalog}/>
+          </div>,
+      '/book': <BookView router={router} bookIsbn={this.state.bookIsbn} catalog={this.state.catalog} carrito={this.state.carrito}/>,
+      '/listPurchases': <PurchasesView router={router} catalog={this.state.catalog} userCredentials={this.state.userCredentials}/>,
+      '/checkout': <CheckoutView router={router} catalog={this.state.catalog} carrito={this.state.carrito} userCredentials={this.state.userCredentials}/>,
+      '/error': <ErrorView router={router} error={this.state.error} carrito = {this.state.carrito}/>
     }
 
     return (
@@ -139,53 +97,12 @@ class App extends React.Component {
         <MyToolBar
           title={title}
           router={router}
-          carrito={this.state.carrito}
         />
-        
-    <ReactRouterDOM.BrowserRouter>
-     
-        <ReactRouterDOM.Route path='/' 
-          component={() => <LoginView
-          router={router}
-          carrito={this.state.carrito} /> }/>
-        <ReactRouterDOM.Route path='/catalog' 
-          component={() => <CatalogView
-            router={router}
-            catalog={this.state.catalog}
-            carrito={this.state.carrito}
-          /> }/>
-        <ReactRouterDOM.Route path='/cart' 
-          component={() => <CarritoView
-          router={router}
-          reducedCatalog={reducedCatalog} />}/>
-        <ReactRouterDOM.Route path='/book' 
-          component={() => <BookView
-            router={router}
-            bookIsbn={this.state.bookIsbn}
-            catalog={this.state.catalog}
-            carrito={this.state.carrito}
-          /> }/>
-        <ReactRouterDOM.Route path='/listPurchases' 
-          component={() => <PurchasesView
-            router={router}
-            catalog={this.state.catalog}
-            userCredentials={this.state.userCredentials}
-          /> }/>
-        <ReactRouterDOM.Route path='/checkout' 
-          component={() => <CheckoutView
-            router={router}
-            catalog={this.state.catalog}
-            carrito={this.state.carrito}
-            userCredentials={this.state.userCredentials}
-          /> }/>
-        <ReactRouterDOM.Route path='/error' 
-          component={() => <ErrorView
-            router={router}
-            error={this.state.error}
-            carrito = {this.state.carrito}
-          /> }/>
-        
-      </ReactRouterDOM.BrowserRouter>
+        <Container maxWidth="md">
+          <div style={{ marginTop: 20, }}>
+            {routes[this.state.path]}
+          </div>
+        </Container>
       </div>
     );
   }
