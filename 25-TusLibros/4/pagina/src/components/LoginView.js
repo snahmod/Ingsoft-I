@@ -19,9 +19,8 @@ function LoginView(props) {
 
   const userLogin = (userID, password) => {
     login(userID, password, json => {
-      console.log('hola')
-      router.setUserCredentials(userID, password)
-      router.navigate("/catalog", { carrito: { ...carrito, cartID: json.cartID } })
+      carrito.setCartID(json.cartID)
+      router.navigate("/catalog", { userCredentials : userCredentials })
     }, data => {
       setDialog({ open: true, message: data.message })
     })

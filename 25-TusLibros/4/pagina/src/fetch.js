@@ -23,7 +23,6 @@ const getISBNApiAsJson = (isbn) => {
 const getApiCall = (path, handleResponse, onFailureDo) => {
   getLocalAsJson(path)
     .then(function (response) {
-      console.log(response)
       if (response.ok) return response.json()
 
       response.json().then(data => { onFailureDo(data) });

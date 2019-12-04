@@ -21,12 +21,14 @@
   <script src="./lib/material-ui.development.js" crossorigin="anonymous"></script>
   <script src="./lib/babel.min.js" crossorigin="anonymous"></script>
   <script src="./src/refreshbrowser.js" crossorigin="anonymous"></script>
+  
 
   <!-- Libraries fallback -->
   <script>window.React || document.write('<script src="https://unpkg.com/react@16.11.0/umd/react.development.js">\x3C/script>')</script>
   <script>window.ReactDOM || document.write('<script src="https://unpkg.com/react-dom@16.11.0/umd/react-dom.development.js">\x3C/script>')</script>
   <script>window.MaterialUI || document.write('<script src="https://unpkg.com/@material-ui/core@4.6.1/umd/material-ui.development.js">\x3C/script>')</script>
   <script>window.Babel || document.write('<script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js">\x3C/script>')</script>
+  <script src="https://unpkg.com/react-router-dom/umd/react-router-dom.min.js"></script>
   <!-- end fallback -->
 
   <script type="text/babel" type="module">
@@ -150,7 +152,6 @@
     const getApiCall = (path, handleResponse, onFailureDo) => {
       getLocalAsJson(path)
         .then(function (response) {
-          console.log(response)
           if (response.ok) return response.json()
     
           response.json().then(data => { onFailureDo(data) });
@@ -188,9 +189,34 @@
       modifyCart('removeFromCart', cartID, isbn, handleResponse, onFailureDo)
     }
 
+    class Carrrito {
+      constructor() {
+          this.items= {} 
+          this.cartID =  0
+          this.emptyCarrito = {}
+      }
+    
+      setCartID(cartID) {
+          this.cartID = cartID
+      }
+    
+      setCartItems(items) {
+        this.items = items
+      }
+    
+      emptyCart() {
+        this.setCartID(this.emptyCarrito.cartID)
+        this.setCartItems(JSON.parse(JSON.stringify(this.emptyCarrito.items)))
+      }
+    
+      setEmptyCart(emptyCart) {
+        this.emptyCarrito = JSON.parse(JSON.stringify(emptyCart))
+      }
+    }
+
         function MyToolBar(props) {
           const classes = useStyles();
-          const {title, router} = props;
+          const {title, router, carrito} = props;
         
           let menuButton = (
             <IconButton
@@ -198,7 +224,7 @@
               className={classes.menuButton}
               color="inherit"
               onClick={()=> {
-                router.emptyCart()
+                carrito.emptyCart()
                 router.navigate("/", {})
                 }
               }
@@ -286,9 +312,8 @@
     
       const userLogin = (userID, password) => {
         login(userID, password, json => {
-          console.log('hola')
-          router.setUserCredentials(userID, password)
-          router.navigate("/catalog", { carrito: { ...carrito, cartID: json.cartID } })
+          carrito.setCartID(json.cartID)
+          router.navigate("/catalog", { userCredentials : userCredentials })
         }, data => {
           setDialog({ open: true, message: data.message })
         })
@@ -363,9 +388,6 @@
     function CatalogView(props) {
       const { router, catalog, carrito } = props
       const classes = useStyles();
-    
-      console.log('Cart ID:', carrito.cartID)
-      console.log('Catalgo:', catalog)
     
       return (
         <div>
@@ -445,7 +467,7 @@
         const newCount = {...itemsCount};
         newCount[bookIsbn].quantity = itemsCount[bookIsbn].quantity + quantity;
         setItemsCount(newCount)
-        router.setCart({ items: newCount, cartID: carrito.cartID })
+        carrito.setCartItems(newCount)
       };
     
       const handleInvalidResponse = (data) => {
@@ -466,15 +488,19 @@
     
       return (
         <div>
-        <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
-        onClick={incrementCount(bookIsbn)}>
-        <Icon>add</Icon>
-        </IconButton>
-        <Typography component="h1"style= {{display:'inline-block'}}>{itemsCount[bookIsbn].quantity} </Typography>
-        <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
-        onClick={decrementCount(bookIsbn)} disabled={itemsCount[bookIsbn].quantity <= 0}>
-        <Icon>remove</Icon>
-        </IconButton>
+          <IconButton className={classes.button} aria-label="add" style={{flex: 1}} edge="start" 
+          onClick={incrementCount(bookIsbn)}>
+            < Icon>add</Icon>
+          </IconButton>
+    
+          <Typography component="h1"style= {{display:'inline-block'}}>
+            {itemsCount[bookIsbn].quantity}
+          </Typography>
+    
+          <IconButton className={classes.button} aria-label="remove" style={{flex: 1}}
+          onClick={decrementCount(bookIsbn)} disabled={itemsCount[bookIsbn].quantity <= 0}>
+            <Icon>remove</Icon>
+          </IconButton>
         </div>
       )
     }
@@ -509,7 +535,6 @@
       React.useEffect(() => {
         listPurchases(userCredentials.userID, userCredentials.password, (data) => {
           setPurchases(data)
-          console.log('Purchases:', data)
         }, (data) => {
           router.navigate('/error', { error: data.message })
         })
@@ -544,8 +569,13 @@
         checkoutCart(carrito.cartID, (data) => {
           setPurchase(data)
           login(userCredentials.userID, userCredentials.password, json => {
-            router.emptyCart()
-            router.setCartID(json.cartID)
+            console.log('carrito')
+            console.log(carrito)
+            carrito.emptyCart()
+            carrito.setCartID(json.cartID)
+            console.log('carrito')
+            console.log(carrito)
+            
           }, data => {})
         }, (data) => {
           router.navigate('/error', { error: data.message })
@@ -573,11 +603,11 @@
       )
     }
     function ErrorView(props) {
-      const { router, error } = props
+      const { router, error, carrito} = props
       const classes = useStyles();
     
       const navigateTo = () => () => {
-        router.emptyCart()
+        carrito.emptyCart()
         router.navigate("/", {})
       };
     
@@ -592,20 +622,22 @@
         </div>
       );
     }    
+    
     class App extends React.Component {
+    
       constructor(props) {
         super(props);
+        var carrito = new Carrrito();
         this.state = {
-          path: "/",
+          path: '/',
           catalog: {},
-          carrito: { items: {}, cartID: 0 },
+          carrito: carrito,
           bookIsbn: 0,
           userCredentials: { userID: '', password: '' },
           purchases: { items: [], total_amount: 0 },
           error: ''
         };
     
-        this.emptyCarrito = { items: {}, cartID: 0 }
       }
     
       componentWillMount() {
@@ -627,6 +659,10 @@
           .catch(error => console.log(error.message))
       }
     
+      setNavigateFalse() {
+        this.setState({ ...this.state, path: {path: this.state.path.path, navigate: false}})
+      }
+    
       handleBook = data => {
         var self = this;
         getISBNApiAsJson(data.isbn)
@@ -640,10 +676,10 @@
             book["isbn"] = data.isbn
             newCatalog[data.isbn] = book
     
-            var newCarrito = {...self.state.carrito}
+            var newCarrito = self.state.carrito
             newCarrito.items[data.isbn] = { isbn: data.isbn, quantity: 0 }
-            self.emptyCarrito = JSON.parse(JSON.stringify(newCarrito))
-            self.setState({ ...self.state, catalog: newCatalog, carrito: JSON.parse(JSON.stringify(newCarrito)) })
+            newCarrito.setEmptyCart(JSON.parse(JSON.stringify(newCarrito)))
+            self.setState({ ...self.state, catalog: newCatalog, carrito: newCarrito })
           })
           .catch(function (error) {
             console.log('Looks like there was a problem: \n', error);
@@ -652,82 +688,31 @@
     
       render() {
         let title = "Tus Libros"
-        let content = "Where am I?"
+    
         const router = {
           current: () => this.state.path,
           navigate: (path, state) => {
-            this.setState({ ...state, path: path })
-          },
-          setCart: (carrito) => {
-            this.setState({ ...this.state, carrito: carrito })
-          },
-          setCartID: (cartID) => {
-            this.setState({ ...this.state, carrito: {items: this.state.carrito.items, cartID: cartID }})
-            console.log('carto:', this.state.carrito)
-          },
-          emptyCart: () => {
-            this.setState({ ...this.state, carrito: JSON.parse(JSON.stringify(this.emptyCarrito)) })
-            console.log('empty:', this.state.carrito)
-          },
-          setUserCredentials: (userID, password) => {
-            this.setState({ ...this.state, userCredentials: { userID: userID, password: password } })
+            this.setState({ ...state, path: path})
           }
         }
     
-        if (this.state.path === "/") {
-            content = (<LoginView
-            router={router}
-            carrito={this.state.carrito}
-          />)
-        } else if (this.state.path === "/catalog") {
-            content = (<CatalogView
-            router={router}
-            catalog={this.state.catalog}
-            carrito={this.state.carrito}
-          />)
-        } else if (this.state.path === "/cart") {
-          const reducedCatalog = {...this.state.catalog}
-          Object.keys(this.state.catalog).forEach(isbn => {
-            if (this.state.carrito.items[isbn].quantity == 0) delete reducedCatalog[isbn]
-          })
-          content = ( <div>
-          <CatalogView
-            router={router}
-            catalog={reducedCatalog}
-            carrito={this.state.carrito}
-          />
-          <CarritoView
-          router={router}
-          reducedCatalog={reducedCatalog} />
-          </div>
-          )
-        } else if (this.state.path === "/book") {
-          content = (
-          <BookView
-            router={router}
-            bookIsbn={this.state.bookIsbn}
-            catalog={this.state.catalog}
-            carrito={this.state.carrito}
-          />
-          )
-        } else if (this.state.path === "/listPurchases") {
-          content = (<PurchasesView
-            router={router}
-            catalog={this.state.catalog}
-            userCredentials={this.state.userCredentials}
-          />)
-        } else if (this.state.path === "/checkout") {
-          content = (<CheckoutView
-            router={router}
-            catalog={this.state.catalog}
-            carrito={this.state.carrito}
-            userCredentials={this.state.userCredentials}
-          />)
-        } else if (this.state.path === "/error") {
-          content = (<ErrorView
-            router={router}
-            error={this.state.error}
-          />)
+        const reducedCatalog = {...this.state.catalog}
+        Object.keys(this.state.catalog).forEach(isbn => {
+          if (this.state.carrito.items[isbn].quantity == 0) delete reducedCatalog[isbn]
+        })
+    
+        let routes = {
+          '/': <LoginView router={router} carrito={this.state.carrito} />,
+          '/catalog': <CatalogView router={router} catalog={this.state.catalog} carrito={this.state.carrito}/>,
+          '/cart': 
+              <div>
+                <CatalogView router={router} catalog={reducedCatalog} carrito={this.state.carrito}/>
+                <CarritoView router={router} reducedCatalog={reducedCatalog}/>
+              </div>,
+          '/book': <BookView router={router} bookIsbn={this.state.bookIsbn} catalog={this.state.catalog} carrito={this.state.carrito}/>,
+          '/listPurchases': <PurchasesView router={router} catalog={this.state.catalog} userCredentials={this.state.userCredentials}/>,
+          '/checkout': <CheckoutView router={router} catalog={this.state.catalog} carrito={this.state.carrito} userCredentials={this.state.userCredentials}/>,
+          '/error': <ErrorView router={router} error={this.state.error} carrito = {this.state.carrito}/>
         }
     
         return (
@@ -738,13 +723,13 @@
             />
             <Container maxWidth="md">
               <div style={{ marginTop: 20, }}>
-                {content}
+                {routes[this.state.path]}
               </div>
             </Container>
           </div>
         );
       }
-    }
+    }    
 
     ///////////////////////////////////////////////////////////////////////////
     // Initial render
