@@ -1,10 +1,10 @@
 function ErrorView(props) {
   const { router, error, carrito} = props
-  const classes = useStyles();
+  const classes = useStyles()
 
   const navigateTo = () => () => {
     carrito.emptyCart()
-    router.navigate("/", {})
+    router.navigate(ROUTE_HOME, {})
   };
 
   return (

@@ -1,19 +1,14 @@
 function CheckoutView(props) {
   const { router, catalog, carrito, userCredentials } = props
-  const classes = useStyles();
-  const [purchase, setPurchase] = React.useState({ items: [], total_amount: 0 });
+  const classes = useStyles()
+  const [purchase, setPurchase] = React.useState({ items: [], total_amount: 0 })
 
   React.useEffect(() => {
-    checkoutCart(carrito.cartID, (data) => {
+    checkoutCart(carrito.getCartId(), (data) => {
       setPurchase(data)
-      login(userCredentials.userID, userCredentials.password, json => {
-        console.log('carrito')
-        console.log(carrito)
+      login(userCredentials.getUserId(), userCredentials.getPassword(), json => {
         carrito.emptyCart()
         carrito.setCartID(json.cartID)
-        console.log('carrito')
-        console.log(carrito)
-        
       }, data => {})
     }, (data) => {
       router.navigate('/error', { error: data.message })

@@ -1,12 +1,12 @@
 function BookListItemView(props) {
   const { router, catalog, bookIsbn, bookListItemQuantityView } = props
-  const classes = useStyles();
+  const classes = useStyles()
 
   const navigateTo = bookIsbn => () => {
     router.navigate("/book", { bookIsbn: bookIsbn })
-  };
+  }
 
-  const labelId = `checkbox-list-secondary-label-${bookIsbn}`;
+  const labelId = `checkbox-list-secondary-label-${bookIsbn}`
   return (
     <ListItem key={bookIsbn} button onClick={navigateTo(bookIsbn)}>
       <ListItemAvatar>

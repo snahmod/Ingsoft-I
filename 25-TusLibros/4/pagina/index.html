@@ -188,7 +188,14 @@
     const removeFromCart = (cartID, isbn, handleResponse, onFailureDo) => {
       modifyCart('removeFromCart', cartID, isbn, handleResponse, onFailureDo)
     }
-
+    
+    const ROUTE_HOME = "/"
+    const ROUTE_CATALOG = "/catalog"
+    const ROUTE_CART = "/cart"
+    const ROUTE_BOOK = "/book"
+    const ROUTE_LISTPURCHASES = "/listPurchases"
+    const ROUTE_CHECKOUT = "/checkout"
+    const ROUTE_ERROR = "/error"
     class Carrrito {
       constructor() {
           this.items= {} 
@@ -212,11 +219,40 @@
       setEmptyCart(emptyCart) {
         this.emptyCarrito = JSON.parse(JSON.stringify(emptyCart))
       }
+    
+      getItems() {
+        return this.items
+      }
+    
+      getCartId() {
+        return this.cartID
+      }
+    
     }
+    class UserCredentials {
+        constructor() {
+            this.userID = ''
+            this.password = ''
+        }
+      
+        setUserCredentials(userID, password) {
+            this.userID = userID
+            this.password = password
+        }
+    
+        getUserId() {
+            return this.userID
+        }
+    
+        getPassword() {
+            return this.password
+        }
+      }
+          
 
         function MyToolBar(props) {
-          const classes = useStyles();
-          const {title, router, carrito} = props;
+          const classes = useStyles()
+          const {title, router, carrito} = props
         
           let menuButton = (
             <IconButton
@@ -225,7 +261,7 @@
               color="inherit"
               onClick={()=> {
                 carrito.emptyCart()
-                router.navigate("/", {})
+                router.navigate(ROUTE_HOME, {})
                 }
               }
               >
@@ -238,7 +274,7 @@
               edge="start"
               className={classes.menuButton}
               color="inherit"
-              onClick={()=>router.navigate("/cart", {})}
+              onClick={()=>router.navigate(ROUTE_CART, {})}
               >
               <Icon>shopping_cart</Icon>
             </IconButton>
@@ -249,7 +285,7 @@
               edge="start"
               className={classes.menuButton}
               color="inherit"
-              onClick={()=>router.navigate("/catalog", {})}
+              onClick={()=>router.navigate(ROUTE_CATALOG, {})}
               >
               <Icon>list</Icon>
             </IconButton>
@@ -260,13 +296,13 @@
               edge="start"
               className={classes.menuButton}
               color="inherit"
-              onClick={()=>router.navigate("/listPurchases", {})}
+              onClick={()=>router.navigate(ROUTE_LISTPURCHASES, {})}
               >
               <Icon>account_circle</Icon>
             </IconButton>
           )
     
-          if (router.current() === "/" || router.current() === "/error") {
+          if (router.current() === ROUTE_HOME || router.current() === ROUTE_ERROR) {
     
             menuButton = (<div></div>)
             carritoButton = (<div></div>)
@@ -285,7 +321,6 @@
                   <Typography variant="h6" className={classes.title}>
                     {title}
                   </Typography>
-                  {/*<Button color="inherit">Login</Button>*/}
                 </Toolbar>
               </AppBar>
             </div>
@@ -293,27 +328,28 @@
         }
     
     function LoginView(props) {
-      const { router, carrito } = props
-      const classes = useStyles();
+      const { router, carrito, userAuthCredential } = props
+      const classes = useStyles()
       const [userCredentials, setUserCredentials] = React.useState({
         userID: '',
         password: ''
       });
     
-      const [dialog, setDialog] = React.useState({ open: false, message: '' });
+      const [dialog, setDialog] = React.useState({ open: false, message: '' })
     
       const closeDialog = () => {
-        setDialog({ open: false, message: '' });
+        setDialog({ open: false, message: '' })
       };
     
       const handleChange = prop => event => {
-        setUserCredentials({ ...userCredentials, [prop]: event.target.value });
+        setUserCredentials({ ...userCredentials, [prop]: event.target.value })
       };
     
       const userLogin = (userID, password) => {
         login(userID, password, json => {
           carrito.setCartID(json.cartID)
-          router.navigate("/catalog", { userCredentials : userCredentials })
+          userAuthCredential.setUserCredentials(userID, password)
+          router.navigate(ROUTE_CATALOG)
         }, data => {
           setDialog({ open: true, message: data.message })
         })
@@ -387,7 +423,7 @@
     }
     function CatalogView(props) {
       const { router, catalog, carrito } = props
-      const classes = useStyles();
+      const classes = useStyles()
     
       return (
         <div>
@@ -415,14 +451,15 @@
     }
     // Component
     function CarritoView(props) {
-      const { router, reducedCatalog } = props
-      const classes = useStyles();
+      const { router, reducedCatalog, carrito } = props
+      const classes = useStyles()
     
       return (
         <div>
+          <CatalogView router={router} catalog={reducedCatalog} carrito={carrito}/>
           <Button variant="contained" color="primary" className={classes.button}
                   disabled = {Object.keys(reducedCatalog).length <= 0}
-                  onClick = {() => {router.navigate("/checkout", {})} }
+                  onClick = {() => {router.navigate(ROUTE_CHECKOUT, {})} }
                   >
             Check out
           </Button>
@@ -458,33 +495,33 @@
       )
     }
     function QuantityButtonsView(props) {
-      const { bookIsbn, router, catalog, carrito } = props
+      const { bookIsbn, router, carrito } = props
       const classes = useStyles();
     
-      const [itemsCount, setItemsCount] = React.useState(carrito.items);
+      const [itemsCount, setItemsCount] = React.useState(carrito.getItems());
     
       const modifyItemCount = (bookIsbn, quantity) => {
         const newCount = {...itemsCount};
-        newCount[bookIsbn].quantity = itemsCount[bookIsbn].quantity + quantity;
+        newCount[bookIsbn].quantity = itemsCount[bookIsbn].quantity + quantity
         setItemsCount(newCount)
         carrito.setCartItems(newCount)
-      };
+      }
     
       const handleInvalidResponse = (data) => {
         router.navigate('/error', { error: data.message })
-      };
+      }
     
       const incrementCount = bookIsbn => () => {
-        addToCart(carrito.cartID, bookIsbn, (data) => {
+        addToCart(carrito.getCartId(), bookIsbn, (data) => {
           modifyItemCount(bookIsbn, 1)
         }, handleInvalidResponse)
-      };
+      }
       
       const decrementCount = bookIsbn => () => {
-        removeFromCart(carrito.cartID, bookIsbn, (data) => {
+        removeFromCart(carrito.getCartId(), bookIsbn, (data) => {
           modifyItemCount(bookIsbn, -1)
         }, handleInvalidResponse)
-      };
+      }
     
       return (
         <div>
@@ -506,13 +543,13 @@
     }
     function BookListItemView(props) {
       const { router, catalog, bookIsbn, bookListItemQuantityView } = props
-      const classes = useStyles();
+      const classes = useStyles()
     
       const navigateTo = bookIsbn => () => {
         router.navigate("/book", { bookIsbn: bookIsbn })
-      };
+      }
     
-      const labelId = `checkbox-list-secondary-label-${bookIsbn}`;
+      const labelId = `checkbox-list-secondary-label-${bookIsbn}`
       return (
         <ListItem key={bookIsbn} button onClick={navigateTo(bookIsbn)}>
           <ListItemAvatar>
@@ -529,11 +566,11 @@
       );
     }    function PurchasesView(props) {
       const { router, catalog, userCredentials } = props
-      const [purchases, setPurchases] = React.useState({ items: [], total_amount: 0 });
-      const classes = useStyles();
+      const [purchases, setPurchases] = React.useState({ items: [], total_amount: 0 })
+      const classes = useStyles()
     
       React.useEffect(() => {
-        listPurchases(userCredentials.userID, userCredentials.password, (data) => {
+        listPurchases(userCredentials.getUserId(), userCredentials.getPassword(), (data) => {
           setPurchases(data)
         }, (data) => {
           router.navigate('/error', { error: data.message })
@@ -562,20 +599,15 @@
     }
     function CheckoutView(props) {
       const { router, catalog, carrito, userCredentials } = props
-      const classes = useStyles();
-      const [purchase, setPurchase] = React.useState({ items: [], total_amount: 0 });
+      const classes = useStyles()
+      const [purchase, setPurchase] = React.useState({ items: [], total_amount: 0 })
     
       React.useEffect(() => {
-        checkoutCart(carrito.cartID, (data) => {
+        checkoutCart(carrito.getCartId(), (data) => {
           setPurchase(data)
-          login(userCredentials.userID, userCredentials.password, json => {
-            console.log('carrito')
-            console.log(carrito)
+          login(userCredentials.getUserId(), userCredentials.getPassword(), json => {
             carrito.emptyCart()
             carrito.setCartID(json.cartID)
-            console.log('carrito')
-            console.log(carrito)
-            
           }, data => {})
         }, (data) => {
           router.navigate('/error', { error: data.message })
@@ -604,11 +636,11 @@
     }
     function ErrorView(props) {
       const { router, error, carrito} = props
-      const classes = useStyles();
+      const classes = useStyles()
     
       const navigateTo = () => () => {
         carrito.emptyCart()
-        router.navigate("/", {})
+        router.navigate(ROUTE_HOME, {})
       };
     
       return (
@@ -627,13 +659,12 @@
     
       constructor(props) {
         super(props);
-        var carrito = new Carrrito();
         this.state = {
           path: '/',
           catalog: {},
-          carrito: carrito,
+          carrito: new Carrrito(),
           bookIsbn: 0,
-          userCredentials: { userID: '', password: '' },
+          userCredentials: new UserCredentials(),
           purchases: { items: [], total_amount: 0 },
           error: ''
         };
@@ -641,7 +672,7 @@
       }
     
       componentWillMount() {
-        this.getCatalog();
+        this.getCatalog()
       }
     
       getCatalog(){
@@ -664,7 +695,7 @@
       }
     
       handleBook = data => {
-        var self = this;
+        var self = this
         getISBNApiAsJson(data.isbn)
           .then(function (response) {
             return response.json()
@@ -677,12 +708,12 @@
             newCatalog[data.isbn] = book
     
             var newCarrito = self.state.carrito
-            newCarrito.items[data.isbn] = { isbn: data.isbn, quantity: 0 }
+            newCarrito.getItems()[data.isbn] = { isbn: data.isbn, quantity: 0 }
             newCarrito.setEmptyCart(JSON.parse(JSON.stringify(newCarrito)))
             self.setState({ ...self.state, catalog: newCatalog, carrito: newCarrito })
           })
           .catch(function (error) {
-            console.log('Looks like there was a problem: \n', error);
+            console.log('Looks like there was a problem: \n', error)
           });
       }
     
@@ -698,21 +729,17 @@
     
         const reducedCatalog = {...this.state.catalog}
         Object.keys(this.state.catalog).forEach(isbn => {
-          if (this.state.carrito.items[isbn].quantity == 0) delete reducedCatalog[isbn]
+          if (this.state.carrito.getItems()[isbn].quantity == 0) delete reducedCatalog[isbn]
         })
-    
+        
         let routes = {
-          '/': <LoginView router={router} carrito={this.state.carrito} />,
-          '/catalog': <CatalogView router={router} catalog={this.state.catalog} carrito={this.state.carrito}/>,
-          '/cart': 
-              <div>
-                <CatalogView router={router} catalog={reducedCatalog} carrito={this.state.carrito}/>
-                <CarritoView router={router} reducedCatalog={reducedCatalog}/>
-              </div>,
-          '/book': <BookView router={router} bookIsbn={this.state.bookIsbn} catalog={this.state.catalog} carrito={this.state.carrito}/>,
-          '/listPurchases': <PurchasesView router={router} catalog={this.state.catalog} userCredentials={this.state.userCredentials}/>,
-          '/checkout': <CheckoutView router={router} catalog={this.state.catalog} carrito={this.state.carrito} userCredentials={this.state.userCredentials}/>,
-          '/error': <ErrorView router={router} error={this.state.error} carrito = {this.state.carrito}/>
+          [ROUTE_HOME]: <LoginView router={router} carrito={this.state.carrito} userAuthCredential={this.state.userCredentials} />,
+          [ROUTE_CATALOG] : <CatalogView router={router} catalog={this.state.catalog} carrito={this.state.carrito}/>,
+          [ROUTE_CART]: <CarritoView router={router} reducedCatalog={reducedCatalog} carrito={this.state.carrito}/>,
+          [ROUTE_BOOK]: <BookView router={router} bookIsbn={this.state.bookIsbn} catalog={this.state.catalog} carrito={this.state.carrito}/>,
+          [ROUTE_LISTPURCHASES]: <PurchasesView router={router} catalog={this.state.catalog} userCredentials={this.state.userCredentials}/>,
+          [ROUTE_CHECKOUT]: <CheckoutView router={router} catalog={this.state.catalog} carrito={this.state.carrito} userCredentials={this.state.userCredentials}/>,
+          [ROUTE_ERROR]: <ErrorView router={router} error={this.state.error} carrito = {this.state.carrito}/>
         }
     
         return (
@@ -720,6 +747,7 @@
             <MyToolBar
               title={title}
               router={router}
+              carrito={this.state.carrito}
             />
             <Container maxWidth="md">
               <div style={{ marginTop: 20, }}>

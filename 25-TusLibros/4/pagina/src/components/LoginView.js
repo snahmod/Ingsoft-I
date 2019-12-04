@@ -1,26 +1,27 @@
 
 function LoginView(props) {
-  const { router, carrito } = props
-  const classes = useStyles();
+  const { router, carrito, userAuthCredential } = props
+  const classes = useStyles()
   const [userCredentials, setUserCredentials] = React.useState({
     userID: '',
     password: ''
   });
 
-  const [dialog, setDialog] = React.useState({ open: false, message: '' });
+  const [dialog, setDialog] = React.useState({ open: false, message: '' })
 
   const closeDialog = () => {
-    setDialog({ open: false, message: '' });
+    setDialog({ open: false, message: '' })
   };
 
   const handleChange = prop => event => {
-    setUserCredentials({ ...userCredentials, [prop]: event.target.value });
+    setUserCredentials({ ...userCredentials, [prop]: event.target.value })
   };
 
   const userLogin = (userID, password) => {
     login(userID, password, json => {
       carrito.setCartID(json.cartID)
-      router.navigate("/catalog", { userCredentials : userCredentials })
+      userAuthCredential.setUserCredentials(userID, password)
+      router.navigate(ROUTE_CATALOG)
     }, data => {
       setDialog({ open: true, message: data.message })
     })

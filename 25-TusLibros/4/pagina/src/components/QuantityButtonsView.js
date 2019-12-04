@@ -1,31 +1,31 @@
 function QuantityButtonsView(props) {
-  const { bookIsbn, router, catalog, carrito } = props
+  const { bookIsbn, router, carrito } = props
   const classes = useStyles();
 
-  const [itemsCount, setItemsCount] = React.useState(carrito.items);
+  const [itemsCount, setItemsCount] = React.useState(carrito.getItems());
 
   const modifyItemCount = (bookIsbn, quantity) => {
     const newCount = {...itemsCount};
-    newCount[bookIsbn].quantity = itemsCount[bookIsbn].quantity + quantity;
+    newCount[bookIsbn].quantity = itemsCount[bookIsbn].quantity + quantity
     setItemsCount(newCount)
     carrito.setCartItems(newCount)
-  };
+  }
 
   const handleInvalidResponse = (data) => {
     router.navigate('/error', { error: data.message })
-  };
+  }
 
   const incrementCount = bookIsbn => () => {
-    addToCart(carrito.cartID, bookIsbn, (data) => {
+    addToCart(carrito.getCartId(), bookIsbn, (data) => {
       modifyItemCount(bookIsbn, 1)
     }, handleInvalidResponse)
-  };
+  }
   
   const decrementCount = bookIsbn => () => {
-    removeFromCart(carrito.cartID, bookIsbn, (data) => {
+    removeFromCart(carrito.getCartId(), bookIsbn, (data) => {
       modifyItemCount(bookIsbn, -1)
     }, handleInvalidResponse)
-  };
+  }
 
   return (
     <div>

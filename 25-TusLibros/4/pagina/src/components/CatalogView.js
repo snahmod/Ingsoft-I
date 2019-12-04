@@ -1,6 +1,6 @@
 function CatalogView(props) {
   const { router, catalog, carrito } = props
-  const classes = useStyles();
+  const classes = useStyles()
 
   return (
     <div>

@@ -4,13 +4,12 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    var carrito = new Carrrito();
     this.state = {
       path: '/',
       catalog: {},
-      carrito: carrito,
+      carrito: new Carrrito(),
       bookIsbn: 0,
-      userCredentials: { userID: '', password: '' },
+      userCredentials: new UserCredentials(),
       purchases: { items: [], total_amount: 0 },
       error: ''
     };
@@ -18,7 +17,7 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    this.getCatalog();
+    this.getCatalog()
   }
 
   getCatalog(){
@@ -41,7 +40,7 @@ class App extends React.Component {
   }
 
   handleBook = data => {
-    var self = this;
+    var self = this
     getISBNApiAsJson(data.isbn)
       .then(function (response) {
         return response.json()
@@ -54,12 +53,12 @@ class App extends React.Component {
         newCatalog[data.isbn] = book
 
         var newCarrito = self.state.carrito
-        newCarrito.items[data.isbn] = { isbn: data.isbn, quantity: 0 }
+        newCarrito.getItems()[data.isbn] = { isbn: data.isbn, quantity: 0 }
         newCarrito.setEmptyCart(JSON.parse(JSON.stringify(newCarrito)))
         self.setState({ ...self.state, catalog: newCatalog, carrito: newCarrito })
       })
       .catch(function (error) {
-        console.log('Looks like there was a problem: \n', error);
+        console.log('Looks like there was a problem: \n', error)
       });
   }
 
@@ -75,21 +74,17 @@ class App extends React.Component {
 
     const reducedCatalog = {...this.state.catalog}
     Object.keys(this.state.catalog).forEach(isbn => {
-      if (this.state.carrito.items[isbn].quantity == 0) delete reducedCatalog[isbn]
+      if (this.state.carrito.getItems()[isbn].quantity == 0) delete reducedCatalog[isbn]
     })
-
+    
     let routes = {
-      '/': <LoginView router={router} carrito={this.state.carrito} />,
-      '/catalog': <CatalogView router={router} catalog={this.state.catalog} carrito={this.state.carrito}/>,
-      '/cart': 
-          <div>
-            <CatalogView router={router} catalog={reducedCatalog} carrito={this.state.carrito}/>
-            <CarritoView router={router} reducedCatalog={reducedCatalog}/>
-          </div>,
-      '/book': <BookView router={router} bookIsbn={this.state.bookIsbn} catalog={this.state.catalog} carrito={this.state.carrito}/>,
-      '/listPurchases': <PurchasesView router={router} catalog={this.state.catalog} userCredentials={this.state.userCredentials}/>,
-      '/checkout': <CheckoutView router={router} catalog={this.state.catalog} carrito={this.state.carrito} userCredentials={this.state.userCredentials}/>,
-      '/error': <ErrorView router={router} error={this.state.error} carrito = {this.state.carrito}/>
+      [ROUTE_HOME]: <LoginView router={router} carrito={this.state.carrito} userAuthCredential={this.state.userCredentials} />,
+      [ROUTE_CATALOG] : <CatalogView router={router} catalog={this.state.catalog} carrito={this.state.carrito}/>,
+      [ROUTE_CART]: <CarritoView router={router} reducedCatalog={reducedCatalog} carrito={this.state.carrito}/>,
+      [ROUTE_BOOK]: <BookView router={router} bookIsbn={this.state.bookIsbn} catalog={this.state.catalog} carrito={this.state.carrito}/>,
+      [ROUTE_LISTPURCHASES]: <PurchasesView router={router} catalog={this.state.catalog} userCredentials={this.state.userCredentials}/>,
+      [ROUTE_CHECKOUT]: <CheckoutView router={router} catalog={this.state.catalog} carrito={this.state.carrito} userCredentials={this.state.userCredentials}/>,
+      [ROUTE_ERROR]: <ErrorView router={router} error={this.state.error} carrito = {this.state.carrito}/>
     }
 
     return (
@@ -97,6 +92,7 @@ class App extends React.Component {
         <MyToolBar
           title={title}
           router={router}
+          carrito={this.state.carrito}
         />
         <Container maxWidth="md">
           <div style={{ marginTop: 20, }}>

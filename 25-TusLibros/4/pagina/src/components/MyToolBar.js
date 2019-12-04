@@ -1,6 +1,6 @@
     function MyToolBar(props) {
-      const classes = useStyles();
-      const {title, router, carrito} = props;
+      const classes = useStyles()
+      const {title, router, carrito} = props
     
       let menuButton = (
         <IconButton
@@ -9,7 +9,7 @@
           color="inherit"
           onClick={()=> {
             carrito.emptyCart()
-            router.navigate("/", {})
+            router.navigate(ROUTE_HOME, {})
             }
           }
           >
@@ -22,7 +22,7 @@
           edge="start"
           className={classes.menuButton}
           color="inherit"
-          onClick={()=>router.navigate("/cart", {})}
+          onClick={()=>router.navigate(ROUTE_CART, {})}
           >
           <Icon>shopping_cart</Icon>
         </IconButton>
@@ -33,7 +33,7 @@
           edge="start"
           className={classes.menuButton}
           color="inherit"
-          onClick={()=>router.navigate("/catalog", {})}
+          onClick={()=>router.navigate(ROUTE_CATALOG, {})}
           >
           <Icon>list</Icon>
         </IconButton>
@@ -44,13 +44,13 @@
           edge="start"
           className={classes.menuButton}
           color="inherit"
-          onClick={()=>router.navigate("/listPurchases", {})}
+          onClick={()=>router.navigate(ROUTE_LISTPURCHASES, {})}
           >
           <Icon>account_circle</Icon>
         </IconButton>
       )
 
-      if (router.current() === "/" || router.current() === "/error") {
+      if (router.current() === ROUTE_HOME || router.current() === ROUTE_ERROR) {
 
         menuButton = (<div></div>)
         carritoButton = (<div></div>)
@@ -69,7 +69,6 @@
               <Typography variant="h6" className={classes.title}>
                 {title}
               </Typography>
-              {/*<Button color="inherit">Login</Button>*/}
             </Toolbar>
           </AppBar>
         </div>

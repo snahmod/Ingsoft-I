@@ -1,0 +1,7 @@
+const ROUTE_HOME = "/"
+const ROUTE_CATALOG = "/catalog"
+const ROUTE_CART = "/cart"
+const ROUTE_BOOK = "/book"
+const ROUTE_LISTPURCHASES = "/listPurchases"
+const ROUTE_CHECKOUT = "/checkout"
+const ROUTE_ERROR = "/error"

@@ -21,4 +21,13 @@ class Carrrito {
   setEmptyCart(emptyCart) {
     this.emptyCarrito = JSON.parse(JSON.stringify(emptyCart))
   }
+
+  getItems() {
+    return this.items
+  }
+
+  getCartId() {
+    return this.cartID
+  }
+
 }

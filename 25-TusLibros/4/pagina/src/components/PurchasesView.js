@@ -1,10 +1,10 @@
 function PurchasesView(props) {
   const { router, catalog, userCredentials } = props
-  const [purchases, setPurchases] = React.useState({ items: [], total_amount: 0 });
-  const classes = useStyles();
+  const [purchases, setPurchases] = React.useState({ items: [], total_amount: 0 })
+  const classes = useStyles()
 
   React.useEffect(() => {
-    listPurchases(userCredentials.userID, userCredentials.password, (data) => {
+    listPurchases(userCredentials.getUserId(), userCredentials.getPassword(), (data) => {
       setPurchases(data)
     }, (data) => {
       router.navigate('/error', { error: data.message })
